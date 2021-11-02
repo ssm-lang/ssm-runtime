@@ -27,9 +27,9 @@ RED = \e[31m
 GREEN = \e[32m
 RESET_COLOR = \e[0m
 
-ARFLAGS = -crU
+ARFLAGS = -cr
 
-all : test-examples test_main
+all : test-examples test_main test-throw
 
 test_main : build/test_main
 	./build/test_main > build/test_main.out || echo "${RED}TEST_MAIN FAILED${RESET_COLOR}"
@@ -41,9 +41,19 @@ test-examples : examples
 	@(diff test/examples.out build/examples.out && \
 	echo "${GREEN}EXAMPLES PASSED${RESET_COLOR}") || \
 	echo "${RED}EXAMPLE OUTPUT DIFFERS${RESET_COLOR}"
+test-throw : build/test-throw build/test-throw-override
+	timeout -v 0.01 ./build/test-throw >build/test-throw.out 2>&1 || true
+	timeout -v 0.01 ./build/test-throw-override >>build/test-throw.out 2>&1 || true
+	@(diff test/test-throw.out build/test-throw.out && \
+	echo "${GREEN}EXAMPLES PASSED${RESET_COLOR}") || \
+	echo "${RED}EXAMPLE OUTPUT DIFFERS${RESET_COLOR}"
 
 build/test_main : test/test_main.c build/libssm.a
 	$(CC) $(CFLAGS) -o $@ test/test_main.c -Lbuild -lssm
+build/test-throw : test/test-throw.c build/libssm.a
+	$(CC) $(CFLAGS) -o $@ test/test-throw.c -Lbuild -lssm
+build/test-throw-override : test/test-throw.c test/override-throw.c build/libssm.a
+	$(CC) $(CFLAGS) -o $@ test/test-throw.c test/override-throw.c -Lbuild -lssm
 
 # Requires COVERAGE_CFLAGS to be set
 ssm-scheduler.c.gcov : build/test_main
@@ -64,9 +74,7 @@ build/libssm.a : $(INCLUDES) $(OBJECTS)
 	rm -f build/libssm.a
 	$(AR) $(ARFLAGS) build/libssm.a $(OBJECTS)
 
-$(OBJECTS) : $(INCLUDES) $(SOURCES)
-
-build/%.o : src/%.c
+build/%.o : src/%.c $(INCLUDES)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 examples : $(EXAMPLEEXES)
