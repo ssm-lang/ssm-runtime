@@ -14,7 +14,16 @@ TEST_CFLAGS = -g -DSSM_DEBUG
 # FIXME: use our own assert for unit testing that decays into a call of
 # of a vacuous function when we're doing coverage testing.
 
-CFLAGS = -Iinclude -O -Wall -pedantic -std=c99 $(TEST_CFLAGS) $(COVERAGE_CFLAGS)
+ROOTDIR = $(realpath .)
+PLATFLAGS = -O -I$(ROOTDIR)/include
+ifdef PLATFORM
+PLATFLAGS += -I$(ROOTDIR)/platform/$(PLATFORM)/include
+ifdef BOARD
+PLATFLAGS += -I$(ROOTDIR)/platform/$(PLATFORM)/boards/$(BOARD)/include \
+	     -DPLATFORM_BOARD -DPLATFORM_BOARD_$(BOARD)
+endif
+endif
+CFLAGS =  $(PLATFLAGS) -Wall -pedantic -std=c99 $(TEST_CFLAGS) $(COVERAGE_CFLAGS)
 
 SOURCES = $(wildcard src/*.c)
 INCLUDES = $(wildcard include/*.h)
@@ -29,6 +38,7 @@ RESET_COLOR = \e[0m
 
 ARFLAGS = -cr
 
+ifndef PLATFORM
 all : test-examples test_main test-throw
 
 test_main : build/test_main
@@ -54,6 +64,29 @@ build/test-throw : test/test-throw.c build/libssm.a
 	$(CC) $(CFLAGS) -o $@ test/test-throw.c -Lbuild -lssm
 build/test-throw-override : test/test-throw.c test/override-throw.c build/libssm.a
 	$(CC) $(CFLAGS) -o $@ test/test-throw.c test/override-throw.c -Lbuild -lssm
+else # PLATFORM
+
+ifeq ("$(wildcard platform/$(PLATFORM))","")
+$(error PLATFORM must be one of the following: $(shell ls platform))
+endif
+ifndef BOARD
+ifneq ("$(wildcard platform/$(PLATFORM)/boards/"),"")
+$(error BOARD must be specified)
+endif
+LIBPLATFORM = build/libssm_platform.$(PLATFORM).a
+else # BOARD
+ifeq ("$(wildcard platform/$(PLATFORM)/boards/$(BOARD))","")
+$(error BOARD must be one of the following: $(shell ls platform/$(PLATFORM)/boards))
+endif
+LIBPLATFORM = build/libssm_platform.$(PLATFORM).$(BOARD).a
+endif # BOARD
+
+all : build/libssm.a $(LIBPLATFORM)
+	# Checking that platform build system linked in src/platform/ code
+	nm $(LIBPLATFORM) | grep ssm_tick_loop > /dev/null
+
+include platform/$(PLATFORM)/Makefile
+endif # PLATFORM
 
 # Requires COVERAGE_CFLAGS to be set
 ssm-scheduler.c.gcov : build/test_main
@@ -81,8 +114,6 @@ examples : $(EXAMPLEEXES)
 
 build/% : examples/%.c build/libssm.a
 	$(CC) $(CFLAGS) -o $@ $< -Lbuild -lssm
-
-
 
 documentation : doc/html/index.html
 

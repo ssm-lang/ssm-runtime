@@ -85,6 +85,10 @@ void ssm_throw(int reason, const char *file, int line, const char *func);
  */
 #define SSM_THROW(reason) ssm_throw(reason, __FILE__, __LINE__, __func__)
 
+#define SSM_ASSERT(cond)                \
+  if (!(cond))                          \
+    SSM_THROW(SSM_INTERNAL_ERROR)
+
 /** Error codes, indicating reason for failure.
  *
  * Platforms may extend the list of errors using SSM_PLATFORM_ERROR like this:

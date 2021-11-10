@@ -1,0 +1,2 @@
+Note that the platform-specific build system is responsible for compiling these
+source files and linking them into the platform library.

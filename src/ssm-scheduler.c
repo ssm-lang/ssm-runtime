@@ -66,14 +66,14 @@ void ssm_reset()
 
 bool ssm_event_on(ssm_sv_t *var)
 {
-  assert(var);
+  SSM_ASSERT(var);
   return var->last_updated == now;
 }
 
 void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trigger)
 {
-  assert(var);
-  assert(trigger);
+  SSM_ASSERT(var);
+  SSM_ASSERT(trigger);
 
   /* Point us to the first element */
   trigger->next = var->triggers;
@@ -91,8 +91,8 @@ void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trigger)
 
 void ssm_desensitize(ssm_trigger_t *trigger)
 {
-  assert(trigger);
-  assert(trigger->prev_ptr);
+  SSM_ASSERT(trigger);
+  SSM_ASSERT(trigger->prev_ptr);
 
   /* Tell predecessor to skip us */
   *trigger->prev_ptr = trigger->next;
@@ -104,7 +104,7 @@ void ssm_desensitize(ssm_trigger_t *trigger)
 
 void ssm_trigger(ssm_sv_t *var, ssm_priority_t priority)
 {
-  assert(var);
+  SSM_ASSERT(var);
   for (ssm_trigger_t *trig = var->triggers ; trig ; trig = trig->next)
     if (trig->act->priority > priority)
       ssm_activate(trig->act);       
@@ -120,8 +120,8 @@ void ssm_trigger(ssm_sv_t *var, ssm_priority_t priority)
  */
 SSM_STATIC_INLINE void act_queue_percolate_up(q_idx_t hole, ssm_act_t *act)
 {
-  assert(act);
-  assert(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
+  SSM_ASSERT(act);
+  SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
   ssm_priority_t priority = act->priority;
   for ( ; hole > SSM_QUEUE_HEAD && priority < act_queue[hole >> 1]->priority ;
 	hole >>= 1 )
@@ -142,8 +142,8 @@ SSM_STATIC_INLINE void act_queue_percolate_up(q_idx_t hole, ssm_act_t *act)
 SSM_STATIC_INLINE void act_queue_percolate_down(q_idx_t hole,
 						ssm_act_t *act)
 {
-  assert(act);
-  assert(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
+  SSM_ASSERT(act);
+  SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
   ssm_priority_t priority = act->priority;
   for (;;) {
     // Find the earlier of the two children
@@ -163,7 +163,7 @@ SSM_STATIC_INLINE void act_queue_percolate_down(q_idx_t hole,
 
 void ssm_activate(ssm_act_t *act)
 {
-  assert(act);
+  SSM_ASSERT(act);
   if (act->scheduled) return; // Don't activate an already activated routine
 
   q_idx_t hole = ++act_queue_len;
@@ -192,17 +192,17 @@ ssm_time_t ssm_now() { return now; }
 SSM_STATIC_INLINE
 q_idx_t find_queued_event(ssm_sv_t *var /**< must be non-NULL */)
 {
-  assert(var); // Should be a real variable
-  assert(var->later_time != SSM_NEVER); // Should be in the queue
+  SSM_ASSERT(var); // Should be a real variable
+  SSM_ASSERT(var->later_time != SSM_NEVER); // Should be in the queue
   for (q_idx_t i = SSM_QUEUE_HEAD ; i <= event_queue_len ; i++)
     if (event_queue[i] == var) return i;
-  assert(0); // Should have found the variable if it was marked as queued
+  SSM_ASSERT(0); // Should have found the variable if it was marked as queued
   return 0;
 }
 
 void ssm_initialize(ssm_sv_t *var, void (*update)(ssm_sv_t *))
 {
-  assert(var);
+  SSM_ASSERT(var);
   *var = (ssm_sv_t){
     .update = update,
     .triggers = 0,
@@ -221,8 +221,8 @@ void ssm_initialize(ssm_sv_t *var, void (*update)(ssm_sv_t *))
 SSM_STATIC_INLINE void event_queue_percolate_up(q_idx_t hole,
 						ssm_sv_t *var)
 {
-  assert(var);
-  assert(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);  
+  SSM_ASSERT(var);
+  SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);  
   ssm_time_t later = var->later_time;
   for ( ; hole > SSM_QUEUE_HEAD &&
 	  later < event_queue[hole >> 1]->later_time ; hole >>= 1 )
@@ -242,8 +242,8 @@ SSM_STATIC_INLINE void event_queue_percolate_up(q_idx_t hole,
 SSM_STATIC_INLINE void event_queue_percolate_down(q_idx_t hole,
 						  ssm_sv_t *event)
 {
-  assert(event);
-  assert(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);
+  SSM_ASSERT(event);
+  SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);
   ssm_time_t later = event->later_time;
   for (;;) {
     // Find the earlier of the two children
@@ -263,7 +263,7 @@ SSM_STATIC_INLINE void event_queue_percolate_down(q_idx_t hole,
 
 void ssm_schedule(ssm_sv_t *var, ssm_time_t later)
 {
-  assert(var);      // A real variable
+  SSM_ASSERT(var);      // A real variable
   if (later <= now) // "later" must be in the future
     SSM_THROW(SSM_INVALID_TIME);
 
@@ -292,7 +292,7 @@ void ssm_schedule(ssm_sv_t *var, ssm_time_t later)
 
 void ssm_unschedule(ssm_sv_t *var)
 {
-  assert(var);        // A real variable
+  SSM_ASSERT(var);        // A real variable
   if (var->later_time != SSM_NEVER) {
     q_idx_t hole = find_queued_event(var);
     var->later_time = SSM_NEVER;
@@ -313,7 +313,7 @@ void ssm_tick()
 {
   // Advance time to the earliest event in the queue
   if (event_queue_len > 0) {
-    assert(now < event_queue[SSM_QUEUE_HEAD]->later_time); // No time-traveling!
+    SSM_ASSERT(now < event_queue[SSM_QUEUE_HEAD]->later_time); // No time-traveling!
     now = event_queue[SSM_QUEUE_HEAD]->later_time;
   }
     
@@ -361,18 +361,18 @@ void event_queue_consistency_check()
 {
   if (event_queue_len == 0) return;
   
-  assert(event_queue_len <= SSM_EVENT_QUEUE_SIZE); // No overflow
+  SSM_ASSERT(event_queue_len <= SSM_EVENT_QUEUE_SIZE); // No overflow
 
   for (q_idx_t i = SSM_QUEUE_HEAD ; i <= event_queue_len ; i++) {
-    assert(event_queue[i]); // Events should be valid
-    assert(event_queue[i]->later_time != SSM_NEVER); // Queue events should have valid time
+    SSM_ASSERT(event_queue[i]); // Events should be valid
+    SSM_ASSERT(event_queue[i]->later_time != SSM_NEVER); // Queue events should have valid time
     q_idx_t child = i << 1;
     if (child <= event_queue_len) {
-      assert(event_queue[child]);
-      assert(event_queue[child]->later_time >= event_queue[i]->later_time);
+      SSM_ASSERT(event_queue[child]);
+      SSM_ASSERT(event_queue[child]->later_time >= event_queue[i]->later_time);
       if (++child <= event_queue_len) {
-	assert(event_queue[child]);
-	assert(event_queue[child]->later_time >= event_queue[i]->later_time);
+	SSM_ASSERT(event_queue[child]);
+	SSM_ASSERT(event_queue[child]->later_time >= event_queue[i]->later_time);
       }
     }
   }
@@ -384,18 +384,18 @@ void act_queue_consistency_check()
 {
   if (act_queue_len == 0) return;
   
-  assert(act_queue_len <= SSM_ACT_QUEUE_SIZE); // No overflow
+  SSM_ASSERT(act_queue_len <= SSM_ACT_QUEUE_SIZE); // No overflow
 
   for (q_idx_t i = SSM_QUEUE_HEAD ; i <= act_queue_len ; i++) {
-    assert(act_queue[i]); // Acts should be valid
-    assert(act_queue[i]->scheduled); // If it's in the queue, it should say so
+    SSM_ASSERT(act_queue[i]); // Acts should be valid
+    SSM_ASSERT(act_queue[i]->scheduled); // If it's in the queue, it should say so
     q_idx_t child = i << 1;
     if (child <= act_queue_len) {
-      assert(act_queue[child]);
-      assert(act_queue[child]->priority >= act_queue[i]->priority);
+      SSM_ASSERT(act_queue[child]);
+      SSM_ASSERT(act_queue[child]->priority >= act_queue[i]->priority);
       if (++child <= act_queue_len) {
-	assert(act_queue[child]);
-	assert(act_queue[child]->priority >= act_queue[i]->priority);
+	SSM_ASSERT(act_queue[child]);
+	SSM_ASSERT(act_queue[child]->priority >= act_queue[i]->priority);
       }
     }
   }
