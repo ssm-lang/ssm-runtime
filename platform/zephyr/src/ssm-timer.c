@@ -140,7 +140,7 @@ int ssm_timer_cancel_alarm(void) {
 }
 
 uint32_t ssm_timer32_read(void) {
-  uint32_t hi0, lo, hi1;
-  ssm_timer_read_to(&hi0, &lo, &hi1);
-  return ssm_timer_calc(hi0, lo, hi1);
+  uint32_t ticks;
+  counter_get_value(ssm_timer_dev, &ticks);
+  return ticks;
 }
