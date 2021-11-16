@@ -2,7 +2,7 @@
 
 void ssm_assign_event(ssm_event_t *v, ssm_priority_t prio)
 {
-  assert(v);
+  SSM_ASSERT(v);
   v->sv.last_updated = ssm_now();
   ssm_trigger(&v->sv, prio);
 }
