@@ -5,7 +5,6 @@
  */
 #include <platform/ssm-io.h>
 #include <platform/ssm-sem.h>
-#include <platform/ssm-platform.h>
 #include <platform/ssm-timer.h>
 #include <platform/ssm-log.h>
 #include <platform/ssm-prof.h>

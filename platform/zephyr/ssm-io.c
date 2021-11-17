@@ -5,16 +5,11 @@
 
 #include <devicetree.h>
 #include <drivers/gpio.h>
+#include <sys/util_macro.h>
 
 /**** INPUT *******************************************************************/
 
 SSM_RB_DECLARE(ssm_input_packet_t, ssm_input_buffer, 12);
-
-typedef struct {
-  struct gpio_dt_spec spec;
-  struct gpio_callback cb;
-  ssm_sv_t *sv;
-} ssm_input_t;
 
 static void input_event_handler(const struct device *port,
                                 struct gpio_callback *cb,
@@ -86,56 +81,15 @@ static int initialize_input_gpio_bool(ssm_sv_t *sv, ssm_input_t *in) {
   return initialize_input_gpio_edge(sv, in, GPIO_INT_EDGE_BOTH);
 }
 
-static int initialize_input_gpio_event(ssm_sv_t *sv, ssm_input_t *in) {
+int initialize_input_gpio_event(ssm_sv_t *sv, ssm_input_t *in) {
   return initialize_input_gpio_edge(sv, in, GPIO_INT_EDGE_TO_ACTIVE);
 }
 
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(sw0), okay)
-#error "sw0 device alias not defined"
-#endif
-#ifdef PLATFORM_BOARD_nrf52840_dk
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(sw1), okay)
-#error "sw1 device alias not defined"
-#endif
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(sw2), okay)
-#error "sw2 device alias not defined"
-#endif
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(sw3), okay)
-#error "sw3 device alias not defined"
-#endif
-#endif
+#define SSM_INPUT(i, _) {.spec = SSM_IN_SPEC_##i},
 
-struct {
-  ssm_input_t in;
-  ssm_input_setup_t init;
-} static_inputs[] = {
-    [0] = {.in = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(sw0), gpios)},
-           .init = initialize_input_gpio_event},
-#ifdef PLATFORM_BOARD_nrf52840_dk
-    [1] = {.in = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(sw1), gpios)},
-           .init = initialize_input_gpio_event},
-    [2] = {.in = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(sw2), gpios)},
-           .init = initialize_input_gpio_event},
-    [3] = {.in = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(sw3), gpios)},
-           .init = initialize_input_gpio_event},
-#endif
+ssm_input_t static_inputs[SSM_IN_COUNT] = {
+  UTIL_LISTIFY(SSM_IN_COUNT, SSM_INPUT)
 };
-
-int bind_static_input_device(ssm_sv_t *sv, int fd) {
-  return static_inputs[fd].init(sv, &static_inputs[fd].in);
-}
-
-typedef struct {
-  /** Activation record fields */
-  ssm_act_t act;
-  ssm_trigger_t trigger;
-
-  /** Statically initialized for static output devices */
-  struct gpio_dt_spec spec;
-
-  /** Bound at runtime */
-  ssm_sv_t *sv;
-} ssm_output_t;
 
 /**** OUTPUT ******************************************************************/
 
@@ -158,10 +112,10 @@ static void step_out_gpio_bool_handler(ssm_act_t *actg) {
   // ssm_desensitize(&out->trigger);
 }
 
-static int initialize_output_gpio_bool(ssm_act_t *parent,
-                                       ssm_priority_t priority,
-                                       ssm_depth_t depth, ssm_sv_t *sv,
-                                       ssm_output_t *out) {
+int initialize_output_gpio_bool(ssm_act_t *parent,
+                                ssm_priority_t priority,
+                                ssm_depth_t depth, ssm_sv_t *sv,
+                                ssm_output_t *out) {
   int err;
 
   out->sv = sv;
@@ -188,43 +142,8 @@ static int initialize_output_gpio_bool(ssm_act_t *parent,
   return 0;
 }
 
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay)
-#error "led0 device alias not defined"
-#endif
-#ifdef PLATFORM_BOARD_nrf52840_dk
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(led1), okay)
-#error "led1 device alias not defined"
-#endif
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(led2), okay)
-#error "led2 device alias not defined"
-#endif
-#if !DT_NODE_HAS_STATUS(DT_ALIAS(led3), okay)
-#error "led3 device alias not defined"
-#endif
-#endif
+#define SSM_OUTPUT(i, _) {.spec = SSM_OUT_SPEC_##i},
 
-typedef int (*ssm_output_setup_t)(ssm_act_t *parent, ssm_priority_t priority,
-                                  ssm_depth_t depth, ssm_sv_t *sv,
-                                  ssm_output_t *out);
-
-static struct {
-  ssm_output_t out;
-  ssm_output_setup_t init;
-} static_outputs[] = {
-    [0] = {.out = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios)},
-           .init = initialize_output_gpio_bool},
-#ifdef PLATFORM_BOARD_nrf52840_dk
-    [1] = {.out = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios)},
-           .init = initialize_output_gpio_bool},
-    [2] = {.out = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios)},
-           .init = initialize_output_gpio_bool},
-    [3] = {.out = {.spec = GPIO_DT_SPEC_GET(DT_ALIAS(led3), gpios)},
-           .init = initialize_output_gpio_bool},
-#endif
+ssm_output_t static_outputs[SSM_OUT_COUNT] = {
+  UTIL_LISTIFY(SSM_OUT_COUNT, SSM_OUTPUT)
 };
-
-ssm_act_t *bind_static_output_device(ssm_act_t *parent, ssm_priority_t priority,
-                                     ssm_depth_t depth, ssm_sv_t *sv, int fd) {
-  static_outputs[fd].init(parent, priority, depth, sv, &static_outputs[fd].out);
-  return &static_outputs[fd].out.act;
-}
