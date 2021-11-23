@@ -200,15 +200,15 @@ q_idx_t find_queued_event(ssm_sv_t *var /**< must be non-NULL */)
   return 0;
 }
 
-void ssm_initialize(ssm_sv_t *var, void (*update)(ssm_sv_t *))
+void ssm_initialize(ssm_sv_t *var)
 {
   assert(var);
-  *var = (ssm_sv_t){
-    .update = update,
-    .triggers = 0,
-    .later_time = SSM_NEVER,
-    .last_updated = SSM_NEVER
-  };
+  var->mm.val_count = 0;
+  var->mm.tag = SSM_SV_T;
+  var->mm.ref_count = 0;
+  var->triggers = NULL;
+  var->later_time = SSM_NEVER;
+  var->last_updated = SSM_NEVER;
 }
 
 /** Starting at the hole, walk up toward the root of the tree, copying
@@ -309,27 +309,24 @@ void ssm_unschedule(ssm_sv_t *var)
   }
 }
 
-void ssm_tick()
+void ssm_tick(ssm_time_t next_time)
 {
-  // Advance time to the earliest event in the queue
-  if (event_queue_len > 0) {
+  if (next_time != SSM_NEVER) {
+    assert(now < next_time); // No time-traveling!
+    assert(next_time <= event_queue[SSM_QUEUE_HEAD]->later_time);
+    now = next_time;
+  } else if (event_queue_len > 0) {
+    // Advance time to the earliest event in the queue
     assert(now < event_queue[SSM_QUEUE_HEAD]->later_time); // No time-traveling!
     now = event_queue[SSM_QUEUE_HEAD]->later_time;
+  } else {
+    SSM_THROW(SSM_INTERNAL_ERROR);
   }
-    
-  /* Update every variable in the event queue at the current time */
-  while (event_queue_len > 0 &&
-	 event_queue[SSM_QUEUE_HEAD]->later_time == now) {
-    
-    ssm_sv_t *sv = event_queue[SSM_QUEUE_HEAD];
-    (*sv->update)(sv);  // Update the scheduled variable
-    sv->last_updated = now;
-    sv->later_time = SSM_NEVER;
 
-    /* Schedule all sensitive triggers */
-    for (ssm_trigger_t *trigger = sv->triggers ; trigger ;
-	 trigger = trigger->next)
-      ssm_activate(trigger->act);
+  /* Update every variable in the event queue at the current time */
+  while (event_queue_len > 0 && event_queue[SSM_QUEUE_HEAD]->later_time == now) {
+    ssm_sv_t *sv = event_queue[SSM_QUEUE_HEAD];
+    ssm_update(sv, now);
 
     /* Remove the top event from the queue by inserting the last
        element in the queue at the front and percolating it toward the leaves */

@@ -68,7 +68,7 @@ See [the detailed documentation](@ref all)
 #define SSM_ACT_FREE(ptr, size) free(ptr)
 #endif
 
-/** Underlying exception handler; can be overridden by each platform
+/** Underlying exception handler; must be overridden by each platform
  *
  * ssm_throw is declared as a weak symbol, meaning it will be left a null
  * pointer if the linker does not find a definition for this symbol in any
@@ -210,6 +210,49 @@ typedef struct ssm_trigger {
 } ssm_trigger_t;
 
 
+/**  SSM values are the size of a machine word. */
+#if UINTPTR_MAX == 0xFFFFFFFF
+  typedef uint32_t ssm_word_t;
+#elif UINTPTR_MAX == 0xFFFFFFFFFFFFFFFFu
+  typedef uint64_t ssm_word_t;
+#else
+  #error Unsupported pointer size
+#endif
+
+struct ssm_object;
+
+/** SSM values are either "packed" values or heap-allocated */
+typedef union {
+  struct ssm_object *heap_obj;    /**< Pointer to a heap-allocated object */
+  ssm_word_t packed_obj;          /**< Packed value */
+} ssm_value_t;
+
+/**  The metadata accompanying any heap-allocated object
+ *
+ * When val_count is 0, tag is to be interpreted as an enum ssm_builtin
+ */
+struct ssm_mm_header {
+  uint8_t val_count;      /**< Size of this object's payload */
+  uint8_t tag;            /**< Which variant is inhabited by this object */
+  uint8_t ref_count;      /**< The number of references to this object */
+};
+
+/**  Built-in types that cannot be expressed as a product of words */
+enum ssm_builtin {
+  SSM_TIMESTAMP_T,        /**< 64-bit timestamps */
+  SSM_SV_T,               /**< Scheduled variables */
+};
+
+/**  Heap-allocated SSM object, with memory management metadata header
+ *
+ * The payload array is declared of size 1 here, but is of varying size in
+ * practice. The actual size should be looked up in the header.
+ */
+struct ssm_object {
+  struct ssm_mm_header mm;    /**< Memory management metadata */
+  ssm_value_t payload[1];     /**< Heap object payload */
+};
+
 /** A variable that may have scheduled updates and triggers
  *
  * This is the "base class" for other scheduled variable types.
@@ -232,12 +275,13 @@ typedef struct ssm_trigger {
  * `later_time` != #SSM_NEVER if and only if this variable in the event queue.
  */
 typedef struct ssm_sv {
-  void (*update)(struct ssm_sv *); /**< Update "virtual method" */
-  ssm_trigger_t *triggers;    /**< List of sensitive continuations */
+  struct ssm_mm_header mm;     /**< Memory management metadata */
   ssm_time_t later_time;       /**< When the variable should be next updated */
   ssm_time_t last_updated;     /**< When the variable was last updated */
+  ssm_trigger_t *triggers;     /**< List of sensitive continuations */
+  ssm_value_t value;
+  ssm_value_t later_value;
 } ssm_sv_t;
-
 
 /** Indicate writing to a variable should trigger a routine
  *
@@ -328,9 +372,25 @@ bool ssm_event_on(ssm_sv_t *var /**< Variable: must be non-NULL */ );
  *
  * Call this to initialize the contents of a newly allocated scheduled
  * variable, e.g., after ssm_enter()
+ *
+ * Leaves the values of the variabled uninitialized.
  */
-void ssm_initialize(ssm_sv_t *var,
-		    void (*update)(ssm_sv_t *));
+void ssm_initialize(ssm_sv_t *var);
+
+/** Perform a (delayed) update on a variable, scheduling all sensitive triggers
+ *
+ * This function's interface exposes the update_time as a parameter because it
+ * allows updates to be performed without adding to the event queue.
+ */
+static inline void ssm_update(ssm_sv_t *sv, ssm_time_t update_time) {
+  assert(update_time == sv->later_time);
+  sv->value = sv->later_value;
+  sv->last_updated = update_time;
+  sv->later_time = SSM_NEVER;
+
+  for (ssm_trigger_t *trigger = sv->triggers ; trigger ; trigger = trigger->next)
+    ssm_activate(trigger->act);
+}
 
 /** Schedule a future update to a variable
  *
@@ -376,7 +436,10 @@ ssm_time_t ssm_now(void);
  *
  * Typically run by the platform code, not the SSM program per se.
  *
- * Advance #now to the time of the earliest event in the queue, if any.
+ * When next_time is #SSM_NEVER, advance #now to the time of the earliest event
+ * in the queue, if any. Otherwise, advance #now to the specified next_time.
+ * It is the caller's responsibility to ensure that next_time is earlier than
+ * the earliest event time in the queue.
  *
  * Remove every event at the head of the event queue scheduled for
  * #now, update the variable's current value by calling its
@@ -386,7 +449,7 @@ ssm_time_t ssm_now(void);
  * Remove the activation record in the activation record queue with the
  * lowest priority number and execute its "step" function.
  */
-void ssm_tick();
+void ssm_tick(ssm_time_t next_time);
 
 /** Reset the scheduler.
  *
