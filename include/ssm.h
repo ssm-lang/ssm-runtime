@@ -68,7 +68,7 @@ See [the detailed documentation](@ref all)
 #define SSM_ACT_FREE(ptr, size) free(ptr)
 #endif
 
-/** Underlying exception handler; can be overridden by each platform
+/** Underlying exception handler; must be overridden by each platform
  *
  * ssm_throw is declared as a weak symbol, meaning it will be left a null
  * pointer if the linker does not find a definition for this symbol in any
