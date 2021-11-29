@@ -211,9 +211,9 @@ typedef struct ssm_trigger {
 
 
 /**  SSM values are the size of a machine word. */
-#if UINTPTR_MAX == 0xFFFFFFFF
+#if UINTPTR_MAX == 0xffffffffu
   typedef uint32_t ssm_word_t;
-#elif UINTPTR_MAX == 0xFFFFFFFFFFFFFFFFu
+#elif UINTPTR_MAX == 0xffffffffffffffffu
   typedef uint64_t ssm_word_t;
 #else
   #error Unsupported pointer size
@@ -282,6 +282,12 @@ typedef struct ssm_sv {
   ssm_value_t value;
   ssm_value_t later_value;
 } ssm_sv_t;
+
+/** Construct an ssm_value_t out of a raw integral 31-bit value */
+#define ssm_marshal(v) (ssm_value_t) {.packed_obj = ((v) << 1 | 1)}
+
+/** Extract an integral value out of a packed ssm_value_t */
+#define ssm_unmarshal(v) ((v).packed_obj >> 1)
 
 /** Indicate writing to a variable should trigger a routine
  *
@@ -373,9 +379,27 @@ bool ssm_event_on(ssm_sv_t *var /**< Variable: must be non-NULL */ );
  * Call this to initialize the contents of a newly allocated scheduled
  * variable, e.g., after ssm_enter()
  *
- * Leaves the values of the variabled uninitialized.
+ * Leaves the values of the variable uninitialized.
  */
 void ssm_initialize(ssm_sv_t *var);
+
+/** Instantaneous assignment to a scheduled variable
+ *
+ * Call this to assign the specified value to the variable.
+ *
+ * Wakes up all sensitive processes at a lower priority.
+ *
+ * Does not overwrite scheduled assignment.
+ */
+void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value);
+
+
+/** Delayed assignment to a scheduled variable.
+ *
+ * Call this to schedule a delayed assignment at a later time, which must be
+ * strictly greater than #now.
+ */
+void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value);
 
 /** Perform a (delayed) update on a variable, scheduling all sensitive triggers
  *
@@ -492,81 +516,6 @@ extern ssm_act_t ssm_top_parent;
 #define container_of(ptr, type, member)                                        \
   ((type *)((char *)(member_type(type, member) *){ptr} -                       \
             offsetof(type, member)))
-
-/* typedef struct { ssm_sv_t sv; } ssm_event_t; */
-/* #define ssm_later_event(var, then) ssm_schedule(&(var)->sv, (then)) */
-/* extern void ssm_assign_event(ssm_event_t *var, ssm_priority_t prio); */
-/* extern void ssm_initialize_event(ssm_event_t *); */
-
-/* #define SSM_DECLARE_SV_SCALAR(payload_t)                                       \ */
-/*   typedef struct {                                                             \ */
-/*     ssm_sv_t sv;                                                          \ */
-/*     payload_t value;       /1* Current value *1/                                 \ */
-/*     payload_t later_value; /1* Buffered value *1/                                \ */
-/*   } ssm_##payload_t##_t;                                                       \ */
-/*   void ssm_assign_##payload_t(ssm_##payload_t##_t *sv, ssm_priority_t prio,    \ */
-/*                           const payload_t value);                              \ */
-/*   void ssm_later_##payload_t(ssm_##payload_t##_t *sv, ssm_time_t then,         \ */
-/*                          const payload_t value);                               \ */
-/*   void ssm_initialize_##payload_t(ssm_##payload_t##_t *v); */
-
-/* #define SSM_DEFINE_SV_SCALAR(payload_t)                                        \ */
-/*   static void ssm_update_##payload_t(ssm_sv_t *sv) {                      \ */
-/*     ssm_##payload_t##_t *v = container_of(sv, ssm_##payload_t##_t, sv);        \ */
-/*     v->value = v->later_value;                                                 \ */
-/*   }                                                                            \ */
-/*   void ssm_assign_##payload_t(ssm_##payload_t##_t *v, ssm_priority_t prio,     \ */
-/*                               const payload_t value) {                         \ */
-/*     v->value = value;					                       \ */
-/*     v->sv.last_updated = ssm_now();			  		       \ */
-/*     ssm_trigger(&v->sv, prio);                                                 \ */
-/*   }                                                                            \ */
-/*   void ssm_later_##payload_t(ssm_##payload_t##_t *v, ssm_time_t then,          \ */
-/*                          const payload_t value) {                              \ */
-/*     v->later_value = value;                                                    \ */
-/*     ssm_schedule(&v->sv, then);					               \ */
-/*   }		 	 						       \ */
-/*   void ssm_initialize_##payload_t(ssm_##payload_t##_t *v) {                    \ */
-/*     ssm_initialize(&v->sv, ssm_update_##payload_t);	     	               \ */
-/*   } */
- 
-typedef int8_t   i8;   /**< 8-bit Signed Integer */
-typedef int16_t  i16;  /**< 16-bit Signed Integer */
-typedef int32_t  i32;  /**< 32-bit Signed Integer */
-typedef int64_t  i64;  /**< 64-bit Signed Integer */
-typedef uint8_t  u8;   /**< 8-bit Unsigned Integer */
-typedef uint16_t u16;  /**< 16-bit Unsigned Integer */
-typedef uint32_t u32;  /**< 32-bit Unsigned Integer */
-typedef uint64_t u64;  /**< 64-bit Unsigned Integer */
-
-/** \struct ssm_bool_t
-    Scheduled Boolean variable */
-/** \struct ssm_i8_t
-    Scheduled 8-bit Signed Integer variable */
-/** \struct ssm_i16_t
-    Scheduled 16-bit Signed Integer variable */
-/** \struct ssm_i32_t
-    Scheduled 32-bit Signed Integer variable */
-/** \struct ssm_i64_t
-    Scheduled 64-bit Signed Integer variable */
-/** \struct ssm_u8_t
-    Scheduled 8-bit Unsigned Integer variable */
-/** \struct ssm_u16_t
-    Scheduled 16-bit Unsigned Integer variable */
-/** \struct ssm_u32_t
-    Scheduled 32-bit Unsigned Integer variable */
-/** \struct ssm_u64_t
-    Scheduled 64-bit Unsigned Integer variable */
-
-/* SSM_DECLARE_SV_SCALAR(bool) */
-/* SSM_DECLARE_SV_SCALAR(i8) */
-/* SSM_DECLARE_SV_SCALAR(i16) */
-/* SSM_DECLARE_SV_SCALAR(i32) */
-/* SSM_DECLARE_SV_SCALAR(i64) */
-/* SSM_DECLARE_SV_SCALAR(u8) */
-/* SSM_DECLARE_SV_SCALAR(u16) */
-/* SSM_DECLARE_SV_SCALAR(u32) */
-/* SSM_DECLARE_SV_SCALAR(u64) */
 
 /** @} */
 

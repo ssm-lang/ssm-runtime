@@ -100,16 +100,7 @@ void ssm_desensitize(ssm_trigger_t *trigger)
   if (trigger->next)
     /* Tell successor its predecessor is our predecessor */
     trigger->next->prev_ptr = trigger->prev_ptr;
-} 
-
-void ssm_trigger(ssm_sv_t *var, ssm_priority_t priority)
-{
-  assert(var);
-  for (ssm_trigger_t *trig = var->triggers ; trig ; trig = trig->next)
-    if (trig->act->priority > priority)
-      ssm_activate(trig->act);       
 }
-
 
 /** Starting at the hole, walk up toward the root of the tree, copying
  * parent to child until we find where we can put the new activation
@@ -314,6 +305,19 @@ void ssm_unschedule(ssm_sv_t *var)
         event_queue_percolate_up(hole, moved_var);
     }
   }
+}
+
+void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value) {
+  var->value = value;
+  var->last_updated = now;
+  for (ssm_trigger_t *trig = var->triggers; trig; trig = trig->next)
+    if (trig->act->priority > prio)
+      ssm_activate(trig->act);
+}
+
+void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value) {
+  var->later_value = value;
+  ssm_schedule(var, later);
 }
 
 void ssm_update(ssm_sv_t *sv)
