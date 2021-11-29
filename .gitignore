@@ -70,3 +70,5 @@ doc/latex/*
 build/
 
 .pio
+
+compile_commands.json
