@@ -379,18 +379,10 @@ void ssm_initialize(ssm_sv_t *var);
 
 /** Perform a (delayed) update on a variable, scheduling all sensitive triggers
  *
- * This function's interface exposes the update_time as a parameter because it
- * allows updates to be performed without adding to the event queue.
+ * This is exposed so that platform code can perform external variable updates,
+ * and should not be called by user code.
  */
-static inline void ssm_update(ssm_sv_t *sv, ssm_time_t update_time) {
-  assert(update_time == sv->later_time);
-  sv->value = sv->later_value;
-  sv->last_updated = update_time;
-  sv->later_time = SSM_NEVER;
-
-  for (ssm_trigger_t *trigger = sv->triggers ; trigger ; trigger = trigger->next)
-    ssm_activate(trigger->act);
-}
+void ssm_update(ssm_sv_t *sv);
 
 /** Schedule a future update to a variable
  *
@@ -432,14 +424,20 @@ ssm_time_t ssm_next_event_time(void);
 /** Return the current model time */
 ssm_time_t ssm_now(void);
 
+/** Advance the current model time
+ *
+ * This is only exposed for platform code to perform external variable updates,
+ * and should not be called by user code. It is the caller's responsibility to
+ * ensure that next is earlier than the earliest event time in the queue.
+ */
+void ssm_set_now(ssm_time_t next);
+
 /** Run the system for the next scheduled instant
  *
  * Typically run by the platform code, not the SSM program per se.
  *
- * When next_time is #SSM_NEVER, advance #now to the time of the earliest event
- * in the queue, if any. Otherwise, advance #now to the specified next_time.
- * It is the caller's responsibility to ensure that next_time is earlier than
- * the earliest event time in the queue.
+ * If there is nothing left to run in the current instant, advance #now to the
+ * time of the earliest event in the queue, if any.
  *
  * Remove every event at the head of the event queue scheduled for
  * #now, update the variable's current value by calling its
@@ -449,7 +447,7 @@ ssm_time_t ssm_now(void);
  * Remove the activation record in the activation record queue with the
  * lowest priority number and execute its "step" function.
  */
-void ssm_tick(ssm_time_t next_time);
+void ssm_tick();
 
 /** Reset the scheduler.
  *
@@ -495,43 +493,42 @@ extern ssm_act_t ssm_top_parent;
   ((type *)((char *)(member_type(type, member) *){ptr} -                       \
             offsetof(type, member)))
 
-typedef struct { ssm_sv_t sv; } ssm_event_t;
-#define ssm_later_event(var, then) ssm_schedule(&(var)->sv, (then))
-extern void ssm_assign_event(ssm_event_t *var, ssm_priority_t prio);
-extern void ssm_initialize_event(ssm_event_t *);
+/* typedef struct { ssm_sv_t sv; } ssm_event_t; */
+/* #define ssm_later_event(var, then) ssm_schedule(&(var)->sv, (then)) */
+/* extern void ssm_assign_event(ssm_event_t *var, ssm_priority_t prio); */
+/* extern void ssm_initialize_event(ssm_event_t *); */
 
+/* #define SSM_DECLARE_SV_SCALAR(payload_t)                                       \ */
+/*   typedef struct {                                                             \ */
+/*     ssm_sv_t sv;                                                          \ */
+/*     payload_t value;       /1* Current value *1/                                 \ */
+/*     payload_t later_value; /1* Buffered value *1/                                \ */
+/*   } ssm_##payload_t##_t;                                                       \ */
+/*   void ssm_assign_##payload_t(ssm_##payload_t##_t *sv, ssm_priority_t prio,    \ */
+/*                           const payload_t value);                              \ */
+/*   void ssm_later_##payload_t(ssm_##payload_t##_t *sv, ssm_time_t then,         \ */
+/*                          const payload_t value);                               \ */
+/*   void ssm_initialize_##payload_t(ssm_##payload_t##_t *v); */
 
-#define SSM_DECLARE_SV_SCALAR(payload_t)                                       \
-  typedef struct {                                                             \
-    ssm_sv_t sv;                                                          \
-    payload_t value;       /* Current value */                                 \
-    payload_t later_value; /* Buffered value */                                \
-  } ssm_##payload_t##_t;                                                       \
-  void ssm_assign_##payload_t(ssm_##payload_t##_t *sv, ssm_priority_t prio,    \
-                          const payload_t value);                              \
-  void ssm_later_##payload_t(ssm_##payload_t##_t *sv, ssm_time_t then,         \
-                         const payload_t value);                               \
-  void ssm_initialize_##payload_t(ssm_##payload_t##_t *v);
-
-#define SSM_DEFINE_SV_SCALAR(payload_t)                                        \
-  static void ssm_update_##payload_t(ssm_sv_t *sv) {                      \
-    ssm_##payload_t##_t *v = container_of(sv, ssm_##payload_t##_t, sv);        \
-    v->value = v->later_value;                                                 \
-  }                                                                            \
-  void ssm_assign_##payload_t(ssm_##payload_t##_t *v, ssm_priority_t prio,     \
-                              const payload_t value) {                         \
-    v->value = value;					                       \
-    v->sv.last_updated = ssm_now();			  		       \
-    ssm_trigger(&v->sv, prio);                                                 \
-  }                                                                            \
-  void ssm_later_##payload_t(ssm_##payload_t##_t *v, ssm_time_t then,          \
-                         const payload_t value) {                              \
-    v->later_value = value;                                                    \
-    ssm_schedule(&v->sv, then);					               \
-  }		 	 						       \
-  void ssm_initialize_##payload_t(ssm_##payload_t##_t *v) {                    \
-    ssm_initialize(&v->sv, ssm_update_##payload_t);	     	               \
-  }
+/* #define SSM_DEFINE_SV_SCALAR(payload_t)                                        \ */
+/*   static void ssm_update_##payload_t(ssm_sv_t *sv) {                      \ */
+/*     ssm_##payload_t##_t *v = container_of(sv, ssm_##payload_t##_t, sv);        \ */
+/*     v->value = v->later_value;                                                 \ */
+/*   }                                                                            \ */
+/*   void ssm_assign_##payload_t(ssm_##payload_t##_t *v, ssm_priority_t prio,     \ */
+/*                               const payload_t value) {                         \ */
+/*     v->value = value;					                       \ */
+/*     v->sv.last_updated = ssm_now();			  		       \ */
+/*     ssm_trigger(&v->sv, prio);                                                 \ */
+/*   }                                                                            \ */
+/*   void ssm_later_##payload_t(ssm_##payload_t##_t *v, ssm_time_t then,          \ */
+/*                          const payload_t value) {                              \ */
+/*     v->later_value = value;                                                    \ */
+/*     ssm_schedule(&v->sv, then);					               \ */
+/*   }		 	 						       \ */
+/*   void ssm_initialize_##payload_t(ssm_##payload_t##_t *v) {                    \ */
+/*     ssm_initialize(&v->sv, ssm_update_##payload_t);	     	               \ */
+/*   } */
  
 typedef int8_t   i8;   /**< 8-bit Signed Integer */
 typedef int16_t  i16;  /**< 16-bit Signed Integer */
@@ -561,15 +558,15 @@ typedef uint64_t u64;  /**< 64-bit Unsigned Integer */
 /** \struct ssm_u64_t
     Scheduled 64-bit Unsigned Integer variable */
 
-SSM_DECLARE_SV_SCALAR(bool)
-SSM_DECLARE_SV_SCALAR(i8)
-SSM_DECLARE_SV_SCALAR(i16)
-SSM_DECLARE_SV_SCALAR(i32)
-SSM_DECLARE_SV_SCALAR(i64)
-SSM_DECLARE_SV_SCALAR(u8)
-SSM_DECLARE_SV_SCALAR(u16)
-SSM_DECLARE_SV_SCALAR(u32)
-SSM_DECLARE_SV_SCALAR(u64)
+/* SSM_DECLARE_SV_SCALAR(bool) */
+/* SSM_DECLARE_SV_SCALAR(i8) */
+/* SSM_DECLARE_SV_SCALAR(i16) */
+/* SSM_DECLARE_SV_SCALAR(i32) */
+/* SSM_DECLARE_SV_SCALAR(i64) */
+/* SSM_DECLARE_SV_SCALAR(u8) */
+/* SSM_DECLARE_SV_SCALAR(u16) */
+/* SSM_DECLARE_SV_SCALAR(u32) */
+/* SSM_DECLARE_SV_SCALAR(u64) */
 
 /** @} */
 

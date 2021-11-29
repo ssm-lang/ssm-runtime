@@ -181,6 +181,13 @@ ssm_time_t ssm_next_event_time() {
 
 ssm_time_t ssm_now() { return now; }
 
+void ssm_set_now(ssm_time_t next)
+{
+  assert(now < next); // No time-traveling!
+  assert(event_queue_len == 0 || next <= event_queue[SSM_QUEUE_HEAD]->later_time);
+  now = next;
+}
+
 /** \brief Determine the index of an already scheduled event
  *
  * This is an inefficient linear search, so it's not meant to be
@@ -309,24 +316,27 @@ void ssm_unschedule(ssm_sv_t *var)
   }
 }
 
-void ssm_tick(ssm_time_t next_time)
+void ssm_update(ssm_sv_t *sv)
 {
-  if (next_time != SSM_NEVER) {
-    assert(now < next_time); // No time-traveling!
-    assert(next_time <= event_queue[SSM_QUEUE_HEAD]->later_time);
-    now = next_time;
-  } else if (event_queue_len > 0) {
-    // Advance time to the earliest event in the queue
-    assert(now < event_queue[SSM_QUEUE_HEAD]->later_time); // No time-traveling!
-    now = event_queue[SSM_QUEUE_HEAD]->later_time;
-  } else {
-    SSM_THROW(SSM_INTERNAL_ERROR);
-  }
+  assert(now == sv->later_time);
+  sv->value = sv->later_value;
+  sv->last_updated = now;
+  sv->later_time = SSM_NEVER;
+  for (ssm_trigger_t *trigger = sv->triggers; trigger; trigger = trigger->next)
+    ssm_activate(trigger->act);
+}
+
+void ssm_tick()
+{
+  assert(act_queue_len == 0 || ssm_next_event_time() == SSM_NEVER || now <= ssm_next_event_time());
+
+  if (act_queue_len == 0 && event_queue_len > 0)
+    ssm_set_now(ssm_next_event_time());
 
   /* Update every variable in the event queue at the current time */
   while (event_queue_len > 0 && event_queue[SSM_QUEUE_HEAD]->later_time == now) {
     ssm_sv_t *sv = event_queue[SSM_QUEUE_HEAD];
-    ssm_update(sv, now);
+    ssm_update(sv);
 
     /* Remove the top event from the queue by inserting the last
        element in the queue at the front and percolating it toward the leaves */
