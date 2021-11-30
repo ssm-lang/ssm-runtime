@@ -48,27 +48,28 @@ ssm_stepf_t step_mywait;
 
 ssm_act_t *ssm_enter_mywait(struct ssm_act *parent, ssm_priority_t priority,
                             ssm_depth_t depth, ssm_u32_t *r) {
-  ssm_act_t *act =
-      ssm_enter(sizeof(act_mywait_t), step_mywait, parent, priority, depth);
-  act_mywait_t *cont = container_of(act, act_mywait_t, act);
-
-  cont->trigger1.act = act;
+  act_mywait_t *cont = malloc(sizeof(*cont));
+  ssm_enter(&cont->act, step_mywait, parent, priority, depth);
   cont->r = r;
-  return act;
+  return &cont->act;
 }
 
 void step_mywait(struct ssm_act *act) {
   act_mywait_t *cont = container_of(act, act_mywait_t, act);
   switch (act->pc) {
   case 0:
+    cont->trigger1.act = act;
     ssm_sensitize(cont->r, &cont->trigger1);
     act->pc = 1;
     return;
   case 1:
     ssm_desensitize(&cont->trigger1);
-    ssm_leave(act, sizeof(act_mywait_t));
-    return;
+    break;
   }
+  act = ssm_leave(act);
+  free(cont);
+  if (act)
+    ssm_call(act);
 }
 
 ssm_stepf_t step_sum;
@@ -76,18 +77,16 @@ ssm_stepf_t step_sum;
 ssm_act_t *ssm_enter_sum(struct ssm_act *parent, ssm_priority_t priority,
                          ssm_depth_t depth, ssm_u32_t *r1, ssm_u32_t *r2,
                          ssm_u32_t *r) {
-  ssm_act_t *act =
-      ssm_enter(sizeof(act_sum_t), step_sum, parent, priority, depth);
-  act_sum_t *cont = container_of(act, act_sum_t, act);
+  act_sum_t *cont = malloc(sizeof(*cont));
+  ssm_enter(&cont->act, step_sum, parent, priority, depth);
   cont->r1 = r1;
   cont->r2 = r2;
   cont->r = r;
-  return act;
+  return &cont->act;
 }
 
 void step_sum(struct ssm_act *act) {
   act_sum_t *cont = container_of(act, act_sum_t, act);
-  ;
   switch (act->pc) {
   case 0: {
     ssm_depth_t new_depth = act->depth - 1; // 2 children
@@ -103,24 +102,25 @@ void step_sum(struct ssm_act *act) {
     ssm_later(cont->r, ssm_now() + SSM_SECOND,
               ssm_marshal(ssm_unmarshal(cont->r1->value) +
                           ssm_unmarshal(cont->r2->value)));
-    ssm_leave(act, sizeof(act_sum_t));
-    return;
+    break;
   }
+  act = ssm_leave(act);
+  free(cont);
+  if (act)
+    ssm_call(act);
 }
 
 ssm_stepf_t step_fib;
 
 ssm_act_t *ssm_enter_fib(struct ssm_act *parent, ssm_priority_t priority,
                          ssm_depth_t depth, u32 n, ssm_u32_t *r) {
-  ssm_act_t *act =
-      ssm_enter(sizeof(act_fib_t), step_fib, parent, priority, depth);
-  act_fib_t *cont = container_of(act, act_fib_t, act);
-
+  act_fib_t *cont = malloc(sizeof(*cont));
+  ssm_enter(&cont->act, step_fib, parent, priority, depth);
   cont->n = n;
   cont->r = r;
   ssm_initialize(&cont->r1);
   ssm_initialize(&cont->r2);
-  return act;
+  return &cont->act;
 }
 
 void step_fib(struct ssm_act *act) {
@@ -132,8 +132,7 @@ void step_fib(struct ssm_act *act) {
 
     if (ssm_unmarshal(cont->n) < 2) {
       ssm_later(cont->r, ssm_now() + SSM_SECOND, ssm_marshal(1));
-      ssm_leave(act, sizeof(act_fib_t));
-      return;
+      break;
     }
     {
       ssm_depth_t new_depth = act->depth - 2; // 4 children
@@ -153,9 +152,12 @@ void step_fib(struct ssm_act *act) {
     act->pc = 1;
     return;
   case 1:
-    ssm_leave(act, sizeof(act_fib_t));
-    return;
+    break;
   }
+  act = ssm_leave(act);
+  free(cont);
+  if (act)
+    ssm_call(act);
 }
 
 void ssm_throw(int reason, const char *file, int line, const char *func) {
@@ -166,7 +168,7 @@ void ssm_throw(int reason, const char *file, int line, const char *func) {
 int main(int argc, char *argv[]) {
   ssm_u32_t result;
   ssm_initialize(&result);
-  result.value = ssm_marshal(0);
+  result.value = ssm_marshal(12);
 
   int n = argc > 1 ? atoi(argv[1]) : 3;
 

@@ -296,56 +296,28 @@ extern void ssm_desensitize(ssm_trigger_t *);
  */
 extern void ssm_activate(ssm_act_t *);
 
-/**
- * Execute a routine immediately.
- */
-static inline void ssm_call(ssm_act_t *act) { (*(act->step))(act); }
+/** Execute a routine immediately */
+#define ssm_call(act) (act)->step((act))
 
-/** Enter a routine
- *
- * Enter a function: allocate the activation record by invoking
- * #SSM_ACT_MALLOC, set up the function and
- * program counter value, and remember the caller.
- *
- * Invokes #SSM_RESOURCES_EXHAUSTED("ssm_enter") if allocation fails.
- *
- */
-static inline ssm_act_t *ssm_enter(size_t bytes, /**< size of the activation record, >0 */
-				   ssm_stepf_t *step, /**< Pointer to "step" function, non-NULL */
-				   ssm_act_t *parent, /**< Activation record of caller, non-NULL */
-				   ssm_priority_t priority, /**< Priority: must be no less than parent's */
-				   ssm_depth_t depth /**< Depth; used if this routine has children */
-							     ) {
-  assert(bytes > 0);
-  assert(step);
-  assert(parent);
-  ++parent->children;
-  ssm_act_t *act = (ssm_act_t *)SSM_ACT_MALLOC(bytes);
-  if (!act) SSM_THROW(SSM_EXHAUSTED_MEMORY);
-  *act = (ssm_act_t){
-      .step = step,
-      .caller = parent,
-      .pc = 0,
-      .children = 0,
-      .priority = priority,
-      .depth = depth,
-      .scheduled = false,
-  };
-  return act;
-}
+/** Initialize the activation record of a routine before entering */
+#define ssm_enter(act, stepf, parent, priority, depth) \
+  ++parent->children,\
+  *act = (ssm_act_t) {\
+      .step = stepf,\
+      .caller = parent,\
+      .pc = 0,\
+      .children = 0,\
+      .priority = priority,\
+      .depth = depth,\
+      .scheduled = false,\
+  }
 
-/**
- * Deallocate an activation record; return to caller if we were the last child.
+/** Destruct the activation record of a routine before leaving
+ *
+ * Returns pointer to caller if it was the last child
  */
-static inline void ssm_leave(ssm_act_t *act, size_t bytes) {
-  assert(act);
-  assert(act->caller);
-  assert(act->caller->step);
-  ssm_act_t *caller = act->caller;
-  SSM_ACT_FREE(act, bytes); /* Free the whole activation record, not just the start */
-  if ((--caller->children) == 0)
-    ssm_call(caller); /* If we were the last child, run our parent */
-}
+#define ssm_leave(act) \
+  --(act)->caller->children == 0 ? (act)->caller : (ssm_act_t *) NULL
 
 /** Return true if there is an event on the given variable in the current instant
  */
