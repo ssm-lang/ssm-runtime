@@ -23,7 +23,7 @@ See [the detailed documentation](@ref all)
     #include "ssm.h"
 
     typedef struct {
-      SSM_ACT_FIELDS;
+      ssm_act_t act;
       ssm_event_t second;
     } main_act_t;
 
@@ -32,9 +32,9 @@ See [the detailed documentation](@ref all)
     main_act_t *enter_main(struct ssm_act *parent,
                            ssm_priority_t priority,
                            ssm_depth_t depth) {
-      main_act_t * act =
-        (main_act_t *) ssm_enter(sizeof(main_act_t),
+      ssm_act_t *act = ssm_enter(sizeof(main_act_t),
                                  main_step, parent, priority, depth);
+      main_act_t *cont = container_of(act, main_act_t, act);
       ssm_initialize_event(&act->second);
     }
 
@@ -162,7 +162,7 @@ typedef void ssm_stepf_t(struct ssm_act *);
 
     Routine activation record "base class." A struct for a particular
     routine must start with this type but then may be followed by
-    routine-specific fields.   See SSM_ACT_FIELDS
+    routine-specific fields.
 */
 typedef struct ssm_act {
   ssm_stepf_t *step;       /**< C function for running this continuation */
@@ -173,29 +173,6 @@ typedef struct ssm_act {
   ssm_depth_t depth;       /**< Index of the LSB in our priority */
   bool scheduled;          /**< True when in the schedule queue */
 } ssm_act_t;
-
-/** "Base class" fields for user-defined activation records
- *
- * The same fields as struct ssm_act.
- *
- * Define your own activation record types like this:
- *
- *     typedef struct {
- *        SSM_ACT_FIELDS;
- *        struct ssm_trigger trigger1;
- *        ssm_int8_t mysv;
- *     } myact_t;
- *
- */
-
-#define SSM_ACT_FIELDS     \
-  ssm_stepf_t *step;       \
-  ssm_act_t *caller;       \
-  uint16_t pc;             \
-  uint16_t children;       \
-  ssm_priority_t priority; \
-  ssm_depth_t depth;       \
-  bool scheduled          
 
 /**  Indicates a routine should run when a scheduled variable is written
  *
