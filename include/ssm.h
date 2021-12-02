@@ -53,6 +53,8 @@ enum ssm_error_t {
   /**< Tried to exceed available recursion depth. */
   SSM_INVALID_TIME,
   /**< Invalid time, e.g., scheduled delayed assignment at an earlier time. */
+  SSM_INVALID_MEMORY,
+  /**< Invalid memory layout, e.g., using a pointer where int was expected. */
   SSM_PLATFORM_ERROR
   /**< Start of platform-specific error code range. */
 };
@@ -91,6 +93,7 @@ struct ssm_sv;
 struct ssm_trigger;
 struct ssm_act;
 struct ssm_object;
+struct ssm_time;
 
 /**
  * @addtogroup mem
@@ -114,14 +117,14 @@ typedef uint64_t ssm_word_t;
  *  timestamps may be misinterpreted as pointers.
  */
 enum ssm_builtin {
-  SSM_TIMESTAMP_T, /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_T,        /**< Scheduled variables, #ssm_sv_t */
+  SSM_TIME_T, /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_T,   /**< Scheduled variables, #ssm_sv_t */
 };
 
 /** @brief SSM values are either "packed" values or heap-allocated. */
 typedef union {
-  struct ssm_object *heap_obj; /**< Pointer to a heap-allocated object. */
-  ssm_word_t packed_obj;       /**< Packed value. */
+  struct ssm_mm_header *heap_obj; /**< Pointer to a heap-allocated object. */
+  ssm_word_t packed_val;          /**< Packed value. */
 } ssm_value_t;
 
 /** @brief The metadata accompanying any heap-allocated object.
@@ -150,14 +153,49 @@ typedef struct ssm_object {
  *  @return   a packed #ssm_value_t.
  */
 #define ssm_marshal(v)                                                         \
-  (ssm_value_t) { .packed_obj = ((v) << 1 | 1) }
+  (ssm_value_t) { .packed_val = ((v) << 1 | 1) }
 
 /** @brief Extract an integral value from a packed #ssm_value_t.
  *
  *  @param v  the packed #ssm_value_t.
  *  @return   the raw 31-bit integral value.
  */
-#define ssm_unmarshal(v) ((v).packed_obj >> 1)
+#define ssm_unmarshal(v) ((v).packed_val >> 1)
+
+/** @brief Whether a value is on the heap (i.e., is an object).
+ *
+ *  @param vp pointer to the #ssm_value_t.
+ *  @returns  non-zero if on heap, zero otherwise.
+ */
+#define ssm_on_heap(vp) ((vp)->packed_val & 0x1 == 0)
+
+/** @brief Whether an mm header is embedded in a builtin-type object.
+ *
+ *  It makes no sense to allocate zero-size objects, so when @a val_count is
+ *  zero, it indicates that it is a builtin object.
+ *
+ *  @param mp pointer to the #ssm_mm_header.
+ *  @returns  non-zero if it is builtin, zero otherwise.
+ */
+#define ssm_obj_is_builtin(mp) ((mp)->val_count == 0)
+
+/** @brief Whether an mm header is embedded in a particular builtin-type object.
+ *
+ *  @param bt #ssm_builtin type enumeration.
+ *  @param mp pointer to the #ssm_mm_header
+ *  @returns  non-zero if it @a mm is of type @a bt, zero otherwise.
+ *
+ *  @sa #ssm_builtin
+ */
+#define ssm_obj_is(bt, mp) (ssm_obj_is_builtin(mp) && (mp)->tag == (bt))
+
+struct ssm_mm_header *ssm_alloc(size_t size);
+void ssm_free(struct ssm_mm_header *mm);
+
+ssm_value_t ssm_new(size_t size);
+void ssm_dup(ssm_value_t v);
+void ssm_drop(ssm_value_t v);
+ssm_value_t ssm_reuse(ssm_value_t v);
 
 /** @} */
 
@@ -174,6 +212,15 @@ typedef uint64_t ssm_time_t;
  *  The value of this must be derived from the underlying type of #ssm_time_t.
  */
 #define SSM_NEVER UINT64_MAX
+
+/** @brief Time value object, stored in the heap.
+ *
+ *  @invariant For all `struct ssm_time t`, `ssm_obj_is_builtin(SSM_TIME_T, t)`.
+ */
+struct ssm_time {
+  struct ssm_mm_header mm;
+  ssm_time_t time;
+};
 
 /** Ticks per nanosecond */
 #define SSM_NANOSECOND 1L
@@ -193,6 +240,21 @@ typedef uint64_t ssm_time_t;
  *  @returns the current model time.
  */
 ssm_time_t ssm_now(void);
+
+/** @brief Allocate a time value object on the heap.
+ *
+ *  Use ssm_free() to free.
+ *
+ *  @param time value to initialize the time object with.
+ *  @returns    an #ssm_value_t pointing to the #ssm_time object.
+ *
+ *  @throws SSM_EXHAUSTED_MEMORY out of memory.
+ *
+ *  @invariant `ssm_obj_is(SSM_TIME_T, ssm_time_alloc(any).heap_obj)`.
+ *
+ *  @sa struct ssm_time.
+ */
+ssm_value_t ssm_time_alloc(ssm_time_t time);
 
 /** @} */
 
@@ -420,20 +482,23 @@ void ssm_desensitize(ssm_trigger_t *trig);
  */
 void ssm_unschedule(ssm_sv_t *var);
 
-/** @} */
-
-
-/**
- * @addtogroup mem
- * @{
+/** @brief Allocate a time value object on the heap.
+ *
+ *  Initializes the @a value field with @a val, and calls ssm_initialize()
+ *  internally to initialize all other fields.
+ *
+ *  Use ssm_free() to free.
+ *
+ *  @param val  value to initialize the sv value with.
+ *  @returns    an #ssm_value_t pointing to the allocated #ssm_sv_t object.
+ *
+ *  @throws SSM_EXHAUSTED_MEMORY out of memory.
+ *
+ *  @invariant `ssm_obj_is(SSM_SV_T, ssm_sv_alloc(any).heap_obj)`.
+ *
+ *  @sa struct ssm_time.
  */
-ssm_object_t *ssm_alloc(size_t size);
-void *ssm_free(ssm_object_t *);
-
-ssm_value_t *ssm_new(size_t size);
-ssm_value_t *ssm_dup(size_t size);
-void ssm_drop(ssm_value_t *v);
-ssm_value_t *ssm_reuse(ssm_value_t *v);
+ssm_value_t ssm_sv_alloc(ssm_value_t val);
 
 /** @} */
 

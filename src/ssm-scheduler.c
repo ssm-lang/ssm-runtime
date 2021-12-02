@@ -251,6 +251,10 @@ void act_queue_consistency_check() {
 
 ssm_time_t ssm_now() { return now; }
 
+ssm_value_t ssm_time_alloc(ssm_time_t time) {
+  // TODO: write this
+}
+
 ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
                      ssm_priority_t priority, ssm_depth_t depth) {
   ssm_act_t *act = NULL; // TODO:
@@ -375,6 +379,11 @@ void ssm_unschedule(ssm_sv_t *var) {
     }
   }
 }
+
+ssm_value_t ssm_time_alloc(ssm_time_t time) {
+  // TODO: write this.
+}
+
 
 ssm_time_t ssm_next_event_time() {
   return event_queue_len ? event_queue[SSM_QUEUE_HEAD]->later_time : SSM_NEVER;
