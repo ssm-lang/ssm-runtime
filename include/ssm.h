@@ -189,12 +189,22 @@ typedef struct ssm_object {
  */
 #define ssm_obj_is(bt, mp) (ssm_obj_is_builtin(mp) && (mp)->tag == (bt))
 
+/** @TODO: document */
 struct ssm_mm_header *ssm_alloc(size_t size);
+
+/** @TODO: document */
 void ssm_free(struct ssm_mm_header *mm);
 
+/** @TODO: document */
 ssm_value_t ssm_new(size_t size);
+
+/** @TODO: document */
 void ssm_dup(ssm_value_t v);
+
+/** @TODO: document */
 void ssm_drop(ssm_value_t v);
+
+/** @TODO: document */
 ssm_value_t ssm_reuse(ssm_value_t v);
 
 /** @} */
