@@ -1,0 +1,38 @@
+/** \mainpage A Runtime Library for the Sparse Synchronous Model
+
+\section intro_sec Introduction
+
+The operation of this library was first described in
+
+> Stephen A. Edwards and John Hui.
+> The Sparse Synchronous Model.
+> In Forum on Specification and Design Languages (FDL),
+> Kiel, Germany, September 2020.
+> http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
+
+\section usage_sec Usage
+
+See [the detailed documentation](@ref all)
+
+\section example Example
+
+
+    #include "ssm.h"
+
+    typedef struct {
+      ssm_act_t act;
+      ssm_event_t second;
+    } main_act_t;
+
+    ssm_stepf_t main_step;
+
+    main_act_t *enter_main(struct ssm_act *parent,
+                           ssm_priority_t priority,
+                           ssm_depth_t depth) {
+      ssm_act_t *act = ssm_enter(sizeof(main_act_t),
+                                 main_step, parent, priority, depth);
+      main_act_t *cont = container_of(act, main_act_t, act);
+      ssm_initialize_event(&act->second);
+    }
+
+*/
