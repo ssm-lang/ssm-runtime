@@ -18,7 +18,7 @@
  */
 #define SSM_ASSERT(cond)                                                       \
   do                                                                           \
-    if (cond)                                                                  \
+    if (!(cond))                                                               \
       SSM_THROW(SSM_INTERNAL_ERROR);                                           \
   while (0)
 
@@ -50,7 +50,7 @@ void ssm_reset(void);
  *  @param next the time to advance to.
  *
  *  @throws SSM_INTERNAL_ERROR @a next is earlier than or equal to ssm_now(), or
- *                            later than the earliest event in the event queue.
+ *                             later than the earliest event in the event queue.
  */
 void ssm_set_now(ssm_time_t next);
 
@@ -85,5 +85,26 @@ void ssm_update(ssm_sv_t *sv);
  *  @throws SSM_INTERNAL_ERROR not ready to tick in the current instant.
  */
 void ssm_tick(void);
+
+#define SSM_BUILTIN_SIZE(b)                                                    \
+  (size_t[]){                                                                  \
+      [SSM_TIME_T] = sizeof(struct ssm_time),                                  \
+      [SSM_SV_T] = sizeof(ssm_sv_t),                                           \
+  }[b]
+
+#define SSM_OBJ_SIZE(val_count)                                                \
+  (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
+
+/** @TODO: document (dan) */
+struct ssm_mm *ssm_builtin_alloc(enum ssm_builtin builtin);
+
+/** @TODO: document (dan) */
+struct ssm_mm *ssm_obj_alloc(uint8_t val_count, uint8_t tag);
+
+/** @TODO: document (dan) */
+struct ssm_mm *ssm_mem_alloc(size_t size);
+
+/** @TODO: document (dan) */
+void ssm_mem_free(struct ssm_mm *mm, size_t size);
 
 #endif /* _SSM_SCHED_H */

@@ -9,7 +9,6 @@
  *  @author Stephen Edwards (sedwards-lab)
  *  @author John Hui (j-hui)
  */
-
 #include <ssm-internal.h>
 
 /**
@@ -251,14 +250,16 @@ void act_queue_consistency_check() {
 
 ssm_time_t ssm_now() { return now; }
 
-ssm_value_t ssm_time_alloc(ssm_time_t time) {
-  // TODO: write this
+struct ssm_time *ssm_new_time(ssm_time_t time) {
+  struct ssm_mm *mm = ssm_builtin_alloc(SSM_TIME_T);
+  struct ssm_time *t = container_of(mm, struct ssm_time, mm);
+  t->time = time;
+  return t;
 }
 
 ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
                      ssm_priority_t priority, ssm_depth_t depth) {
-  ssm_act_t *act = NULL; // TODO:
-  ++parent->children;
+  ssm_act_t *act = malloc(size); // TODO: use something else
   *act = (ssm_act_t){
       .step = step,
       .caller = parent,
@@ -268,10 +269,11 @@ ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
       .depth = depth,
       .scheduled = false,
   };
+  ++parent->children;
   return act;
 }
 
-void ssm_leave(ssm_act_t *act) {
+void ssm_leave(ssm_act_t *act, size_t size) {
   ssm_act_t *parent = act->caller;
   free(act); // TODO:
   if (--parent->children == 0)
@@ -290,13 +292,13 @@ void ssm_activate(ssm_act_t *act) {
   act_queue_percolate_up(hole, act);
 }
 
-void ssm_initialize(ssm_sv_t *var) {
-  var->mm.val_count = 0;
-  var->mm.tag = SSM_SV_T;
-  var->mm.ref_count = 0;
-  var->triggers = NULL;
-  var->later_time = SSM_NEVER;
-  var->last_updated = SSM_NEVER;
+ssm_sv_t *ssm_new_sv(ssm_value_t val) {
+  struct ssm_mm *mm = ssm_builtin_alloc(SSM_SV_T);
+  ssm_sv_t *sv = container_of(mm, ssm_sv_t, mm);
+  sv->triggers = NULL;
+  sv->later_time = SSM_NEVER;
+  sv->last_updated = SSM_NEVER;
+  return sv;
 }
 
 void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value) {
@@ -379,11 +381,6 @@ void ssm_unschedule(ssm_sv_t *var) {
     }
   }
 }
-
-ssm_value_t ssm_time_alloc(ssm_time_t time) {
-  // TODO: write this.
-}
-
 
 ssm_time_t ssm_next_event_time() {
   return event_queue_len ? event_queue[SSM_QUEUE_HEAD]->later_time : SSM_NEVER;
