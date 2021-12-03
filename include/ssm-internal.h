@@ -95,16 +95,30 @@ void ssm_tick(void);
 #define SSM_OBJ_SIZE(val_count)                                                \
   (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
 
-/** @TODO: document (dan) */
-struct ssm_mm *ssm_builtin_alloc(enum ssm_builtin builtin);
-
-/** @TODO: document (dan) */
-struct ssm_mm *ssm_obj_alloc(uint8_t val_count, uint8_t tag);
-
-/** @TODO: document (dan) */
+/** @brief Allocate memory.
+ *
+ *  Belongs to the memory allocator.
+ *
+ *  @TODO: document (dan)
+ */
 struct ssm_mm *ssm_mem_alloc(size_t size);
 
-/** @TODO: document (dan) */
+/** @brief Deallocate memory.
+ *
+ *  Belongs to the memory allocator.
+ *
+ *  @TODO: document (dan)
+ */
 void ssm_mem_free(struct ssm_mm *mm, size_t size);
+
+/** @brief Allocate and initialize the mm header of a builtin type heap object.
+ *
+ *  Belongs to the memory manager.
+ *  @TODO: Perhaps ssm_new_builtin() should be a macro.
+ *
+ *  @param builtin  enumeration indicating which builtin type to allocate.
+ *  @returns        pointer to the mm header of the heap object.
+ */
+struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin);
 
 #endif /* _SSM_SCHED_H */

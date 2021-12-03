@@ -180,7 +180,7 @@ struct ssm_object {
  *  @param mp pointer to the #ssm_mm.
  *  @returns  non-zero if it is builtin, zero otherwise.
  */
-#define ssm_obj_is_builtin(mp) ((mp)->val_count == SSM_BUILTIN)
+#define ssm_mm_is_builtin(mp) ((mp)->val_count == SSM_BUILTIN)
 
 /** @brief Whether an mm header is embedded in a particular builtin-type object.
  *
@@ -190,7 +190,7 @@ struct ssm_object {
  *
  *  @sa #ssm_builtin.
  */
-#define ssm_obj_is(bt, mp) (ssm_obj_is_builtin(mp) && (mp)->tag == (bt))
+#define ssm_mm_is(bt, mp) (ssm_mem_is_builtin(mp) && (mp)->tag == (bt))
 
 /** @brief Convert an #ssm_value_t to an #ssm_object.
  *
@@ -213,7 +213,19 @@ struct ssm_object {
 
 /** @brief Allocate a new heap object to store word-size values.
  *
- * @TODO: document
+ *  @a val_count must be greater than 0, i.e., not equal to #SSM_BUILTIN.
+ *
+ *  The @a mm header in the returned #ssm_object is initialized, but the
+ *  @a payload is not.
+ *
+ *  @param val_count  the number of #ssm_value_t values to be stored in the
+ *                    object payload.
+ *  @param tag        the tag to initialize the @a mm header with.
+ *  @returns          pointer to a newly allocated and initialized #ssm_object.
+ *
+ *  @throws SSM_INTERNAL_ERROR  @a val_count was not greater than 0.
+ *
+ *  @invariant `!ssm_mm_builtin(&ssm_new(any)->mm)`.
  */
 struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag);
 
@@ -247,7 +259,7 @@ typedef uint64_t ssm_time_t;
 
 /** @brief Time value object, stored in the heap.
  *
- *  @invariant For all `struct ssm_time t`, `ssm_obj_is_builtin(SSM_TIME_T, t)`.
+ *  @invariant For all `struct ssm_time t`, `ssm_mm_is_builtin(SSM_TIME_T, t)`.
  */
 struct ssm_time {
   struct ssm_mm mm;
@@ -282,7 +294,7 @@ ssm_time_t ssm_now(void);
  *
  *  @throws SSM_EXHAUSTED_MEMORY out of memory.
  *
- *  @invariant `ssm_obj_is(SSM_TIME_T, &ssm_new_time(any)->mm)`.
+ *  @invariant `ssm_mm_is(SSM_TIME_T, &ssm_new_time(any)->mm)`.
  */
 struct ssm_time *ssm_new_time(ssm_time_t time);
 
@@ -442,6 +454,7 @@ extern ssm_act_t ssm_top_parent;
  *  update may wake any number of sensitive routines.
  *
  *  @invariant #later_time != #SSM_NEVER iff this variable in the event queue.
+ *  @invariant For all `struct ssm_time t`, `ssm_mm_is_builtin(SSM_SV_T, t)`.
  */
 typedef struct ssm_sv {
   struct ssm_mm mm;        /**< Memory management metadata. */
@@ -466,7 +479,7 @@ typedef struct ssm_sv {
  *
  *  @throws SSM_EXHAUSTED_MEMORY out of memory.
  *
- *  @invariant `ssm_obj_is(SSM_SV_T, &ssm_new_sv(any)->mm)`.
+ *  @invariant `ssm_mm_is(SSM_SV_T, &ssm_new_sv(any)->mm)`.
  */
 struct ssm_sv *ssm_new_sv(ssm_value_t val);
 
