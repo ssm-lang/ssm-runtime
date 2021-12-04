@@ -239,7 +239,7 @@ void ssm_drop(struct ssm_mm *mm);
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm);
 
 /** @TODO: document */
-void ssm_free(struct ssm_mm *mm);
+void ssm_mem_free(struct ssm_mm *mm, size_t size);
 
 /** @} */
 
@@ -287,7 +287,7 @@ ssm_time_t ssm_now(void);
 
 /** @brief Allocate a time object on the heap.
  *
- *  Use ssm_free() on the @a mm header to free.
+ *  Use ssm_drop() on the @a mm header to free.
  *
  *  @param time value to initialize the time object with.
  *  @returns    pointer to an #ssm_time in the heap.
@@ -472,7 +472,7 @@ typedef struct ssm_sv {
  *
  *  The scheduled variable is allocated on the heap.
  *
- *  Call ssm_free() on the @a mm header to free.
+ *  Call ssm_drop() on the @a mm header to free.
  *
  *  @param val  value to initialize the sv value with.
  *  @returns    pointer to the allocated #ssm_sv_t object.

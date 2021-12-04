@@ -17,7 +17,7 @@ struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin) {
   struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(builtin));
   mm->val_count = SSM_BUILTIN;
   mm->tag = builtin;
-  mm->ref_count = 0;
+  mm->ref_count = 1;
   return mm;
 }
 
@@ -33,14 +33,12 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
 void ssm_drop(struct ssm_mm *mm) {
-  // TODO: implement this.
+  if (--mm->ref_count == 0)
+    ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
+                                           : SSM_OBJ_SIZE(mm->val_count));
 }
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
-  return NULL; // TODO: implement this.
-}
-
-void ssm_free(struct ssm_mm *mm) {
-  ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
-                                         : SSM_OBJ_SIZE(mm->val_count));
+  SSM_ASSERT(0); // TODO: not implemented
+  return NULL;
 }

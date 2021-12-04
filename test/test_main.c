@@ -1,4 +1,7 @@
-#include "ssm.h"
+#include <assert.h>
+#include <ssm-internal.h>
+#include <ssm-typedefs.h>
+#include <ssm.h>
 #include <stdio.h>
 
 #ifndef SSM_DEBUG
@@ -19,7 +22,7 @@ extern void act_queue_consistency_check(void);
 extern void act_queue_percolate_down(q_idx_t, ssm_act_t *);
 
 #define NUM_VARIABLES 1024
-ssm_sv_t variables[NUM_VARIABLES];
+ssm_value_t variables[NUM_VARIABLES];
 
 #define NUM_ACTS 1024
 ssm_act_t acts[NUM_ACTS];
@@ -27,36 +30,43 @@ ssm_act_t acts[NUM_ACTS];
 #define NUM_TRIGGERS 1024
 ssm_trigger_t triggers[NUM_TRIGGERS];
 
-void check_starts_initialized()
-{
+
+void check_starts_initialized() {
   assert(ssm_now() == 0L);
   assert(event_queue_len == 0);
   assert(act_queue_len == 0);
 }
 
-void event_queue_basic()
-{
+void reset_all() {
   ssm_reset();
+  for (int i = 0; i < NUM_VARIABLES; i++) {
+    ssm_drop(&ssm_to_sv(variables[i])->mm);
+    variables[i] = ssm_from_sv(ssm_new_sv(EVENT_VALUE));
+  }
+  check_starts_initialized();
+}
+
+void event_queue_basic() {
+  reset_all();
   assert(ssm_next_event_time() == SSM_NEVER);
-  assert(!ssm_event_on(&variables[0]));
-  ssm_schedule(&variables[0], 1);
+  assert(!ssm_event_on(variables[0]));
+  ssm_later(ssm_to_sv(variables[0]), 1, EVENT_VALUE);
   assert(event_queue_len == 1);
   assert(ssm_next_event_time() == 1);
   event_queue_consistency_check();
   ssm_tick();
-  bool event_on = ssm_event_on(&variables[0]);
+  bool event_on = ssm_event_on(variables[0]);
   assert(event_on);
   assert(ssm_now() == 1);
   assert(ssm_next_event_time() == SSM_NEVER);
   assert(event_queue_len == 0);
 }
 
-void print_event_queue()
-{
+void print_event_queue() {
   printf("Event queue: ");
-  for (int i = 1 ; i <= event_queue_len ; i++)
+  for (int i = 1; i <= event_queue_len; i++)
     if (event_queue[i])
-      printf("%c", (char) event_queue[i]->later_time);
+      printf("%c", (char)event_queue[i]->later_time);
     else
       printf("[NULL]");
   printf("\n");
@@ -67,25 +77,26 @@ void print_event_queue()
  * earliest from the queue, making sure they come out in the order
  * given by the expected string.
  */
-void event_queue_sort_string(const char *input, const char *expected)
-{
-  ssm_reset();
+void event_queue_sort_string(const char *input, const char *expected) {
+  reset_all();
   assert(event_queue_len == 0);
-  ssm_sv_t *var = variables;
-  for (const char *cp = input ; *cp ; ++cp, ++var) {
-    var->later_time = SSM_NEVER;
-    ssm_schedule(var, (ssm_time_t) *cp);
+  ssm_value_t *var = variables;
+  for (const char *cp = input; *cp; ++cp, ++var) {
+    /* ssm_later() */
+    /* var->later_time = SSM_NEVER; */
+    /* ssm_schedule(var, (ssm_time_t) *cp); */
+    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, EVENT_VALUE);
     event_queue_consistency_check();
   }
 
   while (event_queue_len) {
-    char c = (char) event_queue[1]->later_time;
+    char c = (char)event_queue[1]->later_time;
     printf("%c", c);
     assert(c == *expected++);
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
-      event_queue_percolate_down(1, to_insert); 
+      event_queue_percolate_down(1, to_insert);
     event_queue_consistency_check();
   }
   printf("\n");
@@ -98,14 +109,12 @@ void event_queue_sort_string(const char *input, const char *expected)
  * all the characters in the string"
  *
  */
-void event_queue_reschedule_string(const char *input, const char *expected)
-{
-  ssm_reset();
-  ssm_sv_t *var = variables;
-  
-  for (const char *cp = input ; *cp ; ++cp, ++var) {
-    var->later_time = SSM_NEVER;
-    ssm_schedule(var, (ssm_time_t) *cp);
+void event_queue_reschedule_string(const char *input, const char *expected) {
+  reset_all();
+  ssm_value_t *var = variables;
+
+  for (const char *cp = input; *cp; ++cp, ++var) {
+    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, EVENT_VALUE);
     event_queue_consistency_check();
   }
 
@@ -114,12 +123,12 @@ void event_queue_reschedule_string(const char *input, const char *expected)
   // Reschedule each element, swapping its case
 
   var = variables;
-  for (const char *cp = input ; *cp ; ++cp, ++var) {
+  for (const char *cp = input; *cp; ++cp, ++var) {
     if (*cp != ' ') {
       if (*cp > 'Z')
-	ssm_schedule(var, (ssm_time_t) *cp + 'A' - 'a');
+        ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp + 'A' - 'a', EVENT_VALUE);
       else
-	ssm_schedule(var, (ssm_time_t) *cp + 'a' - 'A');
+        ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp + 'a' - 'A', EVENT_VALUE);
     }
     event_queue_consistency_check();
   }
@@ -140,47 +149,43 @@ void event_queue_reschedule_string(const char *input, const char *expected)
  * string, then unschedule the first n and verify what's left
  */
 void event_queue_unschedule_string(const char *input, int n,
-				   const char *expected)
-{
-  ssm_reset();
-  ssm_sv_t *var = variables;
-  for (const char *cp = input ; *cp ; ++cp, ++var) {
-    var->later_time = SSM_NEVER;
-    ssm_schedule(var, (ssm_time_t) *cp);
+                                   const char *expected) {
+  reset_all();
+  ssm_value_t *var = variables;
+  for (const char *cp = input; *cp; ++cp, ++var) {
+    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, EVENT_VALUE);
     event_queue_consistency_check();
   }
 
   var = variables;
-  for ( int j = n ; j ; ++var, --j ) {
-    ssm_unschedule(var);
+  for (int j = n; j; ++var, --j) {
+    ssm_unschedule(ssm_to_sv(*var));
     event_queue_consistency_check();
   }
 
   // Unschedule them again; it shouldn't matter
-  
+
   var = variables;
-  for ( int j = n ; j ; ++var, --j ) {
-    ssm_unschedule(var);
+  for (int j = n; j; ++var, --j) {
+    ssm_unschedule(ssm_to_sv(*var));
     event_queue_consistency_check();
-  }  
+  }
 
   while (event_queue_len) {
-    char c = (char) event_queue[1]->later_time;
+    char c = (char)event_queue[1]->later_time;
     printf("%c", c);
     assert(c == *expected++);
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
-      event_queue_percolate_down(1, to_insert); 
+      event_queue_percolate_down(1, to_insert);
     event_queue_consistency_check();
   }
   printf("\n");
-
 }
 
-void act_queue_basic()
-{
-  ssm_reset();
+void act_queue_basic() {
+  reset_all();
   assert(act_queue_len == 0);
   assert(!acts[0].scheduled);
   ssm_activate(acts);
@@ -190,12 +195,11 @@ void act_queue_basic()
   assert(act_queue_len == 0);
 }
 
-void act_queue_sort_string(const char *input, const char *expected)
-{
-  ssm_reset();
+void act_queue_sort_string(const char *input, const char *expected) {
+  reset_all();
   assert(act_queue_len == 0);
   ssm_act_t *act = acts;
-  for (const char *cp = input ; *cp ; ++cp, ++act) {
+  for (const char *cp = input; *cp; ++cp, ++act) {
     act->scheduled = false;
     act->priority = *cp;
     ssm_activate(act);
@@ -203,13 +207,13 @@ void act_queue_sort_string(const char *input, const char *expected)
   }
 
   while (act_queue_len) {
-    char c = (char) act_queue[1]->priority;
+    char c = (char)act_queue[1]->priority;
     printf("%c", c);
     assert(c == *expected++);
     ssm_act_t *to_insert = act_queue[act_queue_len--]; // get last
 
     if (act_queue_len) // Was this the last?
-      act_queue_percolate_down(1, to_insert); 
+      act_queue_percolate_down(1, to_insert);
     act_queue_consistency_check();
   }
   printf("\n");
@@ -217,8 +221,7 @@ void act_queue_sort_string(const char *input, const char *expected)
 
 const char *next_expected;
 
-void check_priority_step(ssm_act_t *act)
-{
+void check_priority_step(ssm_act_t *act) {
   assert(act);
   char c = act->priority;
   printf("%c", c);
@@ -229,12 +232,11 @@ void check_priority_step(ssm_act_t *act)
  * then run ssm_tick() making the "step" function print and check the
  * priority of the activation record just executed.
  */
-void act_queue_sort_tick(const char *input, const char *expected)
-{
-  ssm_reset();
+void act_queue_sort_tick(const char *input, const char *expected) {
+  reset_all();
   assert(act_queue_len == 0);
   ssm_act_t *act = acts;
-  for (const char *cp = input ; *cp ; ++cp, ++act) {
+  for (const char *cp = input; *cp; ++cp, ++act) {
     act->step = check_priority_step;
     act->scheduled = false;
     act->priority = *cp;
@@ -244,29 +246,35 @@ void act_queue_sort_tick(const char *input, const char *expected)
   }
 
   next_expected = expected;
-  
+
   ssm_tick();
   act_queue_consistency_check();
 
-  assert(*next_expected == 0); // Did we end up at the end of the expected string?
-  
+  assert(*next_expected ==
+         0); // Did we end up at the end of the expected string?
+
   assert(act_queue_len == 0); // Should have emptied the activation record queue
   printf("\n");
 
   // Make sure all the activation records were unscheduled
   act = acts;
-  for (const char *cp = input ; *cp ; ++cp, ++act)
+  for (const char *cp = input; *cp; ++cp, ++act)
     assert(!act->scheduled);
 }
 
 bool step0ran, step1ran;
 
-void step0(ssm_act_t *act) { step0ran = true; printf("step0 "); }
-void step1(ssm_act_t *act) { step1ran = true; printf("step1 "); }
+void step0(ssm_act_t *act) {
+  step0ran = true;
+  printf("step0 ");
+}
+void step1(ssm_act_t *act) {
+  step1ran = true;
+  printf("step1 ");
+}
 
-void trigger_basic()
-{
-  ssm_reset();
+void trigger_basic() {
+  reset_all();
 
   acts[0].step = step0;
   acts[0].priority = 3;
@@ -281,11 +289,11 @@ void trigger_basic()
 
   step0ran = step1ran = false;
 
-  ssm_sensitize(&variables[0], &triggers[0]);
-  ssm_sensitize(&variables[0], &triggers[1]);
-  ssm_sensitize(&variables[0], &triggers[2]);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[2]);
 
-  ssm_schedule(&variables[0], 1);
+  ssm_later(ssm_to_sv(variables[0]), 1, EVENT_VALUE);
 
   ssm_tick();
   printf("\n");
@@ -296,67 +304,65 @@ void trigger_basic()
 
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_schedule(&variables[0], 2);
-  
+  ssm_later(ssm_to_sv(variables[0]), 2, EVENT_VALUE);
+
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-  
+
   assert(ssm_now() == 2);
   assert(step0ran);
   assert(step1ran);
 
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_schedule(&variables[0], 3);
+  ssm_later(ssm_to_sv(variables[0]), 3, EVENT_VALUE);
   ssm_desensitize(&triggers[1]);
 
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-  
+
   assert(ssm_now() == 3);
   assert(step0ran);
   assert(!step1ran);
 
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_schedule(&variables[0], 4);
+  ssm_later(ssm_to_sv(variables[0]), 4, EVENT_VALUE);
   ssm_desensitize(&triggers[0]);
 
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-    
+
   assert(ssm_now() == 4);
   assert(step0ran);
   assert(!step1ran);
 
-
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_schedule(&variables[0], 5);
+  ssm_later(ssm_to_sv(variables[0]), 5, EVENT_VALUE);
   ssm_desensitize(&triggers[2]);
 
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-    
+
   assert(ssm_now() == 5);
   assert(!step0ran);
   assert(!step1ran);
 
-
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_schedule(&variables[0], 6);
-  ssm_sensitize(&variables[0], &triggers[1]);
-  ssm_sensitize(&variables[0], &triggers[0]);
+  ssm_later(ssm_to_sv(variables[0]), 6, EVENT_VALUE);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
 
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-  
+
   assert(ssm_now() == 6);
   assert(step0ran);
   assert(step1ran);
@@ -364,21 +370,24 @@ void trigger_basic()
   assert(ssm_next_event_time() == SSM_NEVER);
 
   ssm_desensitize(&triggers[0]);
-  ssm_schedule(&variables[0], 7);
-  
+  ssm_later(ssm_to_sv(variables[0]), 7, EVENT_VALUE);
+
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
-  
+
   assert(ssm_now() == 7);
   assert(!step0ran);
   assert(step1ran);
 
   assert(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_sensitize(&variables[0], &triggers[0]);
+  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
 
-  ssm_trigger(&variables[0], 0);
+  for (ssm_trigger_t *trig = ssm_to_sv(variables[0])->triggers; trig;
+       trig = trig->next)
+    if (trig->act->priority > 0)
+      ssm_activate(trig->act);
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
@@ -387,132 +396,133 @@ void trigger_basic()
   assert(step0ran);
   assert(step1ran);
 
+  for (ssm_trigger_t *trig = ssm_to_sv(variables[0])->triggers; trig;
+       trig = trig->next)
+    if (trig->act->priority > 3)
+      ssm_activate(trig->act);
 
-  ssm_trigger(&variables[0], 3); // This priority should skip act[0]
   step0ran = step1ran = false;
   ssm_tick();
   printf("\n");
 
   assert(ssm_now() == 7);
   assert(!step0ran);
-  assert(step1ran);  
+  assert(step1ran);
 }
 
-void vacuous_update(ssm_sv_t *var)
-{
+void vacuous_step(ssm_act_t *act) {}
+
+void ssm_throw(enum ssm_error reason, const char *file, int line,
+               const char *func) {
+  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
+  exit(1);
 }
 
-void vacuous_step(ssm_act_t *act)
-{
-}
+int main() {
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    variables[i] = ssm_from_sv(ssm_new_sv(EVENT_VALUE));
 
-int main()
-{
-  for (int i = 0 ; i < NUM_VARIABLES ; i++)
-    ssm_initialize(variables + i, vacuous_update);
-
-  for (int i = 0 ; i < NUM_ACTS ; i++)
-    acts[i] = (ssm_act_t) {
-      .step = vacuous_step,
-      .caller = &ssm_top_parent,
-      .pc = 0,
-      .children = 0,
-      .priority = 0,
-      .depth = 0,
-      .scheduled = false,
+  for (int i = 0; i < NUM_ACTS; i++)
+    acts[i] = (ssm_act_t){
+        .step = vacuous_step,
+        .caller = &ssm_top_parent,
+        .pc = 0,
+        .children = 0,
+        .priority = 0,
+        .depth = 0,
+        .scheduled = false,
     };
-    
+
   check_starts_initialized();
 
   event_queue_basic();
-  
-  event_queue_sort_string("","");
-  event_queue_sort_string("ABC","ABC");
-  event_queue_sort_string("CBA","ABC");
-  event_queue_sort_string("ABCD","ABCD");
-  event_queue_sort_string("DBCA","ABCD");
-  event_queue_sort_string("DCBA","ABCD");
+  event_queue_sort_string("", "");
+  event_queue_sort_string("ABC", "ABC");
+  event_queue_sort_string("CBA", "ABC");
+  event_queue_sort_string("ABCD", "ABCD");
+  event_queue_sort_string("DBCA", "ABCD");
+  event_queue_sort_string("DCBA", "ABCD");
   event_queue_sort_string("MR JOCK TV QUIZ PHD BAGS FEW LYNX",
-			  "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                          "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   event_queue_sort_string("WALTZ BAD NYMPH FOR QUICK JIGS VEX",
-			  "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
+                          "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
   event_queue_sort_string("SPHINX OF BLACK QUARTZ JUDGE MY VOW",
-			  "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
+                          "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
   event_queue_sort_string("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
-			  "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
+                          "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
   event_queue_sort_string("The Quick Brown Fox Jumps Over The Lazy Dog",
-			  "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz");
+                          "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz");
 
-    
-  event_queue_reschedule_string("ABC","abc");
-  event_queue_reschedule_string("CBA","abc");
-  event_queue_reschedule_string("ABCD","abcd");
-  event_queue_reschedule_string("DBCA","abcd");
-  event_queue_reschedule_string("DCBA","abcd");
-  event_queue_reschedule_string("ABBA SAID GO AWAY",
-				" abdgioswy");
+  event_queue_reschedule_string("ABC", "abc");
+  event_queue_reschedule_string("CBA", "abc");
+  event_queue_reschedule_string("ABCD", "abcd");
+  event_queue_reschedule_string("DBCA", "abcd");
+  event_queue_reschedule_string("DCBA", "abcd");
+  event_queue_reschedule_string("ABBA SAID GO AWAY", " abdgioswy");
   event_queue_reschedule_string("MR JOCK TV QUIZ PHD BAGS FEW LYNX",
-				" abcdefghijklmnopqrstuvwxyz");
+                                " abcdefghijklmnopqrstuvwxyz");
   event_queue_reschedule_string("WALTZ BAD NYMPH FOR QUICK JIGS VEX",
-				" abcdefghijklmnopqrstuvwxyz");
+                                " abcdefghijklmnopqrstuvwxyz");
   event_queue_reschedule_string("SPHINX OF BLACK QUARTZ JUDGE MY VOW",
-				" abcdefghijklmnopqrstuvwxyz");
+                                " abcdefghijklmnopqrstuvwxyz");
   event_queue_reschedule_string("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
-				" abcdefghijklmnopqrstuvwxyz");
+                                " abcdefghijklmnopqrstuvwxyz");
   event_queue_reschedule_string("The Quick Brown Fox Jumps Over The Lazy Dog",
-				" ACEGHIKMNOPRSUVWXYZbdfjloqt");
+                                " ACEGHIKMNOPRSUVWXYZbdfjloqt");
 
   event_queue_unschedule_string("ABCD", 1, "BCD");
   event_queue_unschedule_string("ABCD", 2, "CD");
   event_queue_unschedule_string("ABCD", 3, "D");
   event_queue_unschedule_string("bcda", 2, "ad");
 
-  event_queue_unschedule_string("The Quick Brown Fox Jumps Over The Lazy Dog", 4,
-				"       BDFJLOQTaceeghikmnoooprrsuuvwxyz");  
-  event_queue_unschedule_string("The Quick Brown Fox Jumps Over The Lazy Dog", 15,
-				"      DFJLOTaeeghmooprsuvxyz");
+  event_queue_unschedule_string("The Quick Brown Fox Jumps Over The Lazy Dog",
+                                4, "       BDFJLOQTaceeghikmnoooprrsuuvwxyz");
+  event_queue_unschedule_string("The Quick Brown Fox Jumps Over The Lazy Dog",
+                                15, "      DFJLOTaeeghmooprsuvxyz");
 
   act_queue_basic();
 
-  act_queue_sort_string("","");
-  act_queue_sort_string("ABC","ABC");
-  act_queue_sort_string("CBA","ABC");
-  act_queue_sort_string("ABCD","ABCD");
-  act_queue_sort_string("DBCA","ABCD");
-  act_queue_sort_string("DCBA","ABCD");
+  act_queue_sort_string("", "");
+  act_queue_sort_string("ABC", "ABC");
+  act_queue_sort_string("CBA", "ABC");
+  act_queue_sort_string("ABCD", "ABCD");
+  act_queue_sort_string("DBCA", "ABCD");
+  act_queue_sort_string("DCBA", "ABCD");
   act_queue_sort_string("MR JOCK TV QUIZ PHD BAGS FEW LYNX",
-			  "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                        "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   act_queue_sort_string("WALTZ BAD NYMPH FOR QUICK JIGS VEX",
-			  "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
+                        "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
   act_queue_sort_string("SPHINX OF BLACK QUARTZ JUDGE MY VOW",
-			  "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
+                        "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
   act_queue_sort_string("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
-			  "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
+                        "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
   act_queue_sort_string("The Quick Brown Fox Jumps Over The Lazy Dog",
-			  "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz"); 
- 
+                        "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz");
 
-  act_queue_sort_tick("","");
-  act_queue_sort_tick("ABC","ABC");
-  act_queue_sort_tick("CBA","ABC");
-  act_queue_sort_tick("ABCD","ABCD");
-  act_queue_sort_tick("DBCA","ABCD");
-  act_queue_sort_tick("DCBA","ABCD");
+  act_queue_sort_tick("", "");
+  act_queue_sort_tick("ABC", "ABC");
+  act_queue_sort_tick("CBA", "ABC");
+  act_queue_sort_tick("ABCD", "ABCD");
+  act_queue_sort_tick("DBCA", "ABCD");
+  act_queue_sort_tick("DCBA", "ABCD");
 
   act_queue_sort_tick("MR JOCKTVQUIZPHDBAGSFEWLYNX",
-		      " ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                      " ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   act_queue_sort_tick("MR JOCK TV QUIZ PHD BAGS FEW LYNX",
-		      "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                      "       ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   act_queue_sort_tick("WALTZ BAD NYMPH FOR QUICK JIGS VEX",
-		      "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
+                      "      AABCDEFGHIIJKLMNOPQRSTUVWXYZ");
   act_queue_sort_tick("SPHINX OF BLACK QUARTZ JUDGE MY VOW",
-		      "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
+                      "      AABCDEFGHIJKLMNOOPQRSTUUVWXYZ");
   act_queue_sort_tick("THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
-		      "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
+                      "        ABCDEEEFGHHIJKLMNOOOOPQRRSTTUUVWXYZ");
   act_queue_sort_tick("The Quick Brown Fox Jumps Over The Lazy Dog",
-		      "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz"); 
+                      "        BDFJLOQTTaceeeghhikmnoooprrsuuvwxyz");
 
   trigger_basic();
+
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    ssm_drop(&ssm_to_sv(variables[i])->mm);
 
   printf("PASSED\n");
   return 0;
