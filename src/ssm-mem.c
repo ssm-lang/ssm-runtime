@@ -5,7 +5,7 @@
  */
 #include <ssm-internal.h>
 #include <assert.h>
-#include <allocationDispatcher.h>
+#include <allocation_dispatcher.h>
 ALLOCATION_DISPATCHER *ad = NULL;
 size_t allSizes[1000];
 int numSizes = 0;

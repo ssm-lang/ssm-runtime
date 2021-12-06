@@ -1,7 +1,6 @@
-#ifndef ALLOCATIONDISPATCHER
-#define ALLOCATIONDISPATCHER
-#include "fixedAllocator.h"
-#include "constants.h"
+#ifndef _ALLOCATION_DISPATCHER_H
+#define _ALLOCATION_DISPATCHER_H
+#include <fixed_allocator.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <ssm.h>

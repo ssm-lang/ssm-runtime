@@ -1,5 +1,5 @@
-#ifndef fixed_allocator
-#define fixed_allocator
+#ifndef _FIXED_ALLOCATOR_H
+#define _FIXED_ALLOCATOR_H
 
 #include <stddef.h>
 #include <stdint.h>

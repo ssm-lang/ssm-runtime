@@ -1,10 +1,10 @@
-#include <fixedAllocator.h>
+#include <fixed_allocator.h>
 #include <stdlib.h>
-#include <constants.h>
 #include <assert.h>
 #include <stdio.h>
+#include <ssm.h>
 FIXED_ALLOCATOR *faInitialize(size_t blockSize, size_t numBlocks, void* memory){
-  assert(blockSize>WORD_BOUNDARY);
+  assert(blockSize>sizeof(ssm_word_t));
     //need at least 1 word for pointer to next block in freelist
   FIXED_ALLOCATOR* allocator = memory;
   void* pool = ((char*) memory)+sizeof(FIXED_ALLOCATOR);
