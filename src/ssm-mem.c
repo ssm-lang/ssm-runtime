@@ -4,18 +4,24 @@
  *  @author John Hui (j-hui)
  */
 #include <ssm-internal.h>
+#include <assert.h>
 #include <allocationDispatcher.h>
 ALLOCATION_DISPATCHER *ad = NULL;
 size_t allSizes[1000];
 int numSizes = 0;
+
+void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators){
+  int size_to_malloc = 0;
+  for(int i=0; i<num_allocators; i++){
+    size_to_malloc+=allocator_sizes[i]*allocator_blocks[i]*sizeof(ssm_word_t);
+  }
+  void* memory_block =  malloc(size_to_malloc);
+  ALLOCATION_DISPATCHER *dispatcher = adInitialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
+  ad = dispatcher;
+}
 struct ssm_mm *ssm_mem_alloc(size_t size) {
   if(ad==NULL){
-    size_t allocatorSizes[] = {48};
-    size_t allocatorBlocks[] = {4000};
-    size_t numAllocators = 1;
-    void* memoryBlock =  malloc(48*1000*WORD_BOUNDARY);
-    ALLOCATION_DISPATCHER *dispatcher = adInitialize(allocatorSizes,allocatorBlocks,numAllocators,memoryBlock);
-    ad = dispatcher;
+    assert(0);
   }
   /*
 

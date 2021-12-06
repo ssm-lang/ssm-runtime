@@ -4,6 +4,7 @@
 #include "constants.h"
 #include <stddef.h>
 #include <stdio.h>
+#include <ssm.h>
 
 typedef struct AllocatorDispatcher {
   int numAllocators;
