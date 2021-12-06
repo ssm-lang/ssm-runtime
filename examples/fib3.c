@@ -155,12 +155,6 @@ void step_fib(struct ssm_act *act) {
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
-}
-
 int main(int argc, char *argv[]) {
   ssm_u32_t result = ssm_from_sv(ssm_new_sv(ssm_marshal(0xdeadbeef)));
 
@@ -178,4 +172,10 @@ int main(int argc, char *argv[]) {
   printf("%d\n", (int)ssm_unmarshal(ssm_deref(result)));
 
   return 0;
+}
+
+void ssm_throw(enum ssm_error reason, const char *file, int line,
+               const char *func) {
+  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
+  exit(1);
 }

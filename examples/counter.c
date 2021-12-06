@@ -5,27 +5,6 @@
 #include <stdlib.h>
 
 /*  Synchronous counter example, like scheduler-1/counter3.c
-
-ssm_activate
-  loop
-    clk = 0
-    after 100ms clk = 1     await 100ms
-    await @clk              clk = 1
-    after 100ms clk = 0     await 100ms
-    await @clk              clk = 0
-  loop
-    await
-      clk == true: q1 = d1
-  loop
-    await
-      clk == true: q2 = d2
-  loop
-    await
-      @q2: d2 = q2 + 1
-  loop
-    await
-      @q2 or @d2: d1 = q1 + d2
-
 clock =
   loop
     after 100ms, clk = 1
@@ -61,29 +40,6 @@ main =
       dff q2 d2
       incr q2 d2
       adder d1 d2 q2 q2
-
-How do you check @q2?   Any assignment set the event_time?
-Probably need another time stamp in the variable: indicates the instant in which
-the variable was last updated
-
-    await
-      x != lastx:     Syntactic sugar for this?
-        lastx = x
-
-
-
-    await
-       expr:
-         code
-         code
-       expr:
-         code
-         code
-
-    await expr: code
-
-    await expr
-
 */
 
 typedef struct {
@@ -170,6 +126,7 @@ void step_clock(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_leave(act, sizeof(act_clock_t));
 }
 
 ssm_stepf_t step_dff1;
@@ -208,6 +165,7 @@ void step_dff1(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_leave(act, sizeof(act_dff1_t));
 }
 
 ssm_stepf_t step_dff2;
@@ -248,6 +206,7 @@ void step_dff2(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_leave(act, sizeof(act_dff2_t));
 }
 
 ssm_stepf_t step_incr;
@@ -280,6 +239,7 @@ void step_incr(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_leave(act, sizeof(act_incr_t));
 }
 
 ssm_stepf_t step_adder;
@@ -320,6 +280,7 @@ void step_adder(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_leave(act, sizeof(act_adder_t));
 }
 
 ssm_stepf_t step_main;
