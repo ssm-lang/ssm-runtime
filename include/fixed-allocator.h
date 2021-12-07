@@ -8,10 +8,10 @@
 // skip list initialized with first word pointing to next free
 // global next free pointer - head
 // when freeing, insert at head of linkedlist (reuse!, reduce!, recycle!)
-// actually - not a global var - i guess it's a struct called the fixed_allocator
-// this struct holds memory, and a fixed size
+// actually - not a global var - i guess it's a struct called the
+// fixed_allocator this struct holds memory, and a fixed size
 
-typedef void* memory_t;
+typedef void *memory_t;
 
 typedef struct fixed_allocator {
   size_t blockSize; // in bytes
@@ -27,8 +27,8 @@ typedef struct fixed_allocator {
   which is essentially a linked list, where each free block points to the next
   block that is free, with a pointer in the first word of each block.
 
-  Due to the free list implementation, we require that the size is bigger than the
-  size of a pointer.
+  Due to the free list implementation, we require that the size is bigger than
+  the size of a pointer.
 
 */
 /*
@@ -38,7 +38,8 @@ typedef struct fixed_allocator {
   a certain number of blocks. The free list is set up, and a pointer to the
   allocator is returned.
 */
-fixed_allocator_t *fa_initialize(size_t blockSize, size_t numBlocks, void* memory);
+fixed_allocator_t *fa_initialize(size_t blockSize, size_t numBlocks,
+                                 void *memory);
 
 /*
   faMalloc:
@@ -54,8 +55,8 @@ memory_t fa_malloc(fixed_allocator_t *allocator);
 
   Returns block of memory to the allocator.
   Free list is adjusted accordingly.
-  The behaviour is undefined if the block is outside the bounds of the allocator,
-  or not aligned to a block teh allocator knows about.
+  The behaviour is undefined if the block is outside the bounds of the
+  allocator, or not aligned to a block teh allocator knows about.
 */
 void fa_free(fixed_allocator_t *allocator, memory_t address);
 

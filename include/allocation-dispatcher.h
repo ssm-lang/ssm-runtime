@@ -1,15 +1,14 @@
 #ifndef _ALLOCATION_DISPATCHER_H
 #define _ALLOCATION_DISPATCHER_H
 #include <fixed-allocator.h>
+#include <ssm.h>
 #include <stddef.h>
 #include <stdio.h>
-#include <ssm.h>
 
 typedef struct allocation_dispatcher {
   int numAllocators;
   fixed_allocator_t **allocators;
 } allocation_dispatcher_t;
-
 
 /*
   Allocation Dispatcher:
@@ -25,7 +24,8 @@ typedef struct allocation_dispatcher {
 
   adInitialize sets up the dispatcher, initializing underlying fixed allocators
 */
-allocation_dispatcher_t* ad_initialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool);
+allocation_dispatcher_t *ad_initialize(size_t blockSizes[], size_t numBlocks[],
+                                       size_t numAllocators, void *memoryPool);
 
 /*
   adMalloc:
@@ -36,7 +36,7 @@ allocation_dispatcher_t* ad_initialize(size_t blockSizes[], size_t numBlocks[], 
 
   Size is in number of bytes (sizeof(char)), much like normal malloc
 */
-void* ad_malloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
+void *ad_malloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
 
 /*
   adFree:
@@ -48,7 +48,8 @@ void* ad_malloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
   however, the address itself could also be used.
 
 */
-void* ad_free(allocation_dispatcher_t *allocationDispatcher, size_t size, void* memory);
+void *ad_free(allocation_dispatcher_t *allocationDispatcher, size_t size,
+              void *memory);
 /*
  adDestroy:
 
@@ -61,8 +62,9 @@ void ad_destroy(allocation_dispatcher_t *dispatcher);
 /*
   findAllocator:
 
-  internal helper function to figure out the underlying allcator to make allocation.
-  this may go away eventually
+  internal helper function to figure out the underlying allcator to make
+  allocation. this may go away eventually
 */
-fixed_allocator_t* find_allocator(allocation_dispatcher_t *allocationDispatcher, size_t size);
+fixed_allocator_t *find_allocator(allocation_dispatcher_t *allocationDispatcher,
+                                  size_t size);
 #endif

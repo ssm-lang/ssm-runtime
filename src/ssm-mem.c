@@ -3,26 +3,30 @@
  *
  *  @author John Hui (j-hui)
  */
-#include <ssm-internal.h>
-#include <assert.h>
 #include <allocation-dispatcher.h>
+#include <assert.h>
+#include <ssm-internal.h>
 allocation_dispatcher_t *ad = NULL;
 
-void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators){
+void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[],
+                  size_t num_allocators) {
   int size_to_malloc = 0;
-  for(int i=0; i<num_allocators; i++){
-    size_to_malloc+=allocator_sizes[i]*allocator_blocks[i]*sizeof(ssm_word_t);
+  for (int i = 0; i < num_allocators; i++) {
+    size_to_malloc +=
+        allocator_sizes[i] * allocator_blocks[i] * sizeof(ssm_word_t);
   }
-  void* memory_block =  malloc(size_to_malloc);
-  allocation_dispatcher_t *dispatcher = ad_initialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
+  void *memory_block = malloc(size_to_malloc);
+  allocation_dispatcher_t *dispatcher = ad_initialize(
+      allocator_sizes, allocator_blocks, num_allocators, memory_block);
   ad = dispatcher;
 }
+
 struct ssm_mm *ssm_mem_alloc(size_t size) {
-  return ad_malloc(ad,size); // toDONE(tm): (dan) use our own allocator
+  return ad_malloc(ad, size); // toDONE(tm): (dan) use our own allocator
 }
 
 void ssm_mem_free(struct ssm_mm *mm, size_t size) {
-  ad_free(ad,size,mm); // toDONE(tm): (dan) use our own allocator
+  ad_free(ad, size, mm); // toDONE(tm): (dan) use our own allocator
 }
 
 struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin) {
