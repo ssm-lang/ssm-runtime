@@ -5,13 +5,11 @@
 #include <stdio.h>
 #include <ssm.h>
 
-typedef struct AllocatorDispatcher {
+typedef struct allocation_dispatcher {
   int numAllocators;
-  FIXED_ALLOCATOR **allocators;
-} ALLOCATION_DISPATCHER;
+  fixed_allocator_t **allocators;
+} allocation_dispatcher_t;
 
-//if malloc is not allowed, this will throw an assertion
-#define ALLOW_MALLOC 0
 
 /*
   Allocation Dispatcher:
@@ -27,7 +25,7 @@ typedef struct AllocatorDispatcher {
 
   adInitialize sets up the dispatcher, initializing underlying fixed allocators
 */
-ALLOCATION_DISPATCHER* adInitialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool);
+allocation_dispatcher_t* adInitialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool);
 
 /*
   adMalloc:
@@ -38,7 +36,7 @@ ALLOCATION_DISPATCHER* adInitialize(size_t blockSizes[], size_t numBlocks[], siz
 
   Size is in number of bytes (sizeof(char)), much like normal malloc
 */
-void* adMalloc(ALLOCATION_DISPATCHER *allocationDispatcher, size_t size);
+void* adMalloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
 
 /*
   adFree:
@@ -50,7 +48,7 @@ void* adMalloc(ALLOCATION_DISPATCHER *allocationDispatcher, size_t size);
   however, the address itself could also be used.
 
 */
-void* adFree(ALLOCATION_DISPATCHER *allocationDispatcher, size_t size, void* memory);
+void* adFree(allocation_dispatcher_t *allocationDispatcher, size_t size, void* memory);
 /*
  adDestroy:
 
@@ -58,7 +56,7 @@ void* adFree(ALLOCATION_DISPATCHER *allocationDispatcher, size_t size, void* mem
  This may go away if a block of memory is given to the dispatcher to distribute
  to the fixed allocators.
 */
-void adDestroy(ALLOCATION_DISPATCHER *dispatcher);
+void adDestroy(allocation_dispatcher_t *dispatcher);
 
 /*
   findAllocator:
@@ -66,5 +64,5 @@ void adDestroy(ALLOCATION_DISPATCHER *dispatcher);
   internal helper function to figure out the underlying allcator to make allocation.
   this may go away eventually
 */
-FIXED_ALLOCATOR* findAllocator(ALLOCATION_DISPATCHER *allocationDispatcher, size_t size);
+fixed_allocator_t* findAllocator(allocation_dispatcher_t *allocationDispatcher, size_t size);
 #endif

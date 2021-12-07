@@ -6,7 +6,7 @@
 #include <ssm-internal.h>
 #include <assert.h>
 #include <allocation-dispatcher.h>
-ALLOCATION_DISPATCHER *ad = NULL;
+allocation_dispatcher_t *ad = NULL;
 
 void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators){
   int size_to_malloc = 0;
@@ -14,7 +14,7 @@ void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t nu
     size_to_malloc+=allocator_sizes[i]*allocator_blocks[i]*sizeof(ssm_word_t);
   }
   void* memory_block =  malloc(size_to_malloc);
-  ALLOCATION_DISPATCHER *dispatcher = adInitialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
+  allocation_dispatcher_t *dispatcher = adInitialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
   ad = dispatcher;
 }
 struct ssm_mm *ssm_mem_alloc(size_t size) {

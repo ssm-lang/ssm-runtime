@@ -3,36 +3,36 @@
 #include <stdio.h>
 #include <assert.h>
 
-ALLOCATION_DISPATCHER* adInitialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool){
+allocation_dispatcher_t* adInitialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool){
   void* memoryHead = memoryPool;
-  ALLOCATION_DISPATCHER* dispatcher= memoryHead;
-  memoryHead = ((char*) memoryHead)+sizeof(ALLOCATION_DISPATCHER);
+  allocation_dispatcher_t* dispatcher= memoryHead;
+  memoryHead = ((char*) memoryHead)+sizeof(allocation_dispatcher_t);
   dispatcher->numAllocators = numAllocators;
   dispatcher->allocators = memoryHead;
-  memoryHead= ((char*) memoryHead)+sizeof(FIXED_ALLOCATOR)*numAllocators;
+  memoryHead= ((char*) memoryHead)+sizeof(fixed_allocator_t)*numAllocators;
   for(int i=0; i<numAllocators; i++){
     void* memory = memoryHead;
-    memoryHead = ((char*) memoryHead)+blockSizes[i]*numBlocks[i]+sizeof(FIXED_ALLOCATOR);
+    memoryHead = ((char*) memoryHead)+blockSizes[i]*numBlocks[i]+sizeof(fixed_allocator_t);
     dispatcher->allocators[i]=faInitialize(blockSizes[i], numBlocks[i], memory);
   }
   return dispatcher;
 }
 
-void adDestroy(ALLOCATION_DISPATCHER* ad){
+void adDestroy(allocation_dispatcher_t* ad){
   for(int i=0; i<ad->numAllocators; i++){
     faDestroy(ad->allocators[i]);
   }
 }
-void* adMalloc(ALLOCATION_DISPATCHER *ad, size_t size){
-  FIXED_ALLOCATOR *allocator = findAllocator(ad, size);
+void* adMalloc(allocation_dispatcher_t *ad, size_t size){
+  fixed_allocator_t *allocator = findAllocator(ad, size);
   if(!allocator){
     printf("\n\nmissing size %d\n\n",size);
     assert(0==size);
   }
   return faMalloc(allocator);
 }
-void* adFree(ALLOCATION_DISPATCHER *ad, size_t size, void* memory){
-  FIXED_ALLOCATOR *allocator = findAllocator(ad, size);
+void* adFree(allocation_dispatcher_t *ad, size_t size, void* memory){
+  fixed_allocator_t *allocator = findAllocator(ad, size);
   if(!allocator){
     #if !ALLOW_MALLOC
       assert(0);
@@ -43,7 +43,7 @@ void* adFree(ALLOCATION_DISPATCHER *ad, size_t size, void* memory){
     faFree(allocator,memory);
   }
 }
-FIXED_ALLOCATOR* findAllocator(ALLOCATION_DISPATCHER *ad, size_t size){
+fixed_allocator_t* findAllocator(allocation_dispatcher_t *ad, size_t size){
   //todo: sort and binary search?
   //todo: smallest available size above threshold?
   for(int i=0; i<ad->numAllocators; i++){
