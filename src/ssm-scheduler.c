@@ -48,7 +48,7 @@ typedef uint16_t q_idx_t;
  *
  *  Managed as a binary heap, sorted by @a later_time.
  *
- *  Since the first element (#QUEUE_HEAD) is unusued,
+ *  Since the first element (#SSM_QUEUE_HEAD) is unusued,
  *  event_queue[event_queue_len] is the last element in the queue provided
  *  event_queue_len is non-zero.
  */
