@@ -16,5 +16,11 @@ jobs:
     - name: Checkout repo
       uses: actions/checkout@v2
 
-    - name: Run Doxygen
-      uses: mattnotmitt/doxygen-action@v1.3.1
+    - name: Install dependencies
+      run: |
+        apt-get update
+        apt-get install -y doxygen build-essential
+
+    - name: Build documentation
+      run: |
+        make docs
