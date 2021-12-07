@@ -1,23 +1,25 @@
+#include <ssm.h>
 #include <ssm-internal.h>
 #include <ssm-typedefs.h>
-#include <ssm.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
 /*
-one &a
-  wait a
-  a = a + 1
-
-two &a
-  wait a
-  a = a * 2
-
-main
-  var a = 0
-  after 1s a = 10
-  ssm_activate one(a) two(a)
-  // a = 22 here
+ * one a =
+ *   wait a
+ *   a <- deref a + 1
+ *
+ * two a =
+ *   wait a
+ *   a <- deref a * 2
+ *
+ * main =
+ *   let a = new 0
+ *   after 1s, a <- 10
+ *   par one a
+ *       two a
+ *   // a = 22 here
  */
 
 typedef struct {
@@ -63,6 +65,7 @@ void step_one(struct ssm_act *act) {
     ssm_assign(ssm_to_sv(cont->a), act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) + 1));
   }
+  ssm_drop(ssm_sv_mm(cont->a));
   ssm_leave(act, sizeof(act_one_t));
 }
 
@@ -91,6 +94,7 @@ void step_two(struct ssm_act *act) {
     ssm_assign(ssm_to_sv(cont->a), act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) * 2));
   }
+  ssm_drop(ssm_sv_mm(cont->a));
   ssm_leave(act, sizeof(act_two_t));
 }
 
@@ -115,8 +119,12 @@ void step_main(struct ssm_act *act) {
       ssm_depth_t new_depth = act->depth - 1; // 2 children
       ssm_priority_t new_priority = act->priority;
       ssm_priority_t pinc = 1 << new_depth;
+
+      ssm_dup(ssm_sv_mm(cont->a));
       ssm_activate(ssm_enter_one(act, new_priority, new_depth, cont->a));
+
       new_priority += pinc;
+      ssm_dup(ssm_sv_mm(cont->a));
       ssm_activate(ssm_enter_two(act, new_priority, new_depth, cont->a));
     }
     act->pc = 1;
@@ -124,6 +132,7 @@ void step_main(struct ssm_act *act) {
   case 1:
     printf("a = %d\n", (int)ssm_unmarshal(ssm_deref(cont->a)));
   }
+  ssm_drop(ssm_sv_mm(cont->a));
   ssm_leave(act, sizeof(act_main_t));
 }
 

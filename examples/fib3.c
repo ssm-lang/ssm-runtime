@@ -14,14 +14,14 @@ sum (r1: &Int) (r2: &Int) (r: &Int) =
   after 1s, r <- deref r1 + deref r2
 
 fib (n: Int) (&r: &Int) =
-  let r1 = ref 0
-  let r2 = ref 0
   if n < 2
     after 1s, r <- 1
   else
-    par sum r1 r2 r
-        fib (n - 1) r1
+    let r1 = ref 0
+    let r2 = ref 0
+    par fib (n - 1) r1
         fib (n - 2) r2
+        sum r1 r2 r
 
 0 1 2 3 4 5  6  7  8  9 10  11  12  13
 1 1 2 3 5 8 13 21 34 55 89 144 233 377
@@ -68,6 +68,7 @@ void step_mywait(struct ssm_act *act) {
     ssm_desensitize(&cont->trigger1);
     break;
   }
+  ssm_drop(ssm_sv_mm(cont->r));
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -92,8 +93,10 @@ void step_sum(struct ssm_act *act) {
     ssm_depth_t new_depth = act->depth - 1; // 2 children
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
+    ssm_dup(ssm_sv_mm(cont->r1));
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r1));
     new_priority += pinc;
+    ssm_dup(ssm_sv_mm(cont->r2));
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r2));
   }
     act->pc = 1;
@@ -104,6 +107,9 @@ void step_sum(struct ssm_act *act) {
                           ssm_unmarshal(ssm_deref(cont->r2))));
     break;
   }
+  ssm_drop(ssm_sv_mm(cont->r));
+  ssm_drop(ssm_sv_mm(cont->r2));
+  ssm_drop(ssm_sv_mm(cont->r1));
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -116,8 +122,6 @@ ssm_act_t *ssm_enter_fib(struct ssm_act *parent, ssm_priority_t priority,
                    act_fib_t, act);
   cont->n = n;
   cont->r = r;
-  /* ssm_initialize(&cont->r1); */
-  /* ssm_initialize(&cont->r2); */
   return &cont->act;
 }
 
@@ -125,33 +129,37 @@ void step_fib(struct ssm_act *act) {
   act_fib_t *cont = container_of(act, act_fib_t, act);
   switch (act->pc) {
   case 0:
-    cont->r1 = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
-    cont->r2 = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
-
     if (ssm_unmarshal(cont->n) < 2) {
       ssm_later(ssm_to_sv(cont->r), ssm_now() + SSM_SECOND, ssm_marshal(1));
-      break;
-    }
-    {
+    } else {
+      cont->r1 = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
+      cont->r2 = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
       ssm_depth_t new_depth = act->depth - 2; // 4 children
       ssm_priority_t new_priority = act->priority;
       ssm_priority_t pinc = 1 << new_depth;
+      ssm_dup(ssm_sv_mm(cont->r1));
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 1),
                                  cont->r1));
       new_priority += pinc;
+      ssm_dup(ssm_sv_mm(cont->r2));
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 2),
                                  cont->r2));
       new_priority += pinc;
+      ssm_dup(ssm_sv_mm(cont->r1));
+      ssm_dup(ssm_sv_mm(cont->r2));
+      ssm_dup(ssm_sv_mm(cont->r));
       ssm_activate(ssm_enter_sum(act, new_priority, new_depth, cont->r1,
                                  cont->r2, cont->r));
+      act->pc = 1;
+      return;
+    case 1:;
+      ssm_drop(ssm_sv_mm(cont->r1));
+      ssm_drop(ssm_sv_mm(cont->r2));
     }
-    act->pc = 1;
-    return;
-  case 1:
-    break;
   }
+  ssm_drop(ssm_sv_mm(cont->r));
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -160,6 +168,7 @@ int main(int argc, char *argv[]) {
 
   int n = argc > 1 ? atoi(argv[1]) : 3;
 
+  ssm_dup(ssm_sv_mm(result));
   ssm_activate(ssm_enter_fib(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH,
                              ssm_marshal(n), result));
 
@@ -170,6 +179,8 @@ int main(int argc, char *argv[]) {
 
   printf("simulated %lu seconds\n", ssm_now() / SSM_SECOND);
   printf("%d\n", (int)ssm_unmarshal(ssm_deref(result)));
+
+  ssm_drop(ssm_sv_mm(result));
 
   return 0;
 }

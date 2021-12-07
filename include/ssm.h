@@ -143,7 +143,7 @@ typedef union {
 /** @brief Heap-allocated SSM object, with memory management metadata header.
  *
  *  The payload array is declared of size 1 here, but is of varying size in
- *  practice. The actual size should be looked up in the #mm header.
+ *  practice. The actual size should be looked up in the @a mm header.
  */
 struct ssm_object {
   struct ssm_mm mm;       /**< Memory management metadata. */
@@ -511,12 +511,19 @@ struct ssm_sv *ssm_new_sv(ssm_value_t val);
  */
 #define ssm_event_on(v) (ssm_to_sv(v)->last_updated == ssm_now())
 
-/** @brief Obtain to the value of a scheduled variable.
+/** @brief Obtain the value of a scheduled variable.
  *
  *  @param v  #ssm_value_t that points to a scheduled variable.
  *  @returns  the value that @a v points to.
  */
 #define ssm_deref(v) (ssm_to_sv(v)->value)
+
+/** @brief Obtain memory management header of a scheduled variable.
+ *
+ *  @param v  #ssm_value_t that points to a scheduled variable.
+ *  @returns  a pointer to the #ssm_mm header of @a v.
+ */
+#define ssm_sv_mm(v) (&ssm_to_sv(v)->mm)
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
