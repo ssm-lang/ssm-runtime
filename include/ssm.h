@@ -21,8 +21,6 @@
  * @defgroup mem    Memory management
  * @defgroup time   Timestamps
  * @defgroup util   Utilities
- *
- * @fake command
  */
 
 /**
