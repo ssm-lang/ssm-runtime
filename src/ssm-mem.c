@@ -5,7 +5,7 @@
  */
 #include <ssm-internal.h>
 #include <assert.h>
-#include <allocation_dispatcher.h>
+#include <allocation-dispatcher.h>
 ALLOCATION_DISPATCHER *ad = NULL;
 
 void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators){
