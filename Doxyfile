@@ -11,7 +11,7 @@ PROJECT_NUMBER         = 0.0.2
 PROJECT_BRIEF          =  "Runtime Library for the Sparse Synchronous Model"
 PROJECT_LOGO           =
 
-OUTPUT_DIRECTORY       = doc/generated
+OUTPUT_DIRECTORY       = build/doc
 OUTPUT_LANGUAGE        = English
 
 MARKDOWN_SUPPORT       = YES
@@ -135,7 +135,7 @@ FILE_PATTERNS          = *.c \
                          *.dox
 RECURSIVE              = YES
 
-EXCLUDE                = doc/generated
+EXCLUDE                = build/doc
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =
