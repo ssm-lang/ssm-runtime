@@ -54,9 +54,18 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
 void ssm_drop(struct ssm_mm *mm) {
-  if (--mm->ref_count == 0)
+  if (--mm->ref_count == 0){
+    if(!ssm_mm_is_builtin(mm)){
+      struct ssm_object *obj = (struct ssm_object*) mm;
+      for(int i=0; i<mm->val_count; i++){
+        if(!ssm_mm_is_builtin(obj->payload[i].heap_ptr)){
+           ssm_drop(obj->payload[i].heap_ptr);
+        }
+      }
+    }
     ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
                                            : SSM_OBJ_SIZE(mm->val_count));
+  }
 }
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
