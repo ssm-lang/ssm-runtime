@@ -18,9 +18,6 @@ void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t nu
   ad = dispatcher;
 }
 struct ssm_mm *ssm_mem_alloc(size_t size) {
-  if(ad==NULL){
-    assert(0);
-  }
   return adMalloc(ad,size); // toDONE(tm): (dan) use our own allocator
 }
 
