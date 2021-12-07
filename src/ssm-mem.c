@@ -69,8 +69,25 @@ void ssm_drop(struct ssm_mm *mm) {
 }
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
-  SSM_ASSERT(0); // TODO: not implemented
-  return NULL;
+  if (--mm->ref_count == 0) {
+    if (!ssm_mm_is_builtin(mm)) {
+      struct ssm_object *obj = (struct ssm_object *)mm;
+      for (int i = 0; i < mm->val_count; i++) {
+        if (!ssm_mm_is_builtin(obj->payload[i].heap_ptr)) {
+          ssm_drop(obj->payload[i].heap_ptr);
+        }
+      }
+    }
+    return mm;
+  }
+  else{
+    if(ssm_mm_is_builtin(mm)){
+      return ssm_new_builtin(mm->tag);
+    }
+    else{
+      return ssm_new(mm->val_count,mm->tag);
+    }
+  }
 }
 
 allocation_dispatcher_t *ad_initialize(size_t block_sizes[],
