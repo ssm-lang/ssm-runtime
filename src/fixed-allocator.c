@@ -14,26 +14,22 @@ fixed_allocator_t *faInitialize(size_t blockSize, size_t numBlocks, void* memory
   allocator->freeListHead = allocator->memoryPool;
 
   // initalize freelist
-  INTEGER_REPRESENTATION currentAddress = (INTEGER_REPRESENTATION)(allocator->memoryPool);
-  //fprintf(DEBUG_DEST,"allocator %ld\n",(INTEGER_REPRESENTATION)allocator);
-  //fprintf(DEBUG_DEST,"Initializing free list\n(address, value)\n");
+  ssm_word_t currentAddress = (ssm_word_t)(allocator->memoryPool);
   for(int i=0; i<numBlocks-1; i++){
-    *((INTEGER_REPRESENTATION*) currentAddress)=currentAddress+blockSize;
-    //fprintf(DEBUG_DEST,"%ld, %ld\n",currentAddress, *((INTEGER_REPRESENTATION*) currentAddress));
+    *((ssm_word_t*) currentAddress)=currentAddress+blockSize;
     currentAddress+=blockSize;
   }
-  *((INTEGER_REPRESENTATION*) currentAddress)=0; //nullptr - no more free
-  //fprintf(DEBUG_DEST,"%ld, %ld\n",currentAddress, *((INTEGER_REPRESENTATION*) currentAddress));
+  *((ssm_word_t*) currentAddress)=0; //nullptr - no more free
   return allocator;
 }
-MEMORY faMalloc(fixed_allocator_t *allocator){
+memory_t faMalloc(fixed_allocator_t *allocator){
   assert(allocator->freeListHead!=0); //fail on oom
-  MEMORY toReturn = allocator->freeListHead;
-  allocator->freeListHead = (MEMORY) (*((INTEGER_REPRESENTATION*)(allocator->freeListHead)));
+  memory_t toReturn = allocator->freeListHead;
+  allocator->freeListHead = (memory_t) (*((ssm_word_t*)(allocator->freeListHead)));
   return toReturn;
 }
-void faFree(fixed_allocator_t *allocator, MEMORY address){
-  *((INTEGER_REPRESENTATION*) address) = (INTEGER_REPRESENTATION) (allocator->freeListHead);
+void faFree(fixed_allocator_t *allocator, memory_t address){
+  *((ssm_word_t*) address) = (ssm_word_t) (allocator->freeListHead);
   allocator->freeListHead = address;
 }
 

@@ -11,24 +11,13 @@
 // actually - not a global var - i guess it's a struct called the fixed_allocator
 // this struct holds memory, and a fixed size
 
-typedef void* MEMORY;
-
-
-#if UINTPTR_MAX == 0xFFFF
-  #error how do you even metadata?
-#elif INTPTR_MAX == INT32_MAX
-  typedef uint32_t INTEGER_REPRESENTATION;
-#elif INTPTR_MAX == INT64_MAX
-  typedef unsigned long INTEGER_REPRESENTATION;
-#else
-  #error Unknown pointer size
-#endif
+typedef void* memory_t;
 
 typedef struct fixed_allocator {
   size_t blockSize; // in bytes
   size_t numBlocks;
-  MEMORY memoryPool;
-  MEMORY freeListHead;
+  memory_t memoryPool;
+  memory_t freeListHead;
 } fixed_allocator_t;
 /*
   The Fixed Allocator:
@@ -58,7 +47,7 @@ fixed_allocator_t *faInitialize(size_t blockSize, size_t numBlocks, void* memory
   Returns NULL if OOM (this is protected by an assertion).
   Free list is adjusted accordingly.
 */
-MEMORY faMalloc(fixed_allocator_t *allocator);
+memory_t faMalloc(fixed_allocator_t *allocator);
 
 /*
   faFree:
@@ -68,7 +57,7 @@ MEMORY faMalloc(fixed_allocator_t *allocator);
   The behaviour is undefined if the block is outside the bounds of the allocator,
   or not aligned to a block teh allocator knows about.
 */
-void faFree(fixed_allocator_t *allocator, MEMORY address);
+void faFree(fixed_allocator_t *allocator, memory_t address);
 
 /*
   faDestroy:
