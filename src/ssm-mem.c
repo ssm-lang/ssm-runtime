@@ -7,8 +7,6 @@
 #include <assert.h>
 #include <allocation_dispatcher.h>
 ALLOCATION_DISPATCHER *ad = NULL;
-size_t allSizes[1000];
-int numSizes = 0;
 
 void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators){
   int size_to_malloc = 0;
@@ -23,25 +21,6 @@ struct ssm_mm *ssm_mem_alloc(size_t size) {
   if(ad==NULL){
     assert(0);
   }
-  /*
-
-  // this block of code is used to (inefficiently) construct an array of all allocated sizes
-
-  int foundSize = 0;
-  for(int i=0; i<numSizes;i++){
-    if(size==allSizes[i]){
-      foundSize=1;
-    }
-  }
-  if(!foundSize){
-    allSizes[numSizes++]=size;
-  }
-  printf("\nsizes:\n");
-  for(int i=0; i<numSizes;i++){
-    printf("%d, ",allSizes[i]);
-  }
-  printf("\n");
-  */
   return adMalloc(ad,size); // toDONE(tm): (dan) use our own allocator
 }
 
