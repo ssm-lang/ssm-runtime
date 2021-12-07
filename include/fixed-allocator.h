@@ -11,10 +11,10 @@
 typedef void *memory_t;
 
 typedef struct fixed_allocator {
-  size_t blockSize; // in bytes
-  size_t numBlocks;
-  memory_t memoryPool;
-  memory_t freeListHead;
+  size_t block_size; // in bytes
+  size_t num_blocks;
+  memory_t memory_pool;
+  memory_t free_list_head;
 } fixed_allocator_t;
 /**
   The Fixed Allocator:
@@ -41,7 +41,7 @@ typedef struct fixed_allocator {
   @param memory - raw memory on which to build the allocator, must be
   at least numBlocks*blockSize+sizeof(fixed_allocator_t) big.
 */
-fixed_allocator_t *fa_initialize(size_t blockSize, size_t numBlocks,
+fixed_allocator_t *fa_initialize(size_t block_size, size_t num_blocks,
                                  void *memory);
 
 /**

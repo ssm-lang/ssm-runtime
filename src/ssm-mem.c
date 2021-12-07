@@ -64,26 +64,29 @@ struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
   return NULL;
 }
 
-allocation_dispatcher_t *ad_initialize(size_t blockSizes[], size_t numBlocks[],
-                                       size_t numAllocators, void *memoryPool) {
-  void *memoryHead = memoryPool;
+allocation_dispatcher_t *ad_initialize(size_t block_sizes[],
+                                       size_t num_blocks[],
+                                       size_t num_allocators,
+                                       void *memory_pool) {
+  void *memoryHead = memory_pool;
   allocation_dispatcher_t *dispatcher = memoryHead;
   memoryHead = ((char *)memoryHead) + sizeof(allocation_dispatcher_t);
-  dispatcher->numAllocators = numAllocators;
+  dispatcher->num_allocators = num_allocators;
   dispatcher->allocators = memoryHead;
-  memoryHead = ((char *)memoryHead) + sizeof(fixed_allocator_t) * numAllocators;
-  for (int i = 0; i < numAllocators; i++) {
+  memoryHead =
+      ((char *)memoryHead) + sizeof(fixed_allocator_t) * num_allocators;
+  for (int i = 0; i < num_allocators; i++) {
     void *memory = memoryHead;
-    memoryHead = ((char *)memoryHead) + blockSizes[i] * numBlocks[i] +
+    memoryHead = ((char *)memoryHead) + block_sizes[i] * num_blocks[i] +
                  sizeof(fixed_allocator_t);
     dispatcher->allocators[i] =
-        fa_initialize(blockSizes[i], numBlocks[i], memory);
+        fa_initialize(block_sizes[i], num_blocks[i], memory);
   }
   return dispatcher;
 }
 
 void ad_destroy(allocation_dispatcher_t *ad) {
-  for (int i = 0; i < ad->numAllocators; i++) {
+  for (int i = 0; i < ad->num_allocators; i++) {
     fa_destroy(ad->allocators[i]);
   }
 }
@@ -109,44 +112,44 @@ void *ad_free(allocation_dispatcher_t *ad, size_t size, void *memory) {
 fixed_allocator_t *find_allocator(allocation_dispatcher_t *ad, size_t size) {
   // todo: sort and binary search?
   // todo: smallest available size above threshold?
-  for (int i = 0; i < ad->numAllocators; i++) {
-    if (ad->allocators[i]->blockSize == size) {
+  for (int i = 0; i < ad->num_allocators; i++) {
+    if (ad->allocators[i]->block_size == size) {
       return ad->allocators[i];
     }
   }
   return NULL;
 }
 
-fixed_allocator_t *fa_initialize(size_t blockSize, size_t numBlocks,
+fixed_allocator_t *fa_initialize(size_t block_size, size_t num_blocks,
                                  void *memory) {
-  assert(blockSize > sizeof(ssm_word_t));
+  assert(block_size > sizeof(ssm_word_t));
   // need at least 1 word for pointer to next block in freelist
   fixed_allocator_t *allocator = memory;
   void *pool = ((char *)memory) + sizeof(fixed_allocator_t);
-  allocator->blockSize = blockSize;
-  allocator->numBlocks = numBlocks;
-  allocator->memoryPool = pool;
-  allocator->freeListHead = allocator->memoryPool;
+  allocator->block_size = block_size;
+  allocator->num_blocks = num_blocks;
+  allocator->memory_pool = pool;
+  allocator->free_list_head = allocator->memory_pool;
 
   // initalize freelist
-  ssm_word_t currentAddress = (ssm_word_t)(allocator->memoryPool);
-  for (int i = 0; i < numBlocks - 1; i++) {
-    *((ssm_word_t *)currentAddress) = currentAddress + blockSize;
-    currentAddress += blockSize;
+  ssm_word_t currentAddress = (ssm_word_t)(allocator->memory_pool);
+  for (int i = 0; i < num_blocks - 1; i++) {
+    *((ssm_word_t *)currentAddress) = currentAddress + block_size;
+    currentAddress += block_size;
   }
   *((ssm_word_t *)currentAddress) = 0; // nullptr - no more free
   return allocator;
 }
 memory_t fa_malloc(fixed_allocator_t *allocator) {
-  assert(allocator->freeListHead != 0); // fail on oom
-  memory_t toReturn = allocator->freeListHead;
-  allocator->freeListHead =
-      (memory_t)(*((ssm_word_t *)(allocator->freeListHead)));
+  assert(allocator->free_list_head != 0); // fail on oom
+  memory_t toReturn = allocator->free_list_head;
+  allocator->free_list_head =
+      (memory_t)(*((ssm_word_t *)(allocator->free_list_head)));
   return toReturn;
 }
 void fa_free(fixed_allocator_t *allocator, memory_t address) {
-  *((ssm_word_t *)address) = (ssm_word_t)(allocator->freeListHead);
-  allocator->freeListHead = address;
+  *((ssm_word_t *)address) = (ssm_word_t)(allocator->free_list_head);
+  allocator->free_list_head = address;
 }
 
 void fa_destroy(fixed_allocator_t *allocator) {}
