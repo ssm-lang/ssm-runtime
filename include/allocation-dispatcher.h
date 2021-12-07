@@ -25,7 +25,7 @@ typedef struct allocation_dispatcher {
 
   adInitialize sets up the dispatcher, initializing underlying fixed allocators
 */
-allocation_dispatcher_t* adInitialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool);
+allocation_dispatcher_t* ad_initialize(size_t blockSizes[], size_t numBlocks[], size_t numAllocators, void* memoryPool);
 
 /*
   adMalloc:
@@ -36,7 +36,7 @@ allocation_dispatcher_t* adInitialize(size_t blockSizes[], size_t numBlocks[], s
 
   Size is in number of bytes (sizeof(char)), much like normal malloc
 */
-void* adMalloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
+void* ad_malloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
 
 /*
   adFree:
@@ -48,7 +48,7 @@ void* adMalloc(allocation_dispatcher_t *allocationDispatcher, size_t size);
   however, the address itself could also be used.
 
 */
-void* adFree(allocation_dispatcher_t *allocationDispatcher, size_t size, void* memory);
+void* ad_free(allocation_dispatcher_t *allocationDispatcher, size_t size, void* memory);
 /*
  adDestroy:
 
@@ -56,7 +56,7 @@ void* adFree(allocation_dispatcher_t *allocationDispatcher, size_t size, void* m
  This may go away if a block of memory is given to the dispatcher to distribute
  to the fixed allocators.
 */
-void adDestroy(allocation_dispatcher_t *dispatcher);
+void ad_destroy(allocation_dispatcher_t *dispatcher);
 
 /*
   findAllocator:
@@ -64,5 +64,5 @@ void adDestroy(allocation_dispatcher_t *dispatcher);
   internal helper function to figure out the underlying allcator to make allocation.
   this may go away eventually
 */
-fixed_allocator_t* findAllocator(allocation_dispatcher_t *allocationDispatcher, size_t size);
+fixed_allocator_t* find_allocator(allocation_dispatcher_t *allocationDispatcher, size_t size);
 #endif

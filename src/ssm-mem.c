@@ -14,15 +14,15 @@ void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t nu
     size_to_malloc+=allocator_sizes[i]*allocator_blocks[i]*sizeof(ssm_word_t);
   }
   void* memory_block =  malloc(size_to_malloc);
-  allocation_dispatcher_t *dispatcher = adInitialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
+  allocation_dispatcher_t *dispatcher = ad_initialize(allocator_sizes,allocator_blocks,num_allocators,memory_block);
   ad = dispatcher;
 }
 struct ssm_mm *ssm_mem_alloc(size_t size) {
-  return adMalloc(ad,size); // toDONE(tm): (dan) use our own allocator
+  return ad_malloc(ad,size); // toDONE(tm): (dan) use our own allocator
 }
 
 void ssm_mem_free(struct ssm_mm *mm, size_t size) {
-  adFree(ad,size,mm); // toDONE(tm): (dan) use our own allocator
+  ad_free(ad,size,mm); // toDONE(tm): (dan) use our own allocator
 }
 
 struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin) {
