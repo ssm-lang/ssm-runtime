@@ -68,16 +68,18 @@ allocation_dispatcher_t *ad_initialize(size_t block_sizes[],
                                        size_t num_blocks[],
                                        size_t num_allocators,
                                        void *memory_pool) {
-  void *memoryHead = memory_pool;
-  allocation_dispatcher_t *dispatcher = memoryHead;
-  memoryHead = ((char *)memoryHead) + sizeof(allocation_dispatcher_t);
+  // memory head is keeping track of next available memory
+  // increments to memory head are analogous to calls to malloc
+  void *memory_head = memory_pool;
+  allocation_dispatcher_t *dispatcher = memory_head;
+  memory_head = ((char *)memory_head) + sizeof(allocation_dispatcher_t);
   dispatcher->num_allocators = num_allocators;
-  dispatcher->allocators = memoryHead;
-  memoryHead =
-      ((char *)memoryHead) + sizeof(fixed_allocator_t) * num_allocators;
+  dispatcher->allocators = memory_head;
+  memory_head =
+      ((char *)memory_head) + sizeof(fixed_allocator_t) * num_allocators;
   for (int i = 0; i < num_allocators; i++) {
-    void *memory = memoryHead;
-    memoryHead = ((char *)memoryHead) + block_sizes[i] * num_blocks[i] +
+    void *memory = memory_head;
+    memory_head = ((char *)memory_head) + block_sizes[i] * num_blocks[i] +
                  sizeof(fixed_allocator_t);
     dispatcher->allocators[i] =
         fa_initialize(block_sizes[i], num_blocks[i], memory);
