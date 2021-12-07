@@ -79,13 +79,11 @@ struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
       }
     }
     return mm;
-  }
-  else{
-    if(ssm_mm_is_builtin(mm)){
+  } else {
+    if (ssm_mm_is_builtin(mm)) {
       return ssm_new_builtin(mm->tag);
-    }
-    else{
-      return ssm_new(mm->val_count,mm->tag);
+    } else {
+      return ssm_new(mm->val_count, mm->tag);
     }
   }
 }
