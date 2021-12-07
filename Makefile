@@ -19,6 +19,7 @@ CFLAGS = -Iinclude -O -Wall -pedantic -std=c99 $(TEST_CFLAGS) $(COVERAGE_CFLAGS)
 SOURCES = $(wildcard src/*.c)
 INCLUDES = $(wildcard include/*.h)
 OBJECTS = $(patsubst src/%.c, build/%.o, $(SOURCES))
+DOCS = $(wildcard doc/*.dox) $(wildcard doc/*.md)
 
 EXAMPLES = $(wildcard examples/*.c)
 EXAMPLEEXES = $(patsubst examples/%.c, build/%, $(EXAMPLES))
@@ -69,11 +70,10 @@ build/% : examples/%.c build/libssm.a
 	$(CC) $(CFLAGS) -o $@ $< -Lbuild -lssm
 
 
+docs : doc/generated/html
 
-documentation : doc/html/index.html
-
-doc/html/index.html : doc/Doxyfile $(SOURCES) $(INCLUDES)
-	cd doc && doxygen
+doc/generated/html : Doxyfile $(DOCS) $(SOURCES) $(INCLUDES)
+	doxygen
 
 
 .PHONY : clean

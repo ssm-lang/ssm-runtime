@@ -40,7 +40,7 @@
  *  };
  *  ~~~
  */
-enum ssm_error {
+typedef enum ssm_error {
   SSM_INTERNAL_ERROR = 1,
   /**< Reserved for unforeseen, non-user-facing errors. */
   SSM_EXHAUSTED_ACT_QUEUE,
@@ -57,7 +57,7 @@ enum ssm_error {
   /**< Invalid memory layout, e.g., using a pointer where int was expected. */
   SSM_PLATFORM_ERROR
   /**< Start of platform-specific error code range. */
-};
+} ssm_error_t;
 
 /** @brief Terminate due to a non-recoverable error, with a specified reason.
  *
@@ -84,7 +84,7 @@ enum ssm_error {
  *  @param line   the line number of the source file where the error was thrown.
  *  @param func   the function name where the error was thrown.
  */
-void ssm_throw(enum ssm_error reason, const char *file, int line,
+void ssm_throw(ssm_error_t reason, const char *file, int line,
                const char *func);
 
 /** @} */
@@ -143,7 +143,7 @@ typedef union {
 /** @brief Heap-allocated SSM object, with memory management metadata header.
  *
  *  The payload array is declared of size 1 here, but is of varying size in
- *  practice. The actual size should be looked up in the #mm header.
+ *  practice. The actual size should be looked up in the @a mm header.
  */
 struct ssm_object {
   struct ssm_mm mm;       /**< Memory management metadata. */
@@ -229,16 +229,16 @@ struct ssm_object {
  */
 struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag);
 
-/** @TODO: document */
+/** @todo document */
 void ssm_dup(struct ssm_mm *mm);
 
-/** @TODO: document */
+/** @todo document */
 void ssm_drop(struct ssm_mm *mm);
 
-/** @TODO: document */
+/** @todo document */
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm);
 
-/** @TODO: document */
+/** @todo document */
 void ssm_mem_free(struct ssm_mm *mm, size_t size);
 
 /** @} */
@@ -376,7 +376,7 @@ typedef struct ssm_trigger {
 /** @brief Allocate and initialize a routine activation record.
  *
  *  Uses the underlying memory allocator to allocate an activation record of
- *  a given @size, and initializes it with the rest of the fields. Also
+ *  a given @a size, and initializes it with the rest of the fields. Also
  *  increments the number of children that @a parent has.
  *
  *  This function assumes that the embedded #ssm_act_t is at the beginning of
@@ -405,7 +405,8 @@ ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
  *
  *  Calls the parent if @a act is the last child.
  *
- *  @param act  the activation of the routine to leave.
+ *  @param act  the activation record of the routine to leave.
+ *  @param size the size of activation record.
  */
 void ssm_leave(ssm_act_t *act, size_t size);
 
@@ -446,14 +447,14 @@ extern ssm_act_t ssm_top_parent;
  *  with reference-like semantics in SSM.
  *
  *  Routines may directly assign to them in the current instant (ssm_assign()),
- *  or schedule a delayed assignment to them (ssm_later()). The #last_updated
- *  time is recorded in each case, sensitive routines, i.e., #triggers, are
+ *  or schedule a delayed assignment to them (ssm_later()). The @a last_updated
+ *  time is recorded in each case, sensitive routines, i.e., @a triggers, are
  *  woken up.
  *
  *  At most one delayed assignment may be scheduled at a time, but a single
  *  update may wake any number of sensitive routines.
  *
- *  @invariant #later_time != #SSM_NEVER iff this variable in the event queue.
+ *  @invariant @a later_time != #SSM_NEVER iff this variable in the event queue.
  *  @invariant For all `struct ssm_time t`, `ssm_mm_is_builtin(SSM_SV_T, t)`.
  */
 typedef struct ssm_sv {
@@ -496,7 +497,7 @@ struct ssm_sv *ssm_new_sv(ssm_value_t val);
  *
  *  Provided for convenience; zero runtime cost.
  *
- *  @param t  pointer to the #ssm_object.
+ *  @param s  pointer to the #ssm_object.
  *  @returns  #ssm_value_t of the pointer to @a t.
  */
 #define ssm_from_sv(s)                                                         \
@@ -510,12 +511,19 @@ struct ssm_sv *ssm_new_sv(ssm_value_t val);
  */
 #define ssm_event_on(v) (ssm_to_sv(v)->last_updated == ssm_now())
 
-/** @brief Obtain to the value of a scheduled variable.
+/** @brief Obtain the value of a scheduled variable.
  *
  *  @param v  #ssm_value_t that points to a scheduled variable.
  *  @returns  the value that @a v points to.
  */
 #define ssm_deref(v) (ssm_to_sv(v)->value)
+
+/** @brief Obtain memory management header of a scheduled variable.
+ *
+ *  @param v  #ssm_value_t that points to a scheduled variable.
+ *  @returns  a pointer to the #ssm_mm header of @a v.
+ */
+#define ssm_sv_mm(v) (&ssm_to_sv(v)->mm)
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
@@ -573,7 +581,7 @@ void ssm_desensitize(ssm_trigger_t *trig);
  *
  *  Nothing happens if the variable does not have a pending event.
  *
- *  @TODO: move this to ssm-internal, since this will just be part of drop.
+ *  @todo move this to ssm-internal, since this will just be part of drop.
  *
  *  @param var  the variable.
  */
@@ -611,7 +619,7 @@ void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t nu
  *
  *  @param type   the struct type.
  *  @param member the name of the member in @a type.
- *  @returns      the type of @a member in @type.
+ *  @returns      the type of @a member in @a type.
  */
 #ifdef __GNUC__
 #define member_type(type, member) __typeof__(((type *)0)->member)

@@ -73,6 +73,8 @@ void step_second_clock(struct ssm_act *act) {
       ssm_desensitize(&cont->trigger1);
     }
   }
+  ssm_drop(ssm_sv_mm(cont->timer));
+  ssm_drop(ssm_sv_mm(cont->second_event));
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -109,6 +111,8 @@ void step_report_seconds(struct ssm_act *act) {
       printf("%d\n", (int)ssm_unmarshal(ssm_deref(cont->seconds)));
     }
   }
+  ssm_drop(ssm_sv_mm(cont->seconds));
+  ssm_drop(ssm_sv_mm(cont->second_event));
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -132,8 +136,12 @@ void step_main(struct ssm_act *act) {
     ssm_depth_t new_depth = act->depth - 1;
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
+    ssm_dup(ssm_sv_mm(cont->second));
     ssm_activate(
         ssm_enter_second_clock(act, new_priority, new_depth, cont->second));
+
+    // NOTE: no need to ssm_dup() because we pass away ownership.
+    // Correspondingly, there is no ssm_drop() for it at the end before leave.
     new_priority += pinc;
     ssm_activate(
         ssm_enter_report_seconds(act, new_priority, new_depth, cont->second));

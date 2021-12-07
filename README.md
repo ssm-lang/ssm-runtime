@@ -1,32 +1,28 @@
-# ssm
-The Sparse Synchronous Model: A deterministic real-time execution
-technique that allows explicit, precise timing control.
+# The Sparse Synchronous Model Runtime
 
-Documentation: http://sedwards-lab.github.io/ssm-doc
+The Sparse Synchronous Model (SSM) is a deterministic real-time execution technique that allows explicit, precise timing control.
 
-An early version of this system is described in our FDL 2021 paper
-http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
+## Documentation
 
-To build and test the runtime system on your host,
+The API documentation for this library maybe found [here](http://ssm-lang.github.io/ssm-runtime).
 
-1. `make`
+The operation of this library was first described in:
 
-To run the examples on embedded hardware,
+> Stephen A. Edwards and John Hui.
+> The Sparse Synchronous Model.
+> In Forum on Specification and Design Languages (FDL),
+> Kiel, Germany, September 2020.
+> http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
 
-1. Install the PlatformIO Core (CLI) build system from https://platformio.org/
+## Dependencies
 
-2. Under Linux, you may need to install the `99-platformio-udev.rules` file
-   to enable permissions to access your debugging probe.
-   See https://docs.platformio.org/en/latest/faq.html#platformio-udev-rules
+The core runtime itself is written in C99, and does not have any dependencies.
+This includes includes the scheduler and memory manager.
 
-3. cd into, e.g., examples/blink-platformio-zephyr
+Platform-specific bindings are provided via the [PlatformIO Core (CLI)](https://platformio.org) toolchain manager;
+see their [installation instructions](https://docs.platformio.org/en/latest/core/installation.html).
+On Linux, make sure to install the `99-platformio-udev.rules`.
 
-4. E.g., for the Nordic nrf82840 discovery kit,
-   `pio run --environment nrf52840_dk --target upload --target monitor`
-   will compile, upload, and display the serial output of the example.
-   The monitor target is optional.
-   See the `platformio.ini` file for details about other targets.
+## Examples
 
-   Note that PlatformIO will download and compile a separate copy of this
-   (ssm runtime) library from github, not the one a few directories
-   above the examples.
+See the [examples](examples/) directory.
