@@ -1,11 +1,11 @@
 #ifndef _FIXED_ALLOCATOR_H
 #define _FIXED_ALLOCATOR_H
 
-#include <stddef.h>
-#include <stdint.h>
 #include <assert.h>
 #include <fixed-allocator.h>
 #include <ssm.h>
+#include <stddef.h>
+#include <stdint.h>
 #include <stdlib.h>
 
 typedef void *memory_t;
@@ -19,8 +19,8 @@ typedef struct fixed_allocator {
 /**
   The Fixed Allocator:
 
-  @brief The fixed allocator performs equivalent function to malloc and free, however
-  it only allocates blocks of a given size.
+  @brief The fixed allocator performs equivalent function to malloc and free,
+  however it only allocates blocks of a given size.
 
   It internally maintains a freelist,  which is essentially a linked list,
   where each free block points to the next

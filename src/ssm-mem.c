@@ -6,8 +6,8 @@
 #include <allocation-dispatcher.h>
 #include <assert.h>
 #include <fixed-allocator.h>
-#include <ssm.h>
 #include <ssm-internal.h>
+#include <ssm.h>
 #include <stdio.h>
 #include <stdlib.h>
 
