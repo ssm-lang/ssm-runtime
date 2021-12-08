@@ -1,7 +1,4 @@
 #include <platform/ssm-io.h>
-#include <platform/ssm-timer.h>
-#include <platform/ssm-log.h>
-#include <platform/ssm-prof.h>
 
 #include <devicetree.h>
 #include <drivers/gpio.h>
@@ -14,55 +11,11 @@ SSM_RB_DECLARE(ssm_input_packet_t, ssm_input_buffer, 12);
 static void input_event_handler(const struct device *port,
                                 struct gpio_callback *cb,
                                 gpio_port_pins_t pins) {
-
-#ifndef PLATFORM_TIMER64
-  uint32_t hi0, lo, hi1;
-#else
-  uint64_t time;
-#endif
-  uint32_t key;
-  ssm_input_packet_t *input_packet;
-
-  SSM_PROF(SSM_PROF_INPUT_BEFORE_READTIME);
-
-  key = irq_lock();
-
-#ifndef PLATFORM_TIMER64
-  ssm_timer_read_to(&hi0, &lo, &hi1);
-#else
-  time = ssm_timer_read();
-#endif
-
-  SSM_PROF(SSM_PROF_INPUT_BEFORE_ALLOC);
-
-  if ((input_packet = ssm_rb_writer_alloc(ssm_input_buffer))) {
-    SSM_PROF(SSM_PROF_INPUT_BEFORE_COMMIT);
-
-#ifndef PLATFORM_TIMER64
-    input_packet->hi0 = hi0;
-    input_packet->lo = lo;
-    input_packet->hi1 = hi1;
-#else
-    input_packet->time = time;
-#endif
-    input_packet->sv = container_of(cb, ssm_input_t, cb)->sv;
-    input_packet->payload =
-        gpio_pin_get(port, container_of(cb, ssm_input_t, cb)->spec.pin);
-
-    compiler_barrier();
-
-    ssm_rb_writer_commit(ssm_input_buffer);
-
-    SSM_PROF(SSM_PROF_INPUT_BEFORE_WAKE);
-
-    ssm_sem_post(&ssm_tick_sem);
-
-  } else {
-    dropped_packets++;
-  }
-
+  uint32_t key = irq_lock();
+  ssm_input_event_handler(
+    container_of(cb, ssm_input_t, cb)->sv,
+    gpio_pin_get(port, container_of(cb, ssm_input_t, cb)->spec.pin));
   irq_unlock(key);
-  SSM_PROF(SSM_PROF_INPUT_BEFORE_LEAVE);
 }
 
 typedef int (*ssm_input_setup_t)(ssm_sv_t *sv, ssm_input_t *in);

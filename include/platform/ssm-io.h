@@ -3,6 +3,8 @@
 
 #include <platform/ssm-sem.h>
 #include <platform/ssm-rb.h>
+#include <platform/ssm-timer.h>
+#include <platform/ssm-prof.h>
 #include <platform-specific/ssm-io.h>
 
 // These must be macros so that compile fails on an undefined fd
@@ -42,6 +44,54 @@ SSM_RB_DECLARE(ssm_input_packet_t, ssm_input_buffer, 12);
 SSM_SEM_DECLARE(ssm_tick_sem);
 
 extern uint32_t dropped_packets; /* perhaps use atomic for this */
+
+__attribute__((always_inline))
+static inline void ssm_input_event_handler(ssm_sv_t *sv, uint32_t payload)
+{
+#ifndef PLATFORM_TIMER64
+  uint32_t hi0, lo, hi1;
+#else
+  uint64_t time;
+#endif
+  ssm_input_packet_t *input_packet;
+
+  SSM_PROF(SSM_PROF_INPUT_BEFORE_READTIME);
+
+#ifndef PLATFORM_TIMER64
+  ssm_timer_read_to(&hi0, &lo, &hi1);
+#else
+  time = ssm_timer_read();
+#endif
+
+  SSM_PROF(SSM_PROF_INPUT_BEFORE_ALLOC);
+
+  if ((input_packet = ssm_rb_writer_alloc(ssm_input_buffer))) {
+    SSM_PROF(SSM_PROF_INPUT_BEFORE_COMMIT);
+
+#ifndef PLATFORM_TIMER64
+    input_packet->hi0 = hi0;
+    input_packet->lo = lo;
+    input_packet->hi1 = hi1;
+#else
+    input_packet->time = time;
+#endif
+    input_packet->sv = sv;
+    input_packet->payload = payload;
+
+    compiler_barrier();
+
+    ssm_rb_writer_commit(ssm_input_buffer);
+
+    SSM_PROF(SSM_PROF_INPUT_BEFORE_WAKE);
+
+    ssm_sem_post(&ssm_tick_sem);
+
+  } else {
+    dropped_packets++;
+  }
+
+  SSM_PROF(SSM_PROF_INPUT_BEFORE_LEAVE);
+}
 
 extern int ssm_program_initialize(void);
 

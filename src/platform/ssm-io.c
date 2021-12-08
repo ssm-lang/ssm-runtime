@@ -10,9 +10,6 @@
 #include <platform/ssm-prof.h>
 #include <platform/ssm-sleep.h>
 
-#include <devicetree.h>
-#include <sys/atomic.h>
-
 SSM_LOG_NAME(ssm_io);
 
 SSM_RB_DEFINE(ssm_input_packet_t, ssm_input_buffer, 12);
