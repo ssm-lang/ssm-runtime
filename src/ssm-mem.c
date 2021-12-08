@@ -53,26 +53,30 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
-void ssm_drop(struct ssm_mm *mm) {
-  if (--mm->ref_count == 0) {
-    if (!ssm_mm_is_builtin(mm)) {
-      struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
-      for (int i = 0; i < mm->val_count; i++) {
-        if (ssm_on_heap(obj->payload[i])) {
-          ssm_drop(obj->payload[i].heap_ptr);
-        }
+void drop_child_vars(struct ssm_mm *mm){
+  if (!ssm_mm_is_builtin(mm)) {
+    struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
+    for (int i = 0; i < mm->val_count; i++) {
+      if (ssm_on_heap(obj->payload[i])) {
+        ssm_drop(obj->payload[i].heap_ptr);
       }
     }
-    /*else if(ssm_mm_is(SSM_SV_T,mm)){
-      ssm_sv_t *obj = container_of(mm, struct ssm_object, mm);
-      if (!ssm_mm_is_builtin(obj->value.heap_ptr)) {
-        ssm_drop(obj->value.heap_ptr);
-      }
-      if (!ssm_mm_is_builtin(obj->later_value.heap_ptr)) {
-        ssm_drop(obj->later_value.heap_ptr);
-      }
+  }
+  /*else if(ssm_mm_is(SSM_SV_T,mm)){
+    ssm_sv_t *obj = container_of(mm, struct ssm_object, mm);
+    if (!ssm_mm_is_builtin(obj->value.heap_ptr)) {
+      ssm_drop(obj->value.heap_ptr);
+    }
+    if (!ssm_mm_is_builtin(obj->later_value.heap_ptr)) {
+      ssm_drop(obj->later_value.heap_ptr);
+    }
+  }*/
+}
 
-    }*/
+void ssm_drop(struct ssm_mm *mm) {
+  if (--mm->ref_count == 0) {
+
+    drop_child_vars(mm);
     ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
                                            : SSM_OBJ_SIZE(mm->val_count));
   }
@@ -80,14 +84,7 @@ void ssm_drop(struct ssm_mm *mm) {
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
   if (--mm->ref_count == 0) {
-    if (!ssm_mm_is_builtin(mm)) {
-      struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
-      for (int i = 0; i < mm->val_count; i++) {
-        if (!ssm_mm_is_builtin(obj->payload[i].heap_ptr)) {
-          ssm_drop(obj->payload[i].heap_ptr);
-        }
-      }
-    }
+    drop_child_vars(mm);
     return mm;
   } else {
     if (ssm_mm_is_builtin(mm)) {
