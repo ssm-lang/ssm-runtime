@@ -63,6 +63,16 @@ void ssm_drop(struct ssm_mm *mm) {
         }
       }
     }
+    /*else if(ssm_mm_is(SSM_SV_T,mm)){
+      ssm_sv_t *obj = container_of(mm, struct ssm_object, mm);
+      if (!ssm_mm_is_builtin(obj->value.heap_ptr)) {
+        ssm_drop(obj->value.heap_ptr);
+      }
+      if (!ssm_mm_is_builtin(obj->later_value.heap_ptr)) {
+        ssm_drop(obj->later_value.heap_ptr);
+      }
+
+    }*/
     ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
                                            : SSM_OBJ_SIZE(mm->val_count));
   }
