@@ -190,7 +190,7 @@ struct ssm_object {
  *
  *  @sa #ssm_builtin.
  */
-#define ssm_mm_is(bt, mp) (ssm_mem_is_builtin(mp) && (mp)->tag == (bt))
+#define ssm_mm_is(bt, mp) (ssm_mm_is_builtin(mp) && (mp)->tag == (bt))
 
 /** @brief Convert an #ssm_value_t to an #ssm_object.
  *

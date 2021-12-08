@@ -58,7 +58,7 @@ void ssm_drop(struct ssm_mm *mm) {
     if (!ssm_mm_is_builtin(mm)) {
       struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
       for (int i = 0; i < mm->val_count; i++) {
-        if (!ssm_mm_is_builtin(obj->payload[i].heap_ptr)) {
+        if (ssm_on_heap(obj->payload[i])) {
           ssm_drop(obj->payload[i].heap_ptr);
         }
       }
