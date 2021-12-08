@@ -23,7 +23,7 @@ static void overflow_handler(const struct device *dev, void *user_data) {
   irq_unlock(key);
 }
 
-int ssm_timer_start(void) {
+int ssm_timer32_start(void) {
   int err;
   struct counter_top_cfg top_cfg = {
       .callback = overflow_handler,
@@ -44,8 +44,6 @@ int ssm_timer_start(void) {
 
   LOG_INF("timer will run at %d Hz\r\n", counter_get_frequency(ssm_timer_dev));
   LOG_INF("timer will wraparound at %08x ticks\r\n", SSM_TIMER32_TOP);
-
-  ssm_timer_hi = 0;
 
   if ((err = counter_set_top_value(ssm_timer_dev, &top_cfg)))
     return err;

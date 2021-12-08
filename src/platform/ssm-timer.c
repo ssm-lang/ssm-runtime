@@ -6,6 +6,11 @@ SSM_LOG_NAME(ssm_timer64);
 
 volatile uint32_t ssm_timer_hi;
 
+int ssm_timer_start(void) {
+  ssm_timer_hi = 0;
+  return ssm_timer32_start();
+}
+
 static ssm_timer_callback_t timer_cb;
 
 void ssm_timer32_callback(uint32_t time, void *user_data) {

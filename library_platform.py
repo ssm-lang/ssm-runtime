@@ -29,6 +29,7 @@ env.Replace(
 env.Append(
     CPPDEFINES=[
         # This will be needed if we ever have a 64-bit timer platform,
-        # to set PLATFORM_TIMER64
+        # to set PLATFORM_TIMER64; e.g.:
+        # "PLATFORM_TIMER64",
     ]
 )

@@ -81,6 +81,7 @@ typedef void (*ssm_timer32_callback_t) (uint32_t time, void *user_data);
 
 /** Initialize and start the timer device. */
 extern int ssm_timer_start(void);
+extern int ssm_timer32_start(void);
 
 /** Set alarm for wake_time that triggers callback cb. Returns 0 on success. */
 extern int ssm_timer_set_alarm(uint64_t wake_time, ssm_timer_callback_t cb,
