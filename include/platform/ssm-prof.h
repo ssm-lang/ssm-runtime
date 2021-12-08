@@ -9,7 +9,7 @@
  * May define SSM_PROF(sym)
  *
  */
-#include <board-specific/ssm-prof.h>
+#include <platform-specific/ssm-prof.h>
 
 #ifndef SSM_PROF_INIT
 #define SSM_PROF_INIT(...) do ; while (0)
