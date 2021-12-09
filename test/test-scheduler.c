@@ -81,9 +81,6 @@ void event_queue_sort_string(const char *input, const char *expected) {
   assert(event_queue_len == 0);
   ssm_value_t *var = variables;
   for (const char *cp = input; *cp; ++cp, ++var) {
-    /* ssm_later() */
-    /* var->later_time = SSM_NEVER; */
-    /* ssm_schedule(var, (ssm_time_t) *cp); */
     ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, EVENT_VALUE);
     event_queue_consistency_check();
   }
