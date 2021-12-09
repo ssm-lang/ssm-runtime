@@ -53,6 +53,19 @@ else
   exit 1
 fi
 
+rm -f build/tests.out
+{
+  run test_test-scheduler
+} >> build/tests.out
+
+if diff build/tests.out test/tests.out &> build/tests.diff ; then
+  say "Test output matches expected."
+else
+  say "Test output differs from expected:"
+  cat build/tests.diff
+  exit 1
+fi
+
 if command -v valgrind >/dev/null ; then
   rm -f build/examples.vg-out
   {
@@ -65,23 +78,14 @@ if command -v valgrind >/dev/null ; then
     vg clock
     vg counter
   } >> build/examples.vg-out
+  say "Examples do not have any memory errors"
+
+  {
+    vg test_test-scheduler
+  } >> build/tests.out
+  say "Tests do not have any memory errors"
 else
   say "Warning: valgrind not found in PATH. Skipping memory tests."
 fi
 
-rm -f build/tests.out
-{
-  run test_test-scheduler
-} >> build/tests.out
-
-if diff build/tests.out test/tests.out &> build/tests.diff ; then
-  say "Example output matches expected."
-else
-  say "Example output differs from expected:"
-  cat build/tests.diff
-  exit 1
-fi
-
-{
-  vg test_test-scheduler
-} >> build/tests.out
+make cov
