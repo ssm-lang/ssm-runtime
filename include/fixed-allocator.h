@@ -1,3 +1,17 @@
+/** @file fixed-allocator.h
+ *  @brief The fixed allocator performs equivalent function to malloc and free,
+ *  however it only allocates blocks of a given size.
+ *
+ *
+ * It internally maintains a freelist,  which is essentially a linked list,
+ * where each free block points to the next
+ * block that is free, with a pointer in the first word of each block.
+ *
+ * Due to the free list implementation, we require that the size is bigger than
+ * the size of a pointer.
+ *
+ * @author Daniel Scanteianu (Scanteianu)
+ */
 #ifndef _FIXED_ALLOCATOR_H
 #define _FIXED_ALLOCATOR_H
 
@@ -18,9 +32,6 @@ typedef struct fixed_allocator {
 } fixed_allocator_t;
 /**
   The Fixed Allocator:
-
-  @brief The fixed allocator performs equivalent function to malloc and free,
-  however it only allocates blocks of a given size.
 
   It internally maintains a freelist,  which is essentially a linked list,
   where each free block points to the next

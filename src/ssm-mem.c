@@ -2,6 +2,7 @@
  *  @brief SSM runtime memory management.
  *
  *  @author John Hui (j-hui)
+ *  @author Daniel Scanteianu (Scanteianu)
  */
 #include <allocation-dispatcher.h>
 #include <assert.h>

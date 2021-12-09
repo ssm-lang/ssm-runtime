@@ -1,3 +1,13 @@
+/** @file allocation-dispatcher.h
+ *  @brief allocation_dispatcher is the top-level malloc replacement system.
+ *
+ * The allocation dispatcher allocates space in one of its child allocators.
+ * The child allocators make fixed-size allocations, and the dispatcher
+ * will select the apropriate child allocator.
+ *
+ * @author Daniel Scanteianu (Scanteianu)
+ */
+
 #ifndef _ALLOCATION_DISPATCHER_H
 #define _ALLOCATION_DISPATCHER_H
 #include <fixed-allocator.h>
