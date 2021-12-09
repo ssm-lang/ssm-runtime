@@ -298,6 +298,7 @@ ssm_sv_t *ssm_new_sv(ssm_value_t val) {
   sv->triggers = NULL;
   sv->later_time = SSM_NEVER;
   sv->last_updated = SSM_NEVER;
+  sv->value = val;
   return sv;
 }
 

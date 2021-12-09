@@ -61,7 +61,7 @@ void *ad_malloc(allocation_dispatcher_t *allocation_dispatcher, size_t size);
   @param memory - this is the block to be freed
 
 */
-void *ad_free(allocation_dispatcher_t *allocation_dispatcher, size_t size,
+void ad_free(allocation_dispatcher_t *allocation_dispatcher, size_t size,
               void *memory);
 /**
   @brief the destructor for the allocation_dispatcher

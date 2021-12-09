@@ -53,6 +53,7 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
+// helper used by both reuse and drop
 void drop_child_vars(struct ssm_mm *mm){
   if (!ssm_mm_is_builtin(mm)) {
     struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
@@ -62,15 +63,15 @@ void drop_child_vars(struct ssm_mm *mm){
       }
     }
   }
-  /*else if(ssm_mm_is(SSM_SV_T,mm)){
-    ssm_sv_t *obj = container_of(mm, struct ssm_object, mm);
-    if (!ssm_mm_is_builtin(obj->value.heap_ptr)) {
+  else if(ssm_mm_is(SSM_SV_T,mm)){
+    ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
+    if (ssm_on_heap(obj->value)) {
       ssm_drop(obj->value.heap_ptr);
     }
-    if (!ssm_mm_is_builtin(obj->later_value.heap_ptr)) {
+    if (obj->later_time!=SSM_NEVER && ssm_on_heap(obj->later_value)) {
       ssm_drop(obj->later_value.heap_ptr);
     }
-  }*/
+  }
 }
 
 void ssm_drop(struct ssm_mm *mm) {
@@ -90,7 +91,7 @@ struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
     if (ssm_mm_is_builtin(mm)) {
       return ssm_new_builtin(mm->tag);
     } else {
-      return ssm_new(mm->val_count, mm->tag);
+      return &ssm_new(mm->val_count, mm->tag)->mm;
     }
   }
 }
@@ -126,17 +127,13 @@ void ad_destroy(allocation_dispatcher_t *ad) {
 void *ad_malloc(allocation_dispatcher_t *ad, size_t size) {
   fixed_allocator_t *allocator = find_allocator(ad, size);
   if (!allocator) {
-    printf("\n\nmissing size %d\n\n", size);
-    assert(0 == size);
+    return malloc(size);
   }
   return fa_malloc(allocator);
 }
-void *ad_free(allocation_dispatcher_t *ad, size_t size, void *memory) {
+void ad_free(allocation_dispatcher_t *ad, size_t size, void *memory) {
   fixed_allocator_t *allocator = find_allocator(ad, size);
   if (!allocator) {
-#if !ALLOW_MALLOC
-    assert(0);
-#endif
     free(memory);
   } else {
     fa_free(allocator, memory);
