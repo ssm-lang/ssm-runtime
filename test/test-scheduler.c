@@ -30,7 +30,6 @@ ssm_act_t acts[NUM_ACTS];
 #define NUM_TRIGGERS 1024
 ssm_trigger_t triggers[NUM_TRIGGERS];
 
-
 void check_starts_initialized() {
   assert(ssm_now() == 0L);
   assert(event_queue_len == 0);

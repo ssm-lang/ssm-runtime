@@ -11,7 +11,7 @@ PROJECT_NUMBER         = 0.0.2
 PROJECT_BRIEF          =  "Runtime Library for the Sparse Synchronous Model"
 PROJECT_LOGO           =
 
-OUTPUT_DIRECTORY       = doc/generated
+OUTPUT_DIRECTORY       = build/doc
 OUTPUT_LANGUAGE        = English
 
 MARKDOWN_SUPPORT       = YES
@@ -107,7 +107,7 @@ WARNINGS               = YES
 WARN_IF_UNDOCUMENTED   = YES
 WARN_IF_DOC_ERROR      = YES
 WARN_NO_PARAMDOC       = NO
-WARN_AS_ERROR          = NO
+WARN_AS_ERROR          = YES
 WARN_FORMAT            = "$file:$line: $text"
 WARN_LOGFILE           =
 
@@ -135,7 +135,7 @@ FILE_PATTERNS          = *.c \
                          *.dox
 RECURSIVE              = YES
 
-EXCLUDE                = doc/generated
+EXCLUDE                = build/doc
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       =
 EXCLUDE_SYMBOLS        =
