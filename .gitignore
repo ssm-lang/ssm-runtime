@@ -57,9 +57,6 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-# Doxygen-generated documentation
-doc/generated
-
 # gcov output
 *.gcov
 *.gcda

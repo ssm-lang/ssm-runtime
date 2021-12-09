@@ -365,7 +365,6 @@ void ssm_desensitize(ssm_trigger_t *trigger) {
 }
 
 void ssm_unschedule(ssm_sv_t *var) {
-  assert(var); // A real variable
   if (var->later_time != SSM_NEVER) {
     q_idx_t hole = find_queued_event(var);
     var->later_time = SSM_NEVER;
