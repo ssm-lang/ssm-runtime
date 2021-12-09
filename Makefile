@@ -72,6 +72,7 @@ $(LIB_OBJ) $(EXE_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
+	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
 $(COV_TGT): $(BUILD_DIR)/%.c.gcov: $(BUILD_DIR)/test_%.o run-tests
