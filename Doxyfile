@@ -115,7 +115,8 @@ WARN_LOGFILE           =
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
 
-INPUT                  = src \
+INPUT                  = README.md \
+                         src \
                          include \
                          doc
 INPUT_ENCODING         = UTF-8
