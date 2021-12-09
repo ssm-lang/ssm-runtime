@@ -15,15 +15,6 @@
 #include <stdlib.h>  /* For size_t */
 
 /**
- * @defgroup error  Error handling
- * @defgroup act    Activation records
- * @defgroup sv     Scheduled variables
- * @defgroup mem    Memory management
- * @defgroup time   Timestamps
- * @defgroup util   Utilities
- */
-
-/**
  * @addtogroup error
  * @{
  */

@@ -25,7 +25,7 @@ AUTOLINK_SUPPORT       = YES
 JAVADOC_AUTOBRIEF      = YES
 BRIEF_MEMBER_DESC      = YES
 REPEAT_BRIEF           = YES
-ALWAYS_DETAILED_SEC    = YES
+ALWAYS_DETAILED_SEC    = NO
 QT_AUTOBRIEF           = NO
 MULTILINE_CPP_IS_BRIEF = NO
 
@@ -121,6 +121,8 @@ INPUT                  = README.md \
                          doc
 INPUT_ENCODING         = UTF-8
 
+USE_MDFILE_AS_MAINPAGE = README.md
+
 FILE_PATTERNS          = *.c \
                          *.cc \
                          *.cxx \
@@ -147,8 +149,6 @@ EXAMPLE_RECURSIVE      = YES
 
 IMAGE_PATH             =
 INPUT_FILTER           =
-
-USE_MDFILE_AS_MAINPAGE = README.md
 
 #---------------------------------------------------------------------------
 # Configuration options related to source browsing
