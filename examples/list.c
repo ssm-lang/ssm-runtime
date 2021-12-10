@@ -11,14 +11,14 @@ list = [1, 2, 3]
 
 print_list (l: List) =
   match l
-    Cons i l' = [[ print (show i) ++ "::" ]]
+    Cons i l' = {{ print $ show i ++ "::" }}
                 print_list l'
-    Nil = [[ print "[]\r\n" ]]
+    Nil = {{ print "[]\r\n" }}
 
 map_inc (l: List) -> List =
   match l
-    Cons i l' = Cons (i + 1) (map_inc l')
     Nil = Nil
+    Cons i l' = Cons (i + 1) (map_inc l')
 
 main =
   print_list list
@@ -31,17 +31,27 @@ should print:
   2::3::4::[]
  */
 
-ssm_obj_define(List, 2);
+enum { List_size = 2 };
+typedef struct {
+  struct ssm_mm mm;
+  ssm_value_t payload[2];
+} List;
 enum List { Nil = 0, Cons };
 
 List __0_list = {.mm = {.val_count = List_size, .tag = Nil, .ref_count = 1}};
-List __1_list = {.mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-                 .payload = {ssm_marshal(3), ssm_from_obj(&__0_list)}};
-List __2_list = {.mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-                 .payload = {ssm_marshal(2), ssm_from_obj(&__1_list)}};
-List __3_list = {.mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-                 .payload = {ssm_marshal(1), ssm_from_obj(&__2_list)}};
-ssm_value_t list = ssm_from_obj(&__3_list);
+List __1_list = {
+    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
+    .payload = {
+        [0] = ssm_marshal_static(3), [1] = ssm_from_obj_static(&__0_list)}};
+List __2_list = {
+    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
+    .payload = {
+        [0] = ssm_marshal_static(2), [1] = ssm_from_obj_static(&__1_list)}};
+List __3_list = {
+    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
+    .payload = {
+        [0] = ssm_marshal_static(1), [1] = ssm_from_obj_static(&__2_list)}};
+ssm_value_t list = ssm_from_obj_static(&__3_list);
 
 typedef struct {
   ssm_act_t act;
@@ -65,6 +75,7 @@ ssm_act_t *enter_map_inc(ssm_act_t *parent, ssm_priority_t priority,
 
 void step_map_inc(ssm_act_t *act) {
   act_map_inc_t *cont = container_of(act, act_map_inc_t, act);
+
   switch (act->pc) {
   case 0:
     switch (ssm_to_obj(cont->l)->mm.tag) {
