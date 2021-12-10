@@ -152,16 +152,6 @@ struct ssm_object {
 #define ssm_marshal(v)                                                         \
   (ssm_value_t) { .packed_val = ((v) << 1 | 1) }
 
-/** @brief Construct an #ssm_value_t from a 31-bit integral value.
- *
- *  @TODO: doc
- *
- *  @param v  the 31-bit integral value.
- *  @return   a packed #ssm_value_t.
- */
-#define ssm_marshal_static(v)                                                  \
-  { .packed_val = ((v) << 1 | 1) }
-
 /** @brief Extract an integral value from a packed #ssm_value_t.
  *
  *  @param v  the packed #ssm_value_t.
@@ -214,18 +204,6 @@ struct ssm_object {
  */
 #define ssm_from_obj(o)                                                        \
   (ssm_value_t) { .heap_ptr = &(o)->mm }
-
-/** @brief Convert an #ssm_object pointer to an #ssm_value_t.
- *
- *  @TODO: document
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param o  pointer to the #ssm_object.
- *  @returns  #ssm_value_t of the pointer to @a o.
- */
-#define ssm_from_obj_static(o)                                                 \
-  { .heap_ptr = &(o)->mm }
 
 /** @brief Allocate a new heap object to store word-size values.
  *

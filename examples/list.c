@@ -32,26 +32,14 @@ should print:
  */
 
 enum { List_size = 2 };
-typedef struct {
-  struct ssm_mm mm;
-  ssm_value_t payload[2];
-} List;
 enum List { Nil = 0, Cons };
 
-List __0_list = {.mm = {.val_count = List_size, .tag = Nil, .ref_count = 1}};
-List __1_list = {
-    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-    .payload = {
-        [0] = ssm_marshal_static(3), [1] = ssm_from_obj_static(&__0_list)}};
-List __2_list = {
-    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-    .payload = {
-        [0] = ssm_marshal_static(2), [1] = ssm_from_obj_static(&__1_list)}};
-List __3_list = {
-    .mm = {.val_count = List_size, .tag = Cons, .ref_count = 1},
-    .payload = {
-        [0] = ssm_marshal_static(1), [1] = ssm_from_obj_static(&__2_list)}};
-ssm_value_t list = ssm_from_obj_static(&__3_list);
+typedef struct {
+  struct ssm_mm mm;
+  ssm_value_t payload[List_size];
+} List;
+
+ssm_value_t list;
 
 typedef struct {
   ssm_act_t act;
@@ -214,12 +202,34 @@ void ssm_throw(enum ssm_error reason, const char *file, int line,
   exit(1);
 }
 
-int main(int argc, char *argv[]) {
-  ssm_time_t stop_at = (argc > 1 ? atoi(argv[1]) : 20) * SSM_SECOND;
-
+void ssm_program_initialize(void) {
+  struct ssm_object *obj = ssm_new(List_size, Nil);
+  list = ssm_from_obj(obj);
+  obj = ssm_new(List_size, Cons);
+  obj->payload[0] = ssm_marshal(3);
+  obj->payload[1] = list;
+  list = ssm_from_obj(obj);
+  obj = ssm_new(List_size, Cons);
+  obj->payload[0] = ssm_marshal(2);
+  obj->payload[1] = list;
+  list = ssm_from_obj(obj);
+  obj = ssm_new(List_size, Cons);
+  obj->payload[0] = ssm_marshal(1);
+  obj->payload[1] = list;
+  list = ssm_from_obj(obj);
   ssm_act_t *act =
       ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
   ssm_activate(act);
+}
+
+void ssm_program_exit(void) {
+  ssm_drop(&ssm_to_obj(list)->mm);
+}
+
+int main(int argc, char *argv[]) {
+  ssm_time_t stop_at = (argc > 1 ? atoi(argv[1]) : 20) * SSM_SECOND;
+
+  ssm_program_initialize();
 
   ssm_tick();
 
@@ -227,6 +237,8 @@ int main(int argc, char *argv[]) {
     ssm_tick();
 
   printf("simulated %lu seconds\n", ssm_now() / SSM_SECOND);
+
+  ssm_program_exit();
 
   return 0;
 }
