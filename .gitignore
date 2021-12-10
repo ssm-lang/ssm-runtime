@@ -67,3 +67,5 @@ build/
 .pio
 
 compile_commands.json
+
+vgcore.*
