@@ -141,6 +141,16 @@ struct ssm_object {
   ssm_value_t payload[1]; /**< Heap object payload. */
 };
 
+#define ssm_obj_define(name, payload_size)                                     \
+  enum { name##_size = payload_size };                                         \
+  typedef struct {                                                             \
+    struct ssm_mm mm;                                                          \
+    ssm_value_t payload[payload_size];                                         \
+  } name
+
+#define ssm_obj_payload_count(obj_t)                                           \
+  (sizeof(((obj_t *)0)->payload) / sizeof(ssm_value_t))
+
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
  *
  *  @param v  the 31-bit integral value.

@@ -200,7 +200,7 @@ q_idx_t find_queued_event(ssm_sv_t *var) {
 #ifdef SSM_DEBUG
 #include <assert.h>
 
-/** @brief Assert the event queue is well-formed */
+/** @brief Assert the event queue is well-formed. */
 void event_queue_consistency_check(void) {
   if (event_queue_len == 0)
     return;
@@ -223,8 +223,8 @@ void event_queue_consistency_check(void) {
   }
 }
 
-/** @brief Assert the activation record queue is well-formed */
-void act_queue_consistency_check() {
+/** @brief Assert the activation record queue is well-formed. */
+void act_queue_consistency_check(void) {
   if (act_queue_len == 0)
     return;
 
@@ -248,7 +248,7 @@ void act_queue_consistency_check() {
 
 /** @} */
 
-ssm_time_t ssm_now() { return now; }
+ssm_time_t ssm_now(void) { return now; }
 
 struct ssm_time *ssm_new_time(ssm_time_t time) {
   struct ssm_mm *mm = ssm_new_builtin(SSM_TIME_T);
@@ -341,26 +341,26 @@ void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value) {
 }
 
 void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trigger) {
-  /* Point us to the first element */
+  // Point us to the first element
   trigger->next = var->triggers;
 
   if (var->triggers)
-    /* Make first element point to us */
+    // Make first element point to us
     var->triggers->prev_ptr = &trigger->next;
 
-  /* Insert us at the beginning */
+  // Insert us at the beginning
   var->triggers = trigger;
 
-  /* Our previous is the variable */
+  // Our previous is the variable
   trigger->prev_ptr = &var->triggers;
 }
 
 void ssm_desensitize(ssm_trigger_t *trigger) {
-  /* Tell predecessor to skip us */
+  // Tell predecessor to skip us
   *trigger->prev_ptr = trigger->next;
 
   if (trigger->next)
-    /* Tell successor its predecessor is our predecessor */
+    // Tell successor its predecessor is our predecessor
     trigger->next->prev_ptr = trigger->prev_ptr;
 }
 
@@ -381,11 +381,11 @@ void ssm_unschedule(ssm_sv_t *var) {
   }
 }
 
-ssm_time_t ssm_next_event_time() {
+ssm_time_t ssm_next_event_time(void) {
   return event_queue_len ? event_queue[SSM_QUEUE_HEAD]->later_time : SSM_NEVER;
 }
 
-void ssm_reset() {
+void ssm_reset(void) {
   now = 0L;
   event_queue_len = 0;
   act_queue_len = 0;
@@ -414,17 +414,17 @@ void ssm_tick(void) {
   if (act_queue_len == 0 && event_queue_len > 0)
     ssm_set_now(ssm_next_event_time());
 
-  /* Update every variable in the event queue at the current time */
+  // Update every variable in the event queue at the current time.
   while (event_queue_len > 0 &&
          event_queue[SSM_QUEUE_HEAD]->later_time == now) {
     ssm_sv_t *sv = event_queue[SSM_QUEUE_HEAD];
     ssm_update(sv);
 
-    /* Remove the top event from the queue by inserting the last
-       element in the queue at the front and percolating it toward the leaves */
-    ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
+    // Remove the top event from the queue by inserting the last element in the
+    // queue at the front and percolating it toward the leaves.
+    ssm_sv_t *to_insert = event_queue[event_queue_len--];
 
-    if (event_queue_len) // Was this the last?
+    if (event_queue_len) /* Only percolate if there are other events left */
       event_queue_percolate_down(SSM_QUEUE_HEAD, to_insert);
   }
 
@@ -432,13 +432,13 @@ void ssm_tick(void) {
     ssm_act_t *to_run = act_queue[SSM_QUEUE_HEAD];
     to_run->scheduled = false;
 
-    /* Remove the top activation record from the queue by inserting the
-       last element in the queue at the front and percolating it down */
+    // Remove the top activation record from the queue by inserting the last
+    // element in the queue at the front and percolating it down.
     ssm_act_t *to_insert = act_queue[act_queue_len--];
 
     if (act_queue_len)
       act_queue_percolate_down(SSM_QUEUE_HEAD, to_insert);
 
-    to_run->step(to_run); // Execute the step function
+    to_run->step(to_run);
   }
 }
