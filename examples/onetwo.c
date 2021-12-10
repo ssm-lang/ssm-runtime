@@ -137,6 +137,11 @@ void step_main(struct ssm_act *act) {
 }
 
 int main() {
+  size_t allocator_sizes[] = {48};
+  size_t allocator_blocks[] = {4000};
+  size_t num_allocators = 1;
+  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
+  
   ssm_activate(
       ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
 

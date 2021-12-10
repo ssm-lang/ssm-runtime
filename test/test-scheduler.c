@@ -415,6 +415,10 @@ void ssm_throw(enum ssm_error reason, const char *file, int line,
 }
 
 int main() {
+  size_t allocator_sizes[] = {48};
+  size_t allocator_blocks[] = {4000};
+  size_t num_allocators = 1;
+  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
   for (int i = 0; i < NUM_VARIABLES; i++)
     variables[i] = ssm_from_sv(ssm_new_sv(EVENT_VALUE));
 

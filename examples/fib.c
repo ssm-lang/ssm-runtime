@@ -164,6 +164,11 @@ void step_fib(struct ssm_act *act) {
 }
 
 int main(int argc, char *argv[]) {
+  size_t allocator_sizes[] = {48};
+  size_t allocator_blocks[] = {4000};
+  size_t num_allocators = 1;
+  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
+  
   ssm_u32_t result = ssm_from_sv(ssm_new_sv(ssm_marshal(0xdeadbeef)));
 
   int n = argc > 1 ? atoi(argv[1]) : 3;

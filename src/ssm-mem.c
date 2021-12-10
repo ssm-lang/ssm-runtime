@@ -2,15 +2,37 @@
  *  @brief SSM runtime memory management.
  *
  *  @author John Hui (j-hui)
+ *  @author Daniel Scanteianu (Scanteianu)
  */
+#include <allocation-dispatcher.h>
+#include <assert.h>
+#include <fixed-allocator.h>
 #include <ssm-internal.h>
+#include <ssm.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+allocation_dispatcher_t *ad = NULL;
+
+void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[],
+                  size_t num_allocators) {
+  int size_to_malloc = 0;
+  for (int i = 0; i < num_allocators; i++) {
+    size_to_malloc +=
+        allocator_sizes[i] * allocator_blocks[i] * sizeof(ssm_word_t);
+  }
+  void *memory_block = malloc(size_to_malloc);
+  allocation_dispatcher_t *dispatcher = ad_initialize(
+      allocator_sizes, allocator_blocks, num_allocators, memory_block);
+  ad = dispatcher;
+}
 
 struct ssm_mm *ssm_mem_alloc(size_t size) {
-  return malloc(size); // TODO: (dan) use our own allocator
+  return ad_malloc(ad, size); // toDONE(tm): (dan) use our own allocator
 }
 
 void ssm_mem_free(struct ssm_mm *mm, size_t size) {
-  free(mm); // TODO: (dan) use our own allocator
+  ad_free(ad, size, mm); // toDONE(tm): (dan) use our own allocator
 }
 
 struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin) {
@@ -32,13 +54,133 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
+// helper used by both reuse and drop
+void drop_child_vars(struct ssm_mm *mm){
+  if (!ssm_mm_is_builtin(mm)) {
+    struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
+    for (int i = 0; i < mm->val_count; i++) {
+      if (ssm_on_heap(obj->payload[i])) {
+        ssm_drop(obj->payload[i].heap_ptr);
+      }
+    }
+  }
+  else if(ssm_mm_is(SSM_SV_T,mm)){
+    ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
+    if (ssm_on_heap(obj->value)) {
+      ssm_drop(obj->value.heap_ptr);
+    }
+    if (obj->later_time!=SSM_NEVER && ssm_on_heap(obj->later_value)) {
+      ssm_drop(obj->later_value.heap_ptr);
+    }
+  }
+}
+
 void ssm_drop(struct ssm_mm *mm) {
-  if (--mm->ref_count == 0)
+  if (--mm->ref_count == 0) {
+
+    drop_child_vars(mm);
     ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
                                            : SSM_OBJ_SIZE(mm->val_count));
+  }
 }
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
-  SSM_ASSERT(0); // TODO: not implemented
+  if (--mm->ref_count == 0) {
+    drop_child_vars(mm);
+    return mm;
+  } else {
+    if (ssm_mm_is_builtin(mm)) {
+      return ssm_new_builtin(mm->tag);
+    } else {
+      return &ssm_new(mm->val_count, mm->tag)->mm;
+    }
+  }
+}
+
+allocation_dispatcher_t *ad_initialize(size_t block_sizes[],
+                                       size_t num_blocks[],
+                                       size_t num_allocators,
+                                       void *memory_pool) {
+  // memory head is keeping track of next available memory
+  // increments to memory head are analogous to calls to malloc
+  void *memory_head = memory_pool;
+  allocation_dispatcher_t *dispatcher = memory_head;
+  memory_head = ((char *)memory_head) + sizeof(allocation_dispatcher_t);
+  dispatcher->num_allocators = num_allocators;
+  dispatcher->allocators = memory_head;
+  memory_head =
+      ((char *)memory_head) + sizeof(fixed_allocator_t) * num_allocators;
+  for (int i = 0; i < num_allocators; i++) {
+    void *memory = memory_head;
+    memory_head = ((char *)memory_head) + block_sizes[i] * num_blocks[i] +
+                 sizeof(fixed_allocator_t);
+    dispatcher->allocators[i] =
+        fa_initialize(block_sizes[i], num_blocks[i], memory);
+  }
+  return dispatcher;
+}
+
+void ad_destroy(allocation_dispatcher_t *ad) {
+  for (int i = 0; i < ad->num_allocators; i++) {
+    fa_destroy(ad->allocators[i]);
+  }
+}
+void *ad_malloc(allocation_dispatcher_t *ad, size_t size) {
+  fixed_allocator_t *allocator = find_allocator(ad, size);
+  if (!allocator) {
+    return malloc(size);
+  }
+  return fa_malloc(allocator);
+}
+void ad_free(allocation_dispatcher_t *ad, size_t size, void *memory) {
+  fixed_allocator_t *allocator = find_allocator(ad, size);
+  if (!allocator) {
+    free(memory);
+  } else {
+    fa_free(allocator, memory);
+  }
+}
+fixed_allocator_t *find_allocator(allocation_dispatcher_t *ad, size_t size) {
+  // todo: sort and binary search?
+  // todo: smallest available size above threshold?
+  for (int i = 0; i < ad->num_allocators; i++) {
+    if (ad->allocators[i]->block_size == size) {
+      return ad->allocators[i];
+    }
+  }
   return NULL;
 }
+
+fixed_allocator_t *fa_initialize(size_t block_size, size_t num_blocks,
+                                 void *memory) {
+  assert(block_size > sizeof(ssm_word_t));
+  // need at least 1 word for pointer to next block in freelist
+  fixed_allocator_t *allocator = memory;
+  void *pool = ((char *)memory) + sizeof(fixed_allocator_t);
+  allocator->block_size = block_size;
+  allocator->num_blocks = num_blocks;
+  allocator->memory_pool = pool;
+  allocator->free_list_head = allocator->memory_pool;
+
+  // initalize freelist
+  ssm_word_t currentAddress = (ssm_word_t)(allocator->memory_pool);
+  for (int i = 0; i < num_blocks - 1; i++) {
+    *((ssm_word_t *)currentAddress) = currentAddress + block_size;
+    currentAddress += block_size;
+  }
+  *((ssm_word_t *)currentAddress) = 0; // nullptr - no more free
+  return allocator;
+}
+memory_t fa_malloc(fixed_allocator_t *allocator) {
+  assert(allocator->free_list_head != 0); // fail on oom
+  memory_t toReturn = allocator->free_list_head;
+  allocator->free_list_head =
+      (memory_t)(*((ssm_word_t *)(allocator->free_list_head)));
+  return toReturn;
+}
+void fa_free(fixed_allocator_t *allocator, memory_t address) {
+  *((ssm_word_t *)address) = (ssm_word_t)(allocator->free_list_head);
+  allocator->free_list_head = address;
+}
+
+void fa_destroy(fixed_allocator_t *allocator) {}

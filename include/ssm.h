@@ -184,7 +184,7 @@ struct ssm_object {
  *
  *  @sa #ssm_builtin.
  */
-#define ssm_mm_is(bt, mp) (ssm_mem_is_builtin(mp) && (mp)->tag == (bt))
+#define ssm_mm_is(bt, mp) (ssm_mm_is_builtin(mp) && (mp)->tag == (bt))
 
 /** @brief Convert an #ssm_value_t to an #ssm_object.
  *
@@ -580,6 +580,17 @@ void ssm_desensitize(ssm_trigger_t *trig);
  *  @param var  the variable.
  */
 void ssm_unschedule(ssm_sv_t *var);
+
+/** @brief sets up underlying allocators for system
+ *
+ *  Should be called on system startup
+ *
+ *  @param allocator_sizes - the distinct sizes the system will allocate, sorted
+ *  @param allocator_blocks - the number of allocations of each size to prepare for
+ *
+ *  @param num_allocators - the number of sizes in allocator_sizes
+*/
+void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[], size_t num_allocators);
 
 /** @} */
 

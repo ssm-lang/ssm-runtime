@@ -161,6 +161,11 @@ void ssm_throw(enum ssm_error reason, const char *file, int line,
 }
 
 int main(int argc, char *argv[]) {
+  size_t allocator_sizes[] = {48};
+  size_t allocator_blocks[] = {4000};
+  size_t num_allocators = 1;
+  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
+  
   ssm_time_t stop_at = (argc > 1 ? atoi(argv[1]) : 20) * SSM_SECOND;
 
   ssm_act_t *act =
