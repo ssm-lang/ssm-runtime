@@ -1,5 +1,4 @@
 #include "ssm-examples.h"
-#include <ssm.h>
 #include <stdio.h>
 
 /*

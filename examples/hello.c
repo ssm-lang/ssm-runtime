@@ -1,6 +1,4 @@
-#include <ssm-internal.h>
-#include <ssm-typedefs.h>
-#include <ssm.h>
+#include "ssm-examples.h"
 #include <stdio.h>
 
 typedef struct {
@@ -127,17 +125,10 @@ void step_main(ssm_act_t *act) {
   ssm_leave((ssm_act_t *)act, sizeof(main_act_t));
 }
 
-int main() {
-  ssm_activate(enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
-  do
-    ssm_tick();
-  while (ssm_next_event_time() != SSM_NEVER);
-
-  return 0;
+void ssm_program_init(void) {
+  ssm_act_t *act =
+      enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
+  ssm_activate(act);
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
-}
+void ssm_program_exit(void) {}

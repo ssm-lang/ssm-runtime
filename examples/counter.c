@@ -1,6 +1,4 @@
-#include <ssm-internal.h>
-#include <ssm-typedefs.h>
-#include <ssm.h>
+#include "ssm-examples.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -112,13 +110,15 @@ void step_clock(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_later(ssm_to_sv(cont->clk), ssm_now() + 100, ssm_marshal(1));
+      ssm_later(ssm_to_sv(cont->clk), ssm_now() + (2 * SSM_SECOND),
+                ssm_marshal(1));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 1;
       return;
     case 1:
       ssm_desensitize(&cont->trigger1);
-      ssm_later(ssm_to_sv(cont->clk), ssm_now() + 100, ssm_marshal(0));
+      ssm_later(ssm_to_sv(cont->clk), ssm_now() + (2 * SSM_SECOND),
+                ssm_marshal(0));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 2;
       return;
@@ -330,27 +330,10 @@ void step_main(struct ssm_act *act) {
   ssm_leave(act, sizeof(act_main_t));
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
+void ssm_program_init(void) {
+  ssm_act_t *act =
+      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
+  ssm_activate(act);
 }
 
-int main(int argc, char *argv[]) {
-  size_t allocator_sizes[] = {48};
-  size_t allocator_blocks[] = {4000};
-  size_t num_allocators = 1;
-  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
-  
-  ssm_time_t stop_at = argc > 1 ? atoi(argv[1]) : 1000;
-
-  ssm_activate(
-      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
-
-  do {
-    ssm_tick();
-    printf("finished time %lu\n", ssm_now());
-  } while (ssm_next_event_time() != SSM_NEVER && ssm_now() < stop_at);
-
-  return 0;
-}
+void ssm_program_exit(void) {}
