@@ -95,30 +95,51 @@ void ssm_tick(void);
 #define SSM_OBJ_SIZE(val_count)                                                \
   (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
 
-/** @brief Allocate memory.
- *
- *  Belongs to the memory allocator.
- *
- *  @TODO: document (dan)
- */
-struct ssm_mm *ssm_mem_alloc(size_t size);
+#define ssm_initialize_builtin(mm, b)                                          \
+  do {                                                                         \
+    mm->val_count = SSM_BUILTIN;                                               \
+    mm->tag = b;                                                               \
+    mm->ref_count = 1;                                                         \
+  } while (0)
 
-/** @brief Deallocate memory.
+/** @brief sets up underlying allocators for system
  *
- *  Belongs to the memory allocator.
+ *  Should be called on system startup
  *
- *  @TODO: document (dan)
+ *  @param allocator_sizes - the distinct sizes the system will allocate, sorted
+ *  @param allocator_blocks - the number of allocations of each size to prepare
+ * for
+ *
+ *  @param num_allocators - the number of sizes in allocator_sizes
  */
-void ssm_mem_free(struct ssm_mm *mm, size_t size);
+void ssm_mem_init(void *(*alloc_page_handler)(void),
+                  void *(*alloc_mem_handler)(size_t),
+                  void (*free_mem_handler)(void *, size_t));
+/* Default configuration has memory pools of the following sizes:
+ *
+ * 16, 64, 256, 1024
+ *
+ * and a page size of 4096
+ */
 
-/** @brief Allocate and initialize the mm header of a builtin type heap object.
- *
- *  Belongs to the memory manager.
- *  @TODO: Perhaps ssm_new_builtin() should be a macro.
- *
- *  @param builtin  enumeration indicating which builtin type to allocate.
- *  @returns        pointer to the mm header of the heap object.
- */
-struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin);
+#ifndef SSM_MEM_POOL_MIN_LOG
+#define SSM_MEM_POOL_MIN_LOG 4
+#endif
+
+#ifndef SSM_MEM_POOL_FACTOR_LOG
+#define SSM_MEM_POOL_FACTOR_LOG 2
+#endif
+
+#ifndef SSM_MEM_POOL_COUNT_LOG
+#define SSM_MEM_POOL_COUNT_LOG 2
+#endif
+
+#define SSM_MEM_POOL_MIN (2 << (SSM_MEM_POOL_MIN_LOG - 1))
+#define SSM_MEM_POOL_FACTOR (2 << (SSM_MEM_POOL_FACTOR_LOG - 1))
+#define SSM_MEM_POOL_COUNT (2 << (SSM_MEM_POOL_COUNT_LOG - 1))
+#define SSM_MEM_POOL_SIZE(pool) (SSM_MEM_POOL_MIN << (SSM_MEM_POOL_FACTOR_LOG * pool))
+#define SSM_MEM_PAGE_SIZE SSM_MEM_POOL_SIZE(SSM_MEM_POOL_COUNT)
+
+extern uint8_t ssm_page_init[SSM_MEM_PAGE_SIZE];
 
 #endif /* _SSM_SCHED_H */

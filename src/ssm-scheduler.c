@@ -251,7 +251,8 @@ void act_queue_consistency_check(void) {
 ssm_time_t ssm_now(void) { return now; }
 
 struct ssm_time *ssm_new_time(ssm_time_t time) {
-  struct ssm_mm *mm = ssm_new_builtin(SSM_TIME_T);
+  struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(SSM_TIME_T));
+  ssm_initialize_builtin(mm, SSM_TIME_T);
   struct ssm_time *t = container_of(mm, struct ssm_time, mm);
   t->time = time;
   return t;
@@ -293,7 +294,8 @@ void ssm_activate(ssm_act_t *act) {
 }
 
 ssm_sv_t *ssm_new_sv(ssm_value_t val) {
-  struct ssm_mm *mm = ssm_new_builtin(SSM_SV_T);
+  struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(SSM_SV_T));
+  ssm_initialize_builtin(mm, SSM_SV_T);
   ssm_sv_t *sv = container_of(mm, ssm_sv_t, mm);
   sv->triggers = NULL;
   sv->later_time = SSM_NEVER;

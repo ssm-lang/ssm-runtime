@@ -4,43 +4,173 @@
  *  @author John Hui (j-hui)
  *  @author Daniel Scanteianu (Scanteianu)
  */
-#include <allocation-dispatcher.h>
 #include <assert.h>
-#include <fixed-allocator.h>
 #include <ssm-internal.h>
 #include <ssm.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-allocation_dispatcher_t *ad = NULL;
+uint8_t ssm_page_init[SSM_MEM_PAGE_SIZE];
 
-void ssm_mem_init(size_t allocator_sizes[], size_t allocator_blocks[],
-                  size_t num_allocators) {
-  int size_to_malloc = 0;
-  for (int i = 0; i < num_allocators; i++) {
-    size_to_malloc +=
-        allocator_sizes[i] * allocator_blocks[i] * sizeof(ssm_word_t);
+typedef union block {
+  union block *free_list_next;
+  ssm_word_t free_list_next_idx;
+  uint8_t block_buf[1];
+} block_t;
+
+#define BLOCKS_PER_PAGE (SSM_MEM_PAGE_SIZE / sizeof(block_t))
+
+#define block_is_index(b) ((b)->free_list_next_idx - 1 < BLOCKS_PER_PAGE - 1)
+
+#define block_page_of_ptr(b)                                                   \
+  ((block_t *)((ssm_word_t)b->block_buf & ~(SSM_MEM_PAGE_SIZE - 1)))
+
+struct mem_pool {
+  block_t *free_list_head;
+};
+
+struct mem_pool mem_pools[SSM_MEM_POOL_COUNT];
+
+static void *(*alloc_page)(void);
+static void *(*alloc_mem)(size_t size);
+static void (*free_mem)(void *mem, size_t size);
+
+static inline size_t find_pool_size(size_t size) {
+  for (size_t pool_idx = 0; pool_idx < SSM_MEM_POOL_COUNT; pool_idx++)
+    if (size < SSM_MEM_POOL_SIZE(pool_idx))
+      return pool_idx;
+  return SSM_MEM_POOL_COUNT;
+}
+
+void ssm_mem_init(void *(*alloc_page_handler)(void),
+                  void *(*alloc_mem_handler)(size_t),
+                  void (*free_mem_handler)(void *, size_t)) {
+  alloc_page = alloc_page_handler;
+  alloc_mem = alloc_mem_handler;
+  free_mem = free_mem_handler;
+
+  /** First pass: initialize this list with pointers. */
+  block_t *page_fractal = (block_t *)ssm_page_init;
+  block_t *prev = page_fractal[0].free_list_next =
+      page_fractal + BLOCKS_PER_PAGE / 2;
+
+  for (size_t level = BLOCKS_PER_PAGE / 4; level > 0; level /= 2) {
+    prev = prev->free_list_next = page_fractal + level;
+    while (prev + level * 2 < page_fractal + BLOCKS_PER_PAGE)
+      prev = prev->free_list_next = prev + level * 2;
   }
-  void *memory_block = malloc(size_to_malloc);
-  allocation_dispatcher_t *dispatcher = ad_initialize(
-      allocator_sizes, allocator_blocks, num_allocators, memory_block);
-  ad = dispatcher;
+
+  prev->free_list_next = NULL;
+
+  SSM_ASSERT(prev - page_fractal == BLOCKS_PER_PAGE - 1);
+
+  /** Second pass: convert pointers to relative indices. */
+  for (size_t p = 0; p < BLOCKS_PER_PAGE - 1; p++)
+    page_fractal[p].free_list_next_idx =
+        page_fractal[p].free_list_next - page_fractal;
+
+  /* for (size_t p = 0; p < BLOCKS_PER_PAGE - 1; p++) */
+  /*   printf("%ld => %ld\n", p, page_fractal[p].free_list_next_idx >> 1); */
+
+  /* printf("%ld => %ld\n", BLOCKS_PER_PAGE - 1, */
+  /*        page_fractal[BLOCKS_PER_PAGE - 1].free_list_next_idx); */
+  /* exit(1); */
 }
 
-struct ssm_mm *ssm_mem_alloc(size_t size) {
-  return ad_malloc(ad, size); // toDONE(tm): (dan) use our own allocator
+void *ssm_mem_alloc(size_t size) {
+  size_t p = find_pool_size(size);
+  if (p >= SSM_MEM_POOL_COUNT)
+    return alloc_mem(size);
+  /* static uint8_t *b; */
+
+  struct mem_pool *pool = &mem_pools[p];
+
+  if (pool->free_list_head == NULL) {
+    printf("allocating new page\n");
+    pool->free_list_head = alloc_page();
+
+    SSM_ASSERT((ssm_word_t)pool->free_list_head > BLOCKS_PER_PAGE);
+    /* SSM_ASSERT(((ssm_word_t)pool->free_list_head & (SSM_MEM_PAGE_SIZE - 1))
+     * == */
+    /* 0); */
+
+    /* b = mem_pools[pool].free_list_head->block_buf; */
+
+    /* printf("Pool starts here: %p\n", (void *)b); */
+
+    /* size_t last_block = BLOCKS_PER_PAGE - (SSM_MEM_PAGE_SIZE /
+     * SSM_MEM_POOL_SIZE(pool)); */
+
+    size_t last_block = 504;
+
+    /* printf("PAGE_SIZE: %dB\n", SSM_MEM_PAGE_SIZE); */
+    /* printf("POOL_SIZE: %dB\n", SSM_MEM_POOL_SIZE(pool)); */
+    /* printf("BLOCK_PER_CHUNK: %d\n", SSM_MEM_PAGE_SIZE /
+     * SSM_MEM_POOL_SIZE(pool)); */
+    /* printf("CHUNKS_PER_PAGE: %ld\n", BLOCKS_PER_PAGE); */
+    /* printf("last_block: %ld\n", last_block); */
+
+    pool->free_list_head[last_block].free_list_next = NULL;
+    /* printf("OK\n"); */
+  }
+
+  /* printf("current head: %p %p\n", (void *)mem_pools[pool].free_list_head, */
+  /*        (void *)mem_pools[pool].free_list_head->block_buf); */
+  /* printf("current head: %ld\n", */
+  /*        (b - (unsigned char *)mem_pools[pool].free_list_head) / */
+  /*            sizeof(block_t)); */
+
+  void *buf = pool->free_list_head->block_buf;
+  printf("%p\n", (void *)pool->free_list_head);
+  printf("  %s\n", block_is_index(pool->free_list_head) ? "is index" : "not index");
+  printf("%lx\n", pool->free_list_head->free_list_next_idx);
+
+  if (block_is_index(pool->free_list_head)) {
+    pool->free_list_head = block_page_of_ptr(pool->free_list_head) +
+                                   pool->free_list_head->free_list_next_idx;
+  printf("set as next: %p\n", (void *)pool->free_list_head);
+  } else {
+    pool->free_list_head = pool->free_list_head->free_list_next;
+  }
+  /* pool->free_list_head = block_is_index(pool->free_list_head) */
+  /*                            ? block_page_of_ptr(pool->free_list_head) + */
+  /*                                  pool->free_list_head->free_list_next_idx */
+  /*                            : pool->free_list_head->free_list_next; */
+  return buf;
 }
 
-void ssm_mem_free(struct ssm_mm *mm, size_t size) {
-  ad_free(ad, size, mm); // toDONE(tm): (dan) use our own allocator
+void ssm_mem_free(void *m, size_t size) {
+  size_t pool = find_pool_size(size);
+  if (pool >= SSM_MEM_POOL_COUNT) {
+    free_mem(m, size);
+    return;
+  }
+
+  block_t *new_head = m;
+  new_head->free_list_next = mem_pools[pool].free_list_head;
+  mem_pools[pool].free_list_head = new_head;
 }
 
-struct ssm_mm *ssm_new_builtin(enum ssm_builtin builtin) {
-  struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(builtin));
-  mm->val_count = SSM_BUILTIN;
-  mm->tag = builtin;
-  mm->ref_count = 1;
-  return mm;
+/** TODO: doc */
+static inline void drop_children(struct ssm_mm *mm) {
+  if (!ssm_mm_is_builtin(mm)) {
+    struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
+    for (size_t i = 0; i < mm->val_count; i++)
+      if (ssm_on_heap(obj->payload[i]))
+        ssm_drop(obj->payload[i].heap_ptr);
+  } else {
+    switch (mm->tag) {
+    case SSM_SV_T: {
+      ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
+      if (ssm_on_heap(obj->value)) {
+        ssm_drop(obj->value.heap_ptr);
+      }
+      if (obj->later_time != SSM_NEVER && ssm_on_heap(obj->later_value)) {
+        ssm_drop(obj->later_value.heap_ptr);
+      }
+    } break;
+    }
+  }
 }
 
 struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
@@ -54,133 +184,25 @@ struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
 
 void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
 
-// helper used by both reuse and drop
-void drop_child_vars(struct ssm_mm *mm){
-  if (!ssm_mm_is_builtin(mm)) {
-    struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
-    for (int i = 0; i < mm->val_count; i++) {
-      if (ssm_on_heap(obj->payload[i])) {
-        ssm_drop(obj->payload[i].heap_ptr);
-      }
-    }
-  }
-  else if(ssm_mm_is(SSM_SV_T,mm)){
-    ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
-    if (ssm_on_heap(obj->value)) {
-      ssm_drop(obj->value.heap_ptr);
-    }
-    if (obj->later_time!=SSM_NEVER && ssm_on_heap(obj->later_value)) {
-      ssm_drop(obj->later_value.heap_ptr);
-    }
-  }
-}
-
 void ssm_drop(struct ssm_mm *mm) {
   if (--mm->ref_count == 0) {
-
-    drop_child_vars(mm);
+    drop_children(mm);
     ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
                                            : SSM_OBJ_SIZE(mm->val_count));
   }
 }
 
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
-  if (--mm->ref_count == 0) {
-    drop_child_vars(mm);
-    return mm;
-  } else {
-    if (ssm_mm_is_builtin(mm)) {
-      return ssm_new_builtin(mm->tag);
-    } else {
-      return &ssm_new(mm->val_count, mm->tag)->mm;
-    }
-  }
-}
-
-allocation_dispatcher_t *ad_initialize(size_t block_sizes[],
-                                       size_t num_blocks[],
-                                       size_t num_allocators,
-                                       void *memory_pool) {
-  // memory head is keeping track of next available memory
-  // increments to memory head are analogous to calls to malloc
-  void *memory_head = memory_pool;
-  allocation_dispatcher_t *dispatcher = memory_head;
-  memory_head = ((char *)memory_head) + sizeof(allocation_dispatcher_t);
-  dispatcher->num_allocators = num_allocators;
-  dispatcher->allocators = memory_head;
-  memory_head =
-      ((char *)memory_head) + sizeof(fixed_allocator_t) * num_allocators;
-  for (int i = 0; i < num_allocators; i++) {
-    void *memory = memory_head;
-    memory_head = ((char *)memory_head) + block_sizes[i] * num_blocks[i] +
-                 sizeof(fixed_allocator_t);
-    dispatcher->allocators[i] =
-        fa_initialize(block_sizes[i], num_blocks[i], memory);
-  }
-  return dispatcher;
-}
-
-void ad_destroy(allocation_dispatcher_t *ad) {
-  for (int i = 0; i < ad->num_allocators; i++) {
-    fa_destroy(ad->allocators[i]);
-  }
-}
-void *ad_malloc(allocation_dispatcher_t *ad, size_t size) {
-  fixed_allocator_t *allocator = find_allocator(ad, size);
-  if (!allocator) {
-    return malloc(size);
-  }
-  return fa_malloc(allocator);
-}
-void ad_free(allocation_dispatcher_t *ad, size_t size, void *memory) {
-  fixed_allocator_t *allocator = find_allocator(ad, size);
-  if (!allocator) {
-    free(memory);
-  } else {
-    fa_free(allocator, memory);
-  }
-}
-fixed_allocator_t *find_allocator(allocation_dispatcher_t *ad, size_t size) {
-  // todo: sort and binary search?
-  // todo: smallest available size above threshold?
-  for (int i = 0; i < ad->num_allocators; i++) {
-    if (ad->allocators[i]->block_size == size) {
-      return ad->allocators[i];
-    }
-  }
+  SSM_ASSERT(0);
   return NULL;
+  /* if (--mm->ref_count == 0) { */
+  /*   drop_children(mm); */
+  /*   return mm; */
+  /* } else { */
+  /*   if (ssm_mm_is_builtin(mm)) { */
+  /*     return ssm_new_builtin(mm->tag); */
+  /*   } else { */
+  /*     return &ssm_new(mm->val_count, mm->tag)->mm; */
+  /*   } */
+  /* } */
 }
-
-fixed_allocator_t *fa_initialize(size_t block_size, size_t num_blocks,
-                                 void *memory) {
-  assert(block_size > sizeof(ssm_word_t));
-  // need at least 1 word for pointer to next block in freelist
-  fixed_allocator_t *allocator = memory;
-  void *pool = ((char *)memory) + sizeof(fixed_allocator_t);
-  allocator->block_size = block_size;
-  allocator->num_blocks = num_blocks;
-  allocator->memory_pool = pool;
-  allocator->free_list_head = allocator->memory_pool;
-
-  // initalize freelist
-  ssm_word_t currentAddress = (ssm_word_t)(allocator->memory_pool);
-  for (int i = 0; i < num_blocks - 1; i++) {
-    *((ssm_word_t *)currentAddress) = currentAddress + block_size;
-    currentAddress += block_size;
-  }
-  *((ssm_word_t *)currentAddress) = 0; // nullptr - no more free
-  return allocator;
-}
-memory_t fa_malloc(fixed_allocator_t *allocator) {
-  assert(allocator->free_list_head != 0); // fail on oom
-  memory_t toReturn = allocator->free_list_head;
-  allocator->free_list_head =
-      (memory_t)(*((ssm_word_t *)(allocator->free_list_head)));
-  return toReturn;
-}
-void fa_free(fixed_allocator_t *allocator, memory_t address) {
-  *((ssm_word_t *)address) = (ssm_word_t)(allocator->free_list_head);
-  allocator->free_list_head = address;
-}
-
-void fa_destroy(fixed_allocator_t *allocator) {}
