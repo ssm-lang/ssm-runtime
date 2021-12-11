@@ -260,7 +260,7 @@ struct ssm_time *ssm_new_time(ssm_time_t time) {
 
 ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
                      ssm_priority_t priority, ssm_depth_t depth) {
-  ssm_act_t *act = malloc(size); // TODO: use something else
+  ssm_act_t *act = ssm_mem_alloc(size);
   *act = (ssm_act_t){
       .step = step,
       .caller = parent,
@@ -276,7 +276,7 @@ ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
 
 void ssm_leave(ssm_act_t *act, size_t size) {
   ssm_act_t *parent = act->caller;
-  free(act); // TODO:
+  ssm_mem_free(act, size);
   if (--parent->children == 0)
     parent->step(parent);
 }
