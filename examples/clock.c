@@ -1,5 +1,4 @@
-#include <ssm-internal.h> // Needed to implement tick loop
-#include <ssm-typedefs.h> // Needed for type definitions
+#include "ssm-examples.h"
 #include <ssm.h>
 #include <stdio.h>
 
@@ -104,9 +103,8 @@ void step_report_seconds(struct ssm_act *act) {
       return;
     case 1:
       ssm_desensitize(&cont->trigger1);
-      ssm_assign(
-          ssm_to_sv(cont->seconds), act->priority,
-          ssm_marshal(ssm_unmarshal(ssm_deref(cont->seconds)) + 1));
+      ssm_assign(ssm_to_sv(cont->seconds), act->priority,
+                 ssm_marshal(ssm_unmarshal(ssm_deref(cont->seconds)) + 1));
 
       printf("%d\n", (int)ssm_unmarshal(ssm_deref(cont->seconds)));
     }
@@ -154,30 +152,10 @@ void step_main(struct ssm_act *act) {
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
-}
-
-int main(int argc, char *argv[]) {
-  size_t allocator_sizes[] = {48};
-  size_t allocator_blocks[] = {4000};
-  size_t num_allocators = 1;
-  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
-  
-  ssm_time_t stop_at = (argc > 1 ? atoi(argv[1]) : 20) * SSM_SECOND;
-
+void ssm_program_init(void) {
   ssm_act_t *act =
       ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
   ssm_activate(act);
-
-  ssm_tick();
-
-  while (ssm_next_event_time() != SSM_NEVER && ssm_now() < stop_at)
-    ssm_tick();
-
-  printf("simulated %lu seconds\n", ssm_now() / SSM_SECOND);
-
-  return 0;
 }
+
+void ssm_program_exit(void) {}

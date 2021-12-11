@@ -20,6 +20,7 @@ DOC_TGT := $(BUILD_DIR)/doc
 EXE_SRC := $(wildcard $(EXE_DIR)/*.c)
 EXE_OBJ := $(patsubst $(EXE_DIR)/%.c, $(BUILD_DIR)/%.o, $(EXE_SRC))
 EXE_TGT := $(patsubst %.o, %, $(EXE_OBJ))
+EXE_INC := $(wildcard $(EXE_DIR)/*.h)
 
 TLIB_NAME := t$(LIB_NAME)
 TLIB_OBJ := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/test_%.o, $(LIB_SRC))
@@ -68,7 +69,10 @@ $(TEST_TGT): %: %.o $(TLIB_TGT)
 
 vpath %.c $(SRC_DIR) $(EXE_DIR) $(TEST_DIR)
 
-$(LIB_OBJ) $(EXE_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
+$(EXE_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) $(EXE_INC) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+$(LIB_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)

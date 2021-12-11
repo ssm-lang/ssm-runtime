@@ -1,8 +1,6 @@
-#include <ssm-internal.h>
-#include <ssm-typedefs.h>
+#include "ssm-examples.h"
 #include <ssm.h>
 #include <stdio.h>
-#include <stdlib.h>
 
 /*
 mywait (r: &a) =
@@ -163,35 +161,17 @@ void step_fib(struct ssm_act *act) {
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
-int main(int argc, char *argv[]) {
-  size_t allocator_sizes[] = {48};
-  size_t allocator_blocks[] = {4000};
-  size_t num_allocators = 1;
-  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
-  
-  ssm_u32_t result = ssm_from_sv(ssm_new_sv(ssm_marshal(0xdeadbeef)));
+ssm_u32_t result;
+void ssm_program_init(void) {
+  result = ssm_from_sv(ssm_new_sv(ssm_marshal(0xdeadbeef)));
 
-  int n = argc > 1 ? atoi(argv[1]) : 3;
-
+  int n = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
   ssm_dup(ssm_sv_mm(result));
   ssm_activate(ssm_enter_fib(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH,
                              ssm_marshal(n), result));
 
-  ssm_tick();
-
-  while (ssm_next_event_time() != SSM_NEVER)
-    ssm_tick();
-
-  printf("simulated %lu seconds\n", ssm_now() / SSM_SECOND);
-  printf("%d\n", (int)ssm_unmarshal(ssm_deref(result)));
-
-  ssm_drop(ssm_sv_mm(result));
-
-  return 0;
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
+void ssm_program_exit(void) {
+  printf("%d\n", (int)ssm_unmarshal(ssm_deref(result)));
 }
