@@ -58,9 +58,7 @@ static void *alloc_page(void) {
     exit(3);
   }
   void *m = pages[allocated_pages++] = malloc(SSM_MEM_PAGE_SIZE);
-  /* void *m = pages[allocated_pages++] = malloc(SSM_MEM_PAGE_SIZE * 8); */
-  /* m = (void*)(((ssm_word_t) m & ~(SSM_MEM_PAGE_SIZE - 1)) + SSM_MEM_PAGE_SIZE); */
-  memcpy(m, ssm_page_init, SSM_MEM_PAGE_SIZE);
+  memset(m, 0, SSM_MEM_PAGE_SIZE);
   return m;
 }
 

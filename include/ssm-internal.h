@@ -140,6 +140,4 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
 #define SSM_MEM_POOL_SIZE(pool) (SSM_MEM_POOL_MIN << (SSM_MEM_POOL_FACTOR_LOG * pool))
 #define SSM_MEM_PAGE_SIZE SSM_MEM_POOL_SIZE(SSM_MEM_POOL_COUNT)
 
-extern uint8_t ssm_page_init[SSM_MEM_PAGE_SIZE];
-
 #endif /* _SSM_SCHED_H */
