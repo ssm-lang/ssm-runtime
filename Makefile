@@ -6,6 +6,7 @@ INC_DIR := include
 TEST_DIR := test
 EXE_DIR := examples
 DOC_DIR := doc
+GCOVR_CFG := test/gcovr.cfg
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
 LIB_INC := $(wildcard include/*.h)
@@ -30,7 +31,7 @@ TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJ := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/test_%.o, $(TEST_SRC))
 TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 
-COV_TGT := $(patsubst $(BUILD_DIR)/test_%.o, $(BUILD_DIR)/%.c.gcov, $(TLIB_OBJ))
+COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = cc
 CFLAGS = -g -I$(INC_DIR) -O -Wall -pedantic -std=c99
@@ -43,8 +44,8 @@ TEST_LDFLAGS = $(LDFLAGS) --coverage
 AR = ar
 ARFLAGS = -cr
 
-GCOV = gcov
-GCOVFLAGS = --branch-probabilities --all-blocks
+GCOVR = gcovr
+GCOVR_FLAGS = --config $(GCOVR_CFG)
 
 PHONY += lib docs exes tests cov
 lib: $(LIB_TGT)
@@ -79,8 +80,13 @@ $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
-$(COV_TGT): $(BUILD_DIR)/%.c.gcov: $(BUILD_DIR)/test_%.o run-tests
-	$(GCOV) $(GCOVFLAGS) --stdout $< > $@
+$(COV_TGT): run-tests
+	@if command -v $(GCOVR) >/dev/null; then \
+		echo $(GCOVR) $(GCOVR_FLAGS) ; \
+		$(GCOVR) $(GCOVR_FLAGS) ; \
+	else \
+		echo "Warning: command $(GCOVR) not found. Please install." ; \
+	fi
 
 run-tests: $(TEST_TGT)
 	@for i in $(TEST_TGT) ; do \
