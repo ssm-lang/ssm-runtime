@@ -34,7 +34,7 @@ LIB_INC := $(wildcard include/*.h)
 LIB_OBJ := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(LIB_SRC))
 LIB_TGT := $(BUILD_DIR)/lib$(LIB_NAME).a
 
-DOC_CFG := Doxyfile
+DOC_CFG := doc/Doxyfile
 DOC_SRC := README.md $(wildcard doc/*.md doc/*.dox) $(LIB_SRC) $(LIB_INC)
 DOC_TGT := $(BUILD_DIR)/doc
 
@@ -63,9 +63,6 @@ TEST_LDFLAGS = $(LDFLAGS) --coverage
 
 AR = ar
 ARFLAGS = -cr
-
-GCOVR = gcovr
-GCOVR_FLAGS = --config $(GCOVR_CFG)
 
 PHONY += lib exes tests cov docs
 lib: $(LIB_TGT)
@@ -105,10 +102,10 @@ $(COV_TGT): $(TEST_TGT)
 		echo ./$$i ;\
 		./$$i >/dev/null || exit $$? ;\
 	done
-	$(GCOVR) $(GCOVR_FLAGS)
+	gcvor --config $(GCOVR_CFG)
 
 $(DOC_TGT): $(DOC_CFG) $(DOC_SRC) | $(BUILD_DIR)
-	doxygen
+	doxygen doc/Doxyfile
 
 $(BUILD_DIR):
 	mkdir -p $@
