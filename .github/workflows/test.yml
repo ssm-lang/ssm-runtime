@@ -34,7 +34,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gcov valgrind
+        sudo apt-get install -y build-essential gcc valgrind
 
     # Performed as separate step to more easily detect library build error
     - name: Build library

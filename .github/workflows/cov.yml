@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential gcov
+          sudo apt-get install -y build-essential gcc
           - name: Upload coverage to Codecov
 
       - name: Produce coverage reports
