@@ -86,7 +86,9 @@ SSM_STATIC ssm_time_t now = 0L;
  */
 SSM_STATIC_INLINE
 void act_queue_percolate_up(q_idx_t hole, ssm_act_t *act) {
+  // GCOV_EXCL_START
   SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
+  // GCOV_EXCL_STOP
   ssm_priority_t priority = act->priority;
   for (; hole > SSM_QUEUE_HEAD && priority < act_queue[hole >> 1]->priority;
        hole >>= 1)
@@ -107,7 +109,9 @@ void act_queue_percolate_up(q_idx_t hole, ssm_act_t *act) {
  */
 SSM_STATIC_INLINE
 void act_queue_percolate_down(q_idx_t hole, ssm_act_t *act) {
+  // GCOV_EXCL_START
   SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= act_queue_len);
+  // GCOV_EXCL_STOP
   ssm_priority_t priority = act->priority;
   for (;;) {
     // Find the earlier of the two children
@@ -139,7 +143,9 @@ void act_queue_percolate_down(q_idx_t hole, ssm_act_t *act) {
  */
 SSM_STATIC_INLINE
 void event_queue_percolate_up(q_idx_t hole, ssm_sv_t *var) {
+  // GCOV_EXCL_START
   SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);
+  // GCOV_EXCL_STOP
   ssm_time_t later = var->later_time;
   for (; hole > SSM_QUEUE_HEAD && later < event_queue[hole >> 1]->later_time;
        hole >>= 1)
@@ -159,7 +165,10 @@ void event_queue_percolate_up(q_idx_t hole, ssm_sv_t *var) {
  */
 SSM_STATIC_INLINE
 void event_queue_percolate_down(q_idx_t hole, ssm_sv_t *event) {
+  // GCOV_EXCL_START
   SSM_ASSERT(hole >= SSM_QUEUE_HEAD && hole <= event_queue_len);
+  // GCOV_EXCL_STOP
+
   ssm_time_t later = event->later_time;
   for (;;) {
     // Find the earlier of the two children
@@ -189,61 +198,70 @@ void event_queue_percolate_down(q_idx_t hole, ssm_sv_t *event) {
  */
 SSM_STATIC_INLINE
 q_idx_t find_queued_event(ssm_sv_t *var) {
-  SSM_ASSERT(var->later_time != SSM_NEVER); // Should be in the queue
+  // Should be in the queue
+  // GCOV_EXCL_START (control flow here is too predictable to warrant coverage)
+  SSM_ASSERT(var->later_time != SSM_NEVER);
   for (q_idx_t i = SSM_QUEUE_HEAD; i <= event_queue_len; i++)
     if (event_queue[i] == var)
       return i;
   SSM_ASSERT(0); // Should have found the variable if it was marked as queued
   return 0;
+  // GCOV_EXCL_STOP
 }
 
 #ifdef SSM_DEBUG
-#include <assert.h>
 
-/** @brief Assert the event queue is well-formed. */
+// GCOV_EXCL_START
+/** @brief SSM_ASSERT the event queue is well-formed. */
 void event_queue_consistency_check(void) {
   if (event_queue_len == 0)
     return;
 
-  assert(event_queue_len <= SSM_EVENT_QUEUE_SIZE); // No overflow
+  SSM_ASSERT(event_queue_len <= SSM_EVENT_QUEUE_SIZE); // No overflow
 
   for (q_idx_t i = SSM_QUEUE_HEAD; i <= event_queue_len; i++) {
-    assert(event_queue[i]); // Events should be valid
-    assert(event_queue[i]->later_time !=
-           SSM_NEVER); // Queue events should have valid time
+    // Events should be valid
+    SSM_ASSERT(event_queue[i]);
+    // Queue events should have valid time
+    SSM_ASSERT(event_queue[i]->later_time != SSM_NEVER);
     q_idx_t child = i << 1;
     if (child <= event_queue_len) {
-      assert(event_queue[child]);
-      assert(event_queue[child]->later_time >= event_queue[i]->later_time);
+      SSM_ASSERT(event_queue[child]);
+      SSM_ASSERT(event_queue[child]->later_time >= event_queue[i]->later_time);
       if (++child <= event_queue_len) {
-        assert(event_queue[child]);
-        assert(event_queue[child]->later_time >= event_queue[i]->later_time);
+        SSM_ASSERT(event_queue[child]);
+        SSM_ASSERT(event_queue[child]->later_time >=
+                   event_queue[i]->later_time);
       }
     }
   }
 }
 
-/** @brief Assert the activation record queue is well-formed. */
+/** @brief SSM_ASSERT the activation record queue is well-formed. */
 void act_queue_consistency_check(void) {
   if (act_queue_len == 0)
     return;
 
-  assert(act_queue_len <= SSM_ACT_QUEUE_SIZE); // No overflow
+  // No overflow
+  SSM_ASSERT(act_queue_len <= SSM_ACT_QUEUE_SIZE);
 
   for (q_idx_t i = SSM_QUEUE_HEAD; i <= act_queue_len; i++) {
-    assert(act_queue[i]);            // Acts should be valid
-    assert(act_queue[i]->scheduled); // If it's in the queue, it should say so
+    // Acts should be valid
+    SSM_ASSERT(act_queue[i]);
+    // If it's in the queue, it should say so
+    SSM_ASSERT(act_queue[i]->scheduled);
     q_idx_t child = i << 1;
     if (child <= act_queue_len) {
-      assert(act_queue[child]);
-      assert(act_queue[child]->priority >= act_queue[i]->priority);
+      SSM_ASSERT(act_queue[child]);
+      SSM_ASSERT(act_queue[child]->priority >= act_queue[i]->priority);
       if (++child <= act_queue_len) {
-        assert(act_queue[child]);
-        assert(act_queue[child]->priority >= act_queue[i]->priority);
+        SSM_ASSERT(act_queue[child]);
+        SSM_ASSERT(act_queue[child]->priority >= act_queue[i]->priority);
       }
     }
   }
 }
+// GCOV_EXCL_STOP
 #endif
 
 /** @} */
@@ -395,14 +413,21 @@ void ssm_reset(void) {
 }
 
 void ssm_set_now(ssm_time_t next) {
-  SSM_ASSERT(now < next); // No time-traveling!
-  SSM_ASSERT(event_queue_len == 0 ||
-             next <= event_queue[SSM_QUEUE_HEAD]->later_time);
+  if (next <= now)
+    // No time-traveling!
+    SSM_THROW(SSM_INVALID_TIME);
+
+  if (event_queue_len != 0 && next > event_queue[SSM_QUEUE_HEAD]->later_time)
+    // No skipping scheduled events!
+    SSM_THROW(SSM_NOT_READY);
+
   now = next;
 }
 
 void ssm_update(ssm_sv_t *sv) {
-  SSM_ASSERT(now == sv->later_time);
+  if (now != sv->later_time)
+    SSM_THROW(SSM_NOT_READY);
+
   sv->value = sv->later_value;
   sv->last_updated = now;
   sv->later_time = SSM_NEVER;
@@ -411,8 +436,12 @@ void ssm_update(ssm_sv_t *sv) {
 }
 
 void ssm_tick(void) {
-  SSM_ASSERT(act_queue_len == 0 || ssm_next_event_time() == SSM_NEVER ||
-             now <= ssm_next_event_time());
+  if (act_queue_len != 0 && ssm_next_event_time() != SSM_NEVER &&
+      now > ssm_next_event_time())
+    // There are somehow events in the queue that have a timestamp earlier than
+    // the time at which we are trying to tick. This is usually a sign of queue
+    // mismanagement by platform code.
+    SSM_THROW(SSM_NOT_READY);
 
   if (act_queue_len == 0 && event_queue_len > 0)
     ssm_set_now(ssm_next_event_time());

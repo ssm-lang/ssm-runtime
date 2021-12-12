@@ -42,8 +42,10 @@ typedef enum ssm_error {
   /**< Could not allocate more memory. */
   SSM_EXHAUSTED_PRIORITY,
   /**< Tried to exceed available recursion depth. */
+  SSM_NOT_READY,
+  /**< Not yet ready to perform the requested action. */
   SSM_INVALID_TIME,
-  /**< Invalid time, e.g., scheduled delayed assignment at an earlier time. */
+  /**< Specified invalid time, e.g., scheduled assignment at an earlier time. */
   SSM_INVALID_MEMORY,
   /**< Invalid memory layout, e.g., using a pointer where int was expected. */
   SSM_PLATFORM_ERROR

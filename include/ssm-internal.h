@@ -19,7 +19,7 @@
 #define SSM_ASSERT(cond)                                                       \
   do                                                                           \
     if (!(cond))                                                               \
-      SSM_THROW(SSM_INTERNAL_ERROR);                                           \
+      /* COV_EXCL_LINE */ SSM_THROW(SSM_INTERNAL_ERROR);                       \
   while (0)
 
 /** @brief The time of the next event in the event queue.
@@ -49,8 +49,8 @@ void ssm_reset(void);
  *
  *  @param next the time to advance to.
  *
- *  @throws SSM_INTERNAL_ERROR @a next is earlier than or equal to ssm_now(), or
- *                             later than the earliest event in the event queue.
+ *  @throws SSM_INVALID_TIME  @a next is earlier than or equal to #now.
+ *  @throws SSM_NOT_READY     @a next is later than the earliest queued event.
  */
 void ssm_set_now(ssm_time_t next);
 
@@ -65,7 +65,7 @@ void ssm_set_now(ssm_time_t next);
  *
  *  @param sv the variable.
  *
- *  @throws SSM_INTERNAL_ERROR @a sv not ready to be updated #now.
+ *  @throws SSM_NOT_READY   @a sv was not scheduled to be updated #now.
  */
 void ssm_update(ssm_sv_t *sv);
 
@@ -82,7 +82,7 @@ void ssm_update(ssm_sv_t *sv);
  *  Should only be called if there are activation records to execute #now,
  *  or if #now is earlier than ssm_next_event_time().
  *
- *  @throws SSM_INTERNAL_ERROR not ready to tick in the current instant.
+ *  @throws SSM_INTERNAL_ERROR  there are stale events in the queue before #now.
  */
 void ssm_tick(void);
 

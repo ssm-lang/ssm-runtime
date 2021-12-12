@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <ssm-internal.h>
 #include <ssm.h>
 #include <stdio.h>
@@ -7,8 +6,6 @@
 #ifndef SSM_DEBUG
 #error "SSM_DEBUG undefined; it should be defined for the library"
 #endif
-
-#undef NDEBUG
 
 #define DUMMY_VALUE ssm_marshal(0)
 
@@ -33,9 +30,9 @@ ssm_act_t acts[NUM_ACTS];
 ssm_trigger_t triggers[NUM_TRIGGERS];
 
 void check_starts_initialized() {
-  assert(ssm_now() == 0L);
-  assert(event_queue_len == 0);
-  assert(act_queue_len == 0);
+  SSM_ASSERT(ssm_now() == 0L);
+  SSM_ASSERT(event_queue_len == 0);
+  SSM_ASSERT(act_queue_len == 0);
 }
 
 void reset_all() {
@@ -49,18 +46,18 @@ void reset_all() {
 
 void event_queue_basic() {
   reset_all();
-  assert(ssm_next_event_time() == SSM_NEVER);
-  assert(!ssm_event_on(variables[0]));
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(!ssm_event_on(variables[0]));
   ssm_later(ssm_to_sv(variables[0]), 1, DUMMY_VALUE);
-  assert(event_queue_len == 1);
-  assert(ssm_next_event_time() == 1);
+  SSM_ASSERT(event_queue_len == 1);
+  SSM_ASSERT(ssm_next_event_time() == 1);
   event_queue_consistency_check();
   ssm_tick();
   bool event_on = ssm_event_on(variables[0]);
-  assert(event_on);
-  assert(ssm_now() == 1);
-  assert(ssm_next_event_time() == SSM_NEVER);
-  assert(event_queue_len == 0);
+  SSM_ASSERT(event_on);
+  SSM_ASSERT(ssm_now() == 1);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(event_queue_len == 0);
 }
 
 void print_event_queue() {
@@ -80,7 +77,7 @@ void print_event_queue() {
  */
 void event_queue_sort_string(const char *input, const char *expected) {
   reset_all();
-  assert(event_queue_len == 0);
+  SSM_ASSERT(event_queue_len == 0);
   ssm_value_t *var = variables;
   for (const char *cp = input; *cp; ++cp, ++var) {
     ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, DUMMY_VALUE);
@@ -90,7 +87,7 @@ void event_queue_sort_string(const char *input, const char *expected) {
   while (event_queue_len) {
     char c = (char)event_queue[1]->later_time;
     printf("%c", c);
-    assert(c == *expected++);
+    SSM_ASSERT(c == *expected++);
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
@@ -138,7 +135,7 @@ void event_queue_reschedule_string(const char *input, const char *expected) {
     event_queue_consistency_check();
     char c = ssm_now();
     printf("%c", c);
-    assert(c == *expected++);
+    SSM_ASSERT(c == *expected++);
   }
   printf("\n");
 }
@@ -172,7 +169,7 @@ void event_queue_unschedule_string(const char *input, int n,
   while (event_queue_len) {
     char c = (char)event_queue[1]->later_time;
     printf("%c", c);
-    assert(c == *expected++);
+    SSM_ASSERT(c == *expected++);
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
@@ -184,18 +181,18 @@ void event_queue_unschedule_string(const char *input, int n,
 
 void act_queue_basic() {
   reset_all();
-  assert(act_queue_len == 0);
-  assert(!acts[0].scheduled);
+  SSM_ASSERT(act_queue_len == 0);
+  SSM_ASSERT(!acts[0].scheduled);
   ssm_activate(acts);
-  assert(act_queue_len == 1);
+  SSM_ASSERT(act_queue_len == 1);
   act_queue_consistency_check();
   ssm_tick();
-  assert(act_queue_len == 0);
+  SSM_ASSERT(act_queue_len == 0);
 }
 
 void act_queue_sort_string(const char *input, const char *expected) {
   reset_all();
-  assert(act_queue_len == 0);
+  SSM_ASSERT(act_queue_len == 0);
   ssm_act_t *act = acts;
   for (const char *cp = input; *cp; ++cp, ++act) {
     act->scheduled = false;
@@ -207,7 +204,7 @@ void act_queue_sort_string(const char *input, const char *expected) {
   while (act_queue_len) {
     char c = (char)act_queue[1]->priority;
     printf("%c", c);
-    assert(c == *expected++);
+    SSM_ASSERT(c == *expected++);
     ssm_act_t *to_insert = act_queue[act_queue_len--]; // get last
 
     if (act_queue_len) // Was this the last?
@@ -220,10 +217,10 @@ void act_queue_sort_string(const char *input, const char *expected) {
 const char *next_expected;
 
 void check_priority_step(ssm_act_t *act) {
-  assert(act);
+  SSM_ASSERT(act);
   char c = act->priority;
   printf("%c", c);
-  assert(c == *next_expected++);
+  SSM_ASSERT(c == *next_expected++);
 }
 
 /** Enter the string into the activation record queue with priorities
@@ -232,14 +229,14 @@ void check_priority_step(ssm_act_t *act) {
  */
 void act_queue_sort_tick(const char *input, const char *expected) {
   reset_all();
-  assert(act_queue_len == 0);
+  SSM_ASSERT(act_queue_len == 0);
   ssm_act_t *act = acts;
   for (const char *cp = input; *cp; ++cp, ++act) {
     act->step = check_priority_step;
     act->scheduled = false;
     act->priority = *cp;
     ssm_activate(act);
-    assert(act->scheduled);
+    SSM_ASSERT(act->scheduled);
     act_queue_consistency_check();
   }
 
@@ -248,16 +245,16 @@ void act_queue_sort_tick(const char *input, const char *expected) {
   ssm_tick();
   act_queue_consistency_check();
 
-  assert(*next_expected ==
+  SSM_ASSERT(*next_expected ==
          0); // Did we end up at the end of the expected string?
 
-  assert(act_queue_len == 0); // Should have emptied the activation record queue
+  SSM_ASSERT(act_queue_len == 0); // Should have emptied the activation record queue
   printf("\n");
 
   // Make sure all the activation records were unscheduled
   act = acts;
   for (const char *cp = input; *cp; ++cp, ++act)
-    assert(!act->scheduled);
+    SSM_ASSERT(!act->scheduled);
 }
 
 bool step0ran, step1ran;
@@ -276,10 +273,10 @@ void trigger_basic() {
 
   acts[0].step = step0;
   acts[0].priority = 3;
-  assert(!acts[0].scheduled);
+  SSM_ASSERT(!acts[0].scheduled);
   acts[1].step = step1;
   acts[1].priority = 4;
-  assert(!acts[1].scheduled);
+  SSM_ASSERT(!acts[1].scheduled);
 
   triggers[0].act = &acts[0];
   triggers[1].act = &acts[1];
@@ -295,12 +292,12 @@ void trigger_basic() {
 
   ssm_tick();
   printf("\n");
-  assert(ssm_now() == 1);
+  SSM_ASSERT(ssm_now() == 1);
 
-  assert(step0ran);
-  assert(step1ran);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(ssm_to_sv(variables[0]), 2, DUMMY_VALUE);
 
@@ -308,11 +305,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 2);
-  assert(step0ran);
-  assert(step1ran);
+  SSM_ASSERT(ssm_now() == 2);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(ssm_to_sv(variables[0]), 3, DUMMY_VALUE);
   ssm_desensitize(&triggers[1]);
@@ -321,11 +318,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 3);
-  assert(step0ran);
-  assert(!step1ran);
+  SSM_ASSERT(ssm_now() == 3);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(!step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(ssm_to_sv(variables[0]), 4, DUMMY_VALUE);
   ssm_desensitize(&triggers[0]);
@@ -334,11 +331,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 4);
-  assert(step0ran);
-  assert(!step1ran);
+  SSM_ASSERT(ssm_now() == 4);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(!step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(ssm_to_sv(variables[0]), 5, DUMMY_VALUE);
   ssm_desensitize(&triggers[2]);
@@ -347,11 +344,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 5);
-  assert(!step0ran);
-  assert(!step1ran);
+  SSM_ASSERT(ssm_now() == 5);
+  SSM_ASSERT(!step0ran);
+  SSM_ASSERT(!step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(ssm_to_sv(variables[0]), 6, DUMMY_VALUE);
   ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
@@ -361,11 +358,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 6);
-  assert(step0ran);
-  assert(step1ran);
+  SSM_ASSERT(ssm_now() == 6);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_desensitize(&triggers[0]);
   ssm_later(ssm_to_sv(variables[0]), 7, DUMMY_VALUE);
@@ -374,11 +371,11 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 7);
-  assert(!step0ran);
-  assert(step1ran);
+  SSM_ASSERT(ssm_now() == 7);
+  SSM_ASSERT(!step0ran);
+  SSM_ASSERT(step1ran);
 
-  assert(ssm_next_event_time() == SSM_NEVER);
+  SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
 
@@ -390,9 +387,9 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 7);
-  assert(step0ran);
-  assert(step1ran);
+  SSM_ASSERT(ssm_now() == 7);
+  SSM_ASSERT(step0ran);
+  SSM_ASSERT(step1ran);
 
   for (ssm_trigger_t *trig = ssm_to_sv(variables[0])->triggers; trig;
        trig = trig->next)
@@ -403,9 +400,9 @@ void trigger_basic() {
   ssm_tick();
   printf("\n");
 
-  assert(ssm_now() == 7);
-  assert(!step0ran);
-  assert(step1ran);
+  SSM_ASSERT(ssm_now() == 7);
+  SSM_ASSERT(!step0ran);
+  SSM_ASSERT(step1ran);
 }
 
 void vacuous_step(ssm_act_t *act) {}
