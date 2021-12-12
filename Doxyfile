@@ -145,7 +145,7 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = examples
 EXAMPLE_PATTERNS       = *.c *.h
-EXAMPLE_RECURSIVE      = YES
+EXAMPLE_RECURSIVE      = NO
 
 IMAGE_PATH             =
 INPUT_FILTER           =
