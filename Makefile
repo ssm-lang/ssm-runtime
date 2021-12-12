@@ -1,3 +1,23 @@
+######################
+# SSM runtime Makefile
+######################
+#
+# For a list of useful available targets, run `make help'.
+#
+# Note that this Makefile is only used to build and test the platform-generic
+# core of the SSM runtime; platform-specific builds may use their own build
+# system that ignores this Makefile.
+#
+# Any .c files under EXE_DIR are linked against this library to produce an
+# executable.
+#
+# This Makefile also a version of the runtime library instrumented for code
+# coverage analysis. The build artifacts for instrumented code are mangled using
+# the test_ prefix. This version of the runtime library is used to link against
+# .c files in TEST_DIR.
+#
+# To actually run tests, please see the runtests.sh script.
+
 LIB_NAME := ssm
 
 BUILD_DIR := build
@@ -47,12 +67,12 @@ ARFLAGS = -cr
 GCOVR = gcovr
 GCOVR_FLAGS = --config $(GCOVR_CFG)
 
-PHONY += lib docs exes tests cov
+PHONY += lib exes tests cov docs
 lib: $(LIB_TGT)
-docs: $(DOC_TGT)
 exes: $(EXE_TGT)
 tests: $(TEST_TGT)
 cov: $(COV_TGT)
+docs: $(DOC_TGT)
 
 $(LIB_TGT): $(LIB_OBJ)
 	rm -f $@
@@ -80,20 +100,12 @@ $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
-$(COV_TGT): run-tests
-	@if command -v $(GCOVR) >/dev/null; then \
-		echo $(GCOVR) $(GCOVR_FLAGS) ; \
-		$(GCOVR) $(GCOVR_FLAGS) ; \
-	else \
-		echo "Error: command $(GCOVR) not found. Please install." ; \
-		exit 1; \
-	fi
-
-run-tests: $(TEST_TGT)
+$(COV_TGT): $(TEST_TGT)
 	@for i in $(TEST_TGT) ; do \
 		echo ./$$i ;\
 		./$$i >/dev/null || exit $$? ;\
 	done
+	$(GCOVR) $(GCOVR_FLAGS)
 
 $(DOC_TGT): $(DOC_CFG) $(DOC_SRC) | $(BUILD_DIR)
 	doxygen
@@ -109,12 +121,15 @@ PHONY += help
 help:
 	@echo "Available phony targets:" $(PHONY)
 	@echo
-	@echo "lib     Build SSM runtime library     (build/libssm.a)"
-	@echo "docs    Build code documentation      (build/doc)"
-	@echo "exes    Build programs in examples/   (build/<example-name>)"
-	@echo "tests   Build tests in test/          (build/test_<test-name>)"
-	@echo "cov     Build coverage report         (build/<filename.c>.gcov)"
+	@echo "lib     Build SSM runtime library     [build/libssm.a]"
+	@echo "exes    Build programs in examples/   [build/<example-name>]"
+	@echo "tests   Build tests in test/          [build/test_<test-name>]"
+	@echo "cov     Build coverage report         [build/<filename.c>.gcov] (depends on gcovr)"
+	@echo "docs    Build code documentation      [build/doc]               (depends on doxygen)"
 	@echo "clean   Remove build directory"
 	@echo "help    Show this help menu"
+	@echo
+	@echo "Available example targets:" $(EXE_TGT)
+	@echo "Available test targets:" $(TEST_TGT)
 
 .PHONY: $(PHONY)

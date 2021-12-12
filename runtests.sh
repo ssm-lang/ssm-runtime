@@ -1,5 +1,16 @@
 #!/usr/bin/env bash
 
+#########################
+# SSM runtime test script
+#########################
+#
+# Use this script to run all tests and compare against expected output, which
+# can found in test/{examples,tests}.out). Example and test outputs are written
+# to build/{examples,tests}.out, respectively.
+#
+# If Valgrind is installed, this script also uses it to check for memory errors.
+# Valgrind output is written to build/{examples,tests}.vg-out.
+
 set -euf
 set -o pipefail
 
@@ -11,7 +22,6 @@ say () {
   echo "[$scriptname]" "$@"
 }
 
-# Run an example
 run () {
   local exe="$BUILD_DIR/$1"
   shift
