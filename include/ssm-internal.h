@@ -12,40 +12,52 @@
 
 #include <ssm.h>
 
-/** @brief Throw an internal error.
+/** @ingroup error
+ *  @brief Throw an internal error.
+ *
+ *  @platformonly
  *
  *  @param cond the condition to assert.
  */
 #define SSM_ASSERT(cond)                                                       \
   do                                                                           \
     if (!(cond))                                                               \
-      /* COV_EXCL_LINE */ SSM_THROW(SSM_INTERNAL_ERROR);                       \
+      SSM_THROW(SSM_INTERNAL_ERROR);                                           \
   while (0)
 
-/** @brief The time of the next event in the event queue.
+/** @ingroup time
+ *  @brief The time of the next event in the event queue.
  *
- *  Used by platform code to determine whether and when to invoke ssm_tick().
+ *  Used to determine whether and when to invoke ssm_tick().
+ *
+ *  @platformonly
  *
  *  @returns the next event time, or #SSM_NEVER if the event queue is empty.
  */
 ssm_time_t ssm_next_event_time(void);
 
-/** @brief Reset the scheduler.
+/** @ingroup time
+ *  @brief Reset the scheduler.
  *
  *  Set #now to 0; clear the event and activation record queues.
  *
  *  This does not need to be called before calling ssm_tick() for the first
  *  time; the global state automatically starts initialized.
+ *
+ *  @platformonly
  */
 void ssm_reset(void);
 
-/** @brief Advance the current model time.
- *
- *  Exposed internally so that platform code can perform external variable
- *  updates, to implement external inputs.
+/** @ingroup time
+ *  @brief Advance the current model time.
  *
  *  @a next must be later than ssm_now(), and earlier than or equal to
  *  ssm_next_event_time().
+ *
+ *  Exposed so that platform code can perform external variable updates, to
+ *  implement external inputs.
+ *
+ *  @platformonly
  *
  *  @param next the time to advance to.
  *
@@ -54,14 +66,17 @@ void ssm_reset(void);
  */
 void ssm_set_now(ssm_time_t next);
 
-/** @brief Perform a (delayed) update on a variable.
+/** @ingroup sv
+ *  @brief Perform a (delayed) update on a variable.
  *
  *  Schedules all routine activation records sensitive to @a sv in the
  *  activation queue.
  *
+ *  Should only be called if the variable is scheduled to be updated #now.
+ *
  *  Exposed so that platform code can perform external variable updates.
  *
- *  Should only be called if the variable is scheduled to be updated #now.
+ *  @platformonly
  *
  *  @param sv the variable.
  *
@@ -69,7 +84,8 @@ void ssm_set_now(ssm_time_t next);
  */
 void ssm_update(ssm_sv_t *sv);
 
-/** @brief Run the system for the next scheduled instant.
+/** @ingroup act
+ *  @brief Run the system for the next scheduled instant.
  *
  *  If there is nothing left to run in the current instant, advance #now to the
  *  time of the earliest event in the queue, if any.
@@ -82,30 +98,20 @@ void ssm_update(ssm_sv_t *sv);
  *  Should only be called if there are activation records to execute #now,
  *  or if #now is earlier than ssm_next_event_time().
  *
+ *  @platformonly
+ *
  *  @throws SSM_INTERNAL_ERROR  there are stale events in the queue before #now.
  */
 void ssm_tick(void);
 
-/** @brief Lookup the size of a builtin.
- *
- *  @param b  an #ssm_builtin indicating the type.
- *  @returns  the size of a builtin of type @a b, in bytes.
+/**
+ * @addtogroup mem
+ * @{
  */
-#define SSM_BUILTIN_SIZE(b)                                                    \
-  (size_t[]){                                                                  \
-      [SSM_TIME_T] = sizeof(struct ssm_time),                                  \
-      [SSM_SV_T] = sizeof(ssm_sv_t),                                           \
-  }[b]
-
-/** @brief Compute the size of a heap object.
- *
- *  @param val_count  the number of values in the #ssm_object.
- *  @returns          the size of the #ssm_object, in bytes.
- */
-#define SSM_OBJ_SIZE(val_count)                                                \
-  (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
 
 /** @brief Initialize the mm header of a builtin type.
+ *
+ *  @platformonly
  *
  *  @param mm   pointer to the mm header.
  *  @param b    an #ssm_builtin indicating the type.
@@ -116,11 +122,6 @@ void ssm_tick(void);
     mm->tag = b;                                                               \
     mm->ref_count = 1;                                                         \
   } while (0)
-
-/**
- * @addtogroup alloc
- * @{
- */
 
 /** @brief Initializes the underlying allocator system.
  *
@@ -135,6 +136,8 @@ void ssm_tick(void);
  *  alloc_mem_handler. These handlers may also assume they will not be invoked
  *  to request memory ranges of less than #SSM_MEM_POOL_MAX bytes.
  *
+ *  @platformonly
+ *
  *  @param alloc_page_handler   allocates pages.
  *  @param alloc_mem_handler    allocates arbitrarily large.
  *  @param free_mem_handler     frees pages allocated with @a alloc_mem_handler.
@@ -144,21 +147,50 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
                   void (*free_mem_handler)(void *, size_t));
 
 #ifndef SSM_MEM_POOL_MIN
-/** @brief Block size of the smallest memory pool. */
+/** @brief Block size of the smallest memory pool.
+ *
+ *  Must be strictly greater than the word size, i.e., the size of #ssm_word_t.
+ *
+ *  @platformonly
+ */
 #define SSM_MEM_POOL_MIN 16
 #endif
 
+#if SSM_MEM_POOL_MIN < SSM_POINTER_SIZE
+#error SSM_MEM_POOL_MIN must be larger than word size.
+#endif
+
 #ifndef SSM_MEM_POOL_FACTOR_BASE2
-/** @brief Factor between each successive memory pool size, in base 2. */
+/** @brief Factor between each successive memory pool size, in base 2.
+ *
+ *  Must be strictly greater than 0.
+ *
+ *  @platformonly
+ */
 #define SSM_MEM_POOL_FACTOR_BASE2 2
 #endif
 
+#if SSM_MEM_POOL_FACTOR_BASE2 < 1
+#error SSM_MEM_POOL_FACTOR_BASE2 must be strictly greater than 0.
+#endif
+
 #ifndef SSM_MEM_POOL_COUNT
-/** @brief Number of memory pools. */
+/** @brief Number of memory pools.
+ *
+ *  Must be strictly greater than 0.
+ *
+ *  @platformonly
+ */
 #define SSM_MEM_POOL_COUNT 4
 #endif
 
+#if SSM_MEM_POOL_COUNT < 1
+#error SSM_MEM_POOL_COUNT must be strictly greater than 0.
+#endif
+
 /** @brief Compute the size of a memory pool.
+ *
+ *  @platformonly
  *
  *  @param pool   the 0-index of the memory pool.
  *  @returns      the size of the memory pool at position @a pool.
@@ -166,11 +198,17 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
 #define SSM_MEM_POOL_SIZE(pool)                                                \
   (SSM_MEM_POOL_MIN << (SSM_MEM_POOL_FACTOR_BASE2 * pool))
 
-/** @brief The size of the largest memory pool. */
+/** @brief The size of the largest memory pool.
+ *
+ *  @platformonly
+ */
 #define SSM_MEM_POOL_MAX SSM_MEM_POOL_SIZE(SSM_MEM_POOL_COUNT - 1)
 
 #ifndef SSM_MEM_PAGE_SIZE
-/** @brief The size of a memory page; must be greater than #SSM_MEM_POOL_MAX. */
+/** @brief The size of a memory page; must be greater than #SSM_MEM_POOL_MAX.
+ *
+ *  @platformonly
+ */
 #define SSM_MEM_PAGE_SIZE SSM_MEM_POOL_SIZE(SSM_MEM_POOL_COUNT)
 #endif
 

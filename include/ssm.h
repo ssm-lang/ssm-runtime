@@ -95,8 +95,10 @@ struct ssm_time;
 
 /** @brief SSM values are the size of a machine word. */
 #if UINTPTR_MAX == 0xffffffffu
+#define SSM_WORD_SIZE 32
 typedef uint32_t ssm_word_t;
 #elif UINTPTR_MAX == 0xffffffffffffffffu
+#define SSM_WORD_SIZE 64
 typedef uint64_t ssm_word_t;
 #else
 #error Unsupported pointer size
@@ -207,6 +209,25 @@ struct ssm_object {
 #define ssm_from_obj(o)                                                        \
   (ssm_value_t) { .heap_ptr = &(o)->mm }
 
+/** @brief Lookup the size of a builtin.
+ *
+ *  @param b  an #ssm_builtin indicating the type.
+ *  @returns  the size of a builtin of type @a b, in bytes.
+ */
+#define SSM_BUILTIN_SIZE(b)                                                    \
+  (size_t[]){                                                                  \
+      [SSM_TIME_T] = sizeof(struct ssm_time),                                  \
+      [SSM_SV_T] = sizeof(ssm_sv_t),                                           \
+  }[b]
+
+/** @brief Compute the size of a heap object.
+ *
+ *  @param val_count  the number of values in the #ssm_object.
+ *  @returns          the size of the #ssm_object, in bytes.
+ */
+#define SSM_OBJ_SIZE(val_count)                                                \
+  (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
+
 /** @brief Allocate a new heap object to store word-size values.
  *
  *  @a val_count must be greater than 0, i.e., not equal to #SSM_BUILTIN.
@@ -225,28 +246,56 @@ struct ssm_object {
  */
 struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag);
 
-/** @todo document */
+/** @brief Duplicate a reference to a heap item, incrementing its ref count.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
 void ssm_dup(struct ssm_mm *mm);
 
-/** @todo document */
+/** @brief Drop a reference to a heap item, and free it if necessary.
+ *
+ *  If @a mm is freed, all references held by the heap item itself will also be
+ *  be dropped.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
 void ssm_drop(struct ssm_mm *mm);
 
-/** @todo document */
+/** @brief Reuse heap-allocated memory.
+ *
+ * @TODO: reconsider interface and document ssm_reuse().
+ */
 struct ssm_mm *ssm_reuse(struct ssm_mm *mm);
 
-/** @brief Allocate memory.
+/** @brief Allocate a contiguous range of memory.
  *
- *  Belongs to the memory allocator.
+ *  Memory will be allocated from an appropriately sized memory pool, if one is
+ *  available. Guaranteed to be aligned against the smallest power of 2 greater
+ *  than @a size.
  *
- *  @TODO: document
+ *  @param size   the requested memory range size, in bytes.
+ *  @returns      pointer to the first byte of the allocate memory block.
  */
 void *ssm_mem_alloc(size_t size);
 
-/** @brief Deallocate memory.
+/** @brief Preallocate memory pages to ensure capacity in memory pools.
  *
- *  @TODO: document
+ *  Does nothing if no memory pool will fit a block of @a size.
+ *
+ *  @param size       size whose memory pool should be preallocaed pages.
+ *  @param num_pages  number of pages to allocate.
  */
-void ssm_mem_free(void *mm, size_t size);
+void ssm_mem_prealloc(size_t size, size_t num_pages);
+
+/** @brief Deallocate memory allocated by ssm_mem_alloc().
+ *
+ *  The behavior of freeing memory not allocated by ssm_mem_alloc() is
+ *  undefined.
+ *
+ *  @param m      pointer to the memory range allocated by ssm_mem_alloc().
+ *  @param size   the size of the memory range allocated by ssm_mem_alloc().
+ */
+void ssm_mem_free(void *m, size_t size);
 
 /** @} */
 

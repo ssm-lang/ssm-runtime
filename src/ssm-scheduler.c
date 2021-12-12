@@ -4,17 +4,19 @@
  *  Contains a priority queue implemented using a binary heap.
  *
  *  When `SSM_DEBUG` is defined, relevant symbols are exported for whitebox
- *  testing.
+ *  testing (see #SSM_STATIC and #SSM_STATIC_INLINE).
  *
  *  @author Stephen Edwards (sedwards-lab)
  *  @author John Hui (j-hui)
  */
 #include <ssm-internal.h>
 
-/**
- * defgroup queue Priority queue
+/** @def SSM_STATIC
+ *  @brief A symbol is static unless `SSM_DEBUG` is defined.
+ *
+ *  @def SSM_STATIC_INLINE
+ *  @brief A symbol is static inline unless `SSM_DEBUG` is defined.
  */
-
 #ifdef SSM_DEBUG
 #define SSM_STATIC
 #define SSM_STATIC_INLINE
@@ -22,11 +24,6 @@
 #define SSM_STATIC static
 #define SSM_STATIC_INLINE static inline
 #endif
-
-/**
- * @addtogroup queue
- * @{
- */
 
 #ifndef SSM_EVENT_QUEUE_SIZE
 /** @brief Size of the event queue; override as necessary. */
@@ -263,8 +260,6 @@ void act_queue_consistency_check(void) {
 }
 // GCOV_EXCL_STOP
 #endif
-
-/** @} */
 
 ssm_time_t ssm_now(void) { return now; }
 
