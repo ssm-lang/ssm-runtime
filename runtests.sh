@@ -87,9 +87,3 @@ if command -v valgrind >/dev/null ; then
 else
   say "Warning: valgrind not found in PATH. Skipping memory tests."
 fi
-
-if command -v gcov >/dev/null ; then
-  make cov
-else
-  say "Warning: gcov not found in PATH. Skipping coverage profile."
-fi
