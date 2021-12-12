@@ -85,7 +85,8 @@ $(COV_TGT): run-tests
 		echo $(GCOVR) $(GCOVR_FLAGS) ; \
 		$(GCOVR) $(GCOVR_FLAGS) ; \
 	else \
-		echo "Warning: command $(GCOVR) not found. Please install." ; \
+		echo "Error: command $(GCOVR) not found. Please install." ; \
+		exit 1; \
 	fi
 
 run-tests: $(TEST_TGT)
