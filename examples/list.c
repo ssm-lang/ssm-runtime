@@ -1,6 +1,4 @@
-#include <ssm-internal.h>
-#include <ssm-typedefs.h>
-#include <ssm.h>
+#include "ssm-examples.h"
 #include <stdio.h>
 
 /* (print statements added in C implementation)
@@ -196,13 +194,7 @@ void step_main(struct ssm_act *act) {
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
-}
-
-void ssm_program_initialize(void) {
+void ssm_program_init(void) {
   struct ssm_object *obj = ssm_new(List_size, Nil);
   list = ssm_from_obj(obj);
   obj = ssm_new(List_size, Cons);
@@ -224,21 +216,4 @@ void ssm_program_initialize(void) {
 
 void ssm_program_exit(void) {
   ssm_drop(&ssm_to_obj(list)->mm);
-}
-
-int main(int argc, char *argv[]) {
-  ssm_time_t stop_at = (argc > 1 ? atoi(argv[1]) : 20) * SSM_SECOND;
-
-  ssm_program_initialize();
-
-  ssm_tick();
-
-  while (ssm_next_event_time() != SSM_NEVER && ssm_now() < stop_at)
-    ssm_tick();
-
-  printf("simulated %lu seconds\n", ssm_now() / SSM_SECOND);
-
-  ssm_program_exit();
-
-  return 0;
 }

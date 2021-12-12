@@ -1,22 +1,21 @@
 ./build/fib
-# simulated 3 seconds
+# ./build/fib: simulated 3 seconds
 # 3
 ./build/fib 4
-# simulated 4 seconds
+# ./build/fib: simulated 4 seconds
 # 5
 ./build/fib 5
-# simulated 5 seconds
+# ./build/fib: simulated 5 seconds
 # 8
 ./build/fib 13
-# simulated 13 seconds
+# ./build/fib: simulated 13 seconds
 # 377
 ./build/fib 15
-# simulated 15 seconds
+# ./build/fib: simulated 15 seconds
 # 987
 ./build/onetwo
-# finished time 0
 # a = 22
-# finished time 100
+# ./build/onetwo: simulated 0 seconds
 ./build/clock
 # 1
 # 2
@@ -38,49 +37,39 @@
 # 18
 # 19
 # 20
-# simulated 20 seconds
+# ./build/clock: simulated 20 seconds
 ./build/counter
 # clk = 0
 # q1 = 0 d1 = 0
 # q2 = 0 d2 = 0
-# finished time 0
 # clk = 1
 # q1 = 0 d1 = 1
 # q2 = 0 d2 = 1
-# finished time 100
 # clk = 0
 # q1 = 1 d1 = 3
 # q2 = 1 d2 = 2
-# finished time 200
 # clk = 1
 # q1 = 1 d1 = 3
 # q2 = 1 d2 = 2
-# finished time 300
 # clk = 0
 # q1 = 3 d1 = 6
 # q2 = 2 d2 = 3
-# finished time 400
 # clk = 1
 # q1 = 3 d1 = 6
 # q2 = 2 d2 = 3
-# finished time 500
 # clk = 0
 # q1 = 6 d1 = 10
 # q2 = 3 d2 = 4
-# finished time 600
 # clk = 1
 # q1 = 6 d1 = 10
 # q2 = 3 d2 = 4
-# finished time 700
 # clk = 0
 # q1 = 10 d1 = 15
 # q2 = 4 d2 = 5
-# finished time 800
 # clk = 1
 # q1 = 10 d1 = 15
 # q2 = 4 d2 = 5
-# finished time 900
 # clk = 0
 # q1 = 15 d1 = 21
 # q2 = 5 d2 = 6
-# finished time 1000
+# ./build/counter: simulated 20 seconds

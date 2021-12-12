@@ -1,7 +1,4 @@
-#include <ssm.h>
-#include <ssm-internal.h>
-#include <ssm-typedefs.h>
-
+#include "ssm-examples.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -136,25 +133,9 @@ void step_main(struct ssm_act *act) {
   ssm_leave(act, sizeof(act_main_t));
 }
 
-int main() {
-  size_t allocator_sizes[] = {48};
-  size_t allocator_blocks[] = {4000};
-  size_t num_allocators = 1;
-  ssm_mem_init(allocator_sizes,allocator_blocks,num_allocators);
-  
+void ssm_program_init(void) {
   ssm_activate(
       ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
-
-  do {
-    ssm_tick();
-    printf("finished time %lu\n", ssm_now());
-  } while (ssm_next_event_time() != SSM_NEVER);
-
-  return 0;
 }
 
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%s:%d: reason: %d\n", file, func, line, reason);
-  exit(1);
-}
+void ssm_program_exit(void) {}
