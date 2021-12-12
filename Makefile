@@ -101,5 +101,13 @@ clean:
 PHONY += help
 help:
 	@echo "Available phony targets:" $(PHONY)
+	@echo
+	@echo "lib     Build SSM runtime library     (build/libssm.a)"
+	@echo "docs    Build code documentation      (build/doc)"
+	@echo "exes    Build programs in examples/   (build/<example-name>)"
+	@echo "tests   Build tests in test/          (build/test_<test-name>)"
+	@echo "cov     Build coverage report         (build/<filename.c>.gcov)"
+	@echo "clean   Remove build directory"
+	@echo "help    Show this help menu"
 
 .PHONY: $(PHONY)
