@@ -2,4 +2,4 @@ See @ref util.
 
 @defgroup util Utilities
 
-Helpful macro definitions that are not specific to SSM.
+This module contains helpful macro definitions that are not specific to SSM.
