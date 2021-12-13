@@ -97,12 +97,12 @@ $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
 
-$(COV_TGT): $(TEST_TGT)
+$(COV_TGT): $(GCOVR_CFG) $(TEST_TGT)
 	@for i in $(TEST_TGT) ; do \
 		echo ./$$i ;\
 		./$$i >/dev/null || exit $$? ;\
 	done
-	gcvor --config $(GCOVR_CFG)
+	gcovr --config $(GCOVR_CFG)
 
 $(DOC_TGT): $(DOC_CFG) $(DOC_SRC) | $(BUILD_DIR)
 	doxygen doc/Doxyfile
