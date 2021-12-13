@@ -1,0 +1,5 @@
+<map id="ssm&#45;internal.h" name="ssm&#45;internal.h">
+<area shape="rect" id="node1" title="The internal interface of the SSM runtime." alt="" coords="65,5,181,32"/>
+<area shape="rect" id="node2" href="$ssm-mem_8c.html" title="SSM runtime memory management and allocation." alt="" coords="5,80,104,107"/>
+<area shape="rect" id="node3" href="$ssm-scheduler_8c.html" title="Implementation of the SSM runtime scheduler." alt="" coords="129,80,255,107"/>
+</map>

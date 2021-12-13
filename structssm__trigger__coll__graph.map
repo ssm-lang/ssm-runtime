@@ -1,0 +1,4 @@
+<map id="ssm_trigger" name="ssm_trigger">
+<area shape="rect" id="node1" title="Indicates a routine should run when a scheduled variable is written." alt="" coords="5,96,104,123"/>
+<area shape="rect" id="node2" href="$structssm__act.html" title="Activation record for an SSM routine." alt="" coords="17,5,93,32"/>
+</map>
