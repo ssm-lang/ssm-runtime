@@ -36,11 +36,11 @@ void check_starts_initialized() {
 }
 
 void reset_all() {
-  ssm_reset();
-  for (int i = 0; i < NUM_VARIABLES; i++) {
+  for (int i = 0; i < NUM_VARIABLES; i++)
     ssm_drop(&ssm_to_sv(variables[i])->mm);
+  ssm_reset();
+  for (int i = 0; i < NUM_VARIABLES; i++)
     variables[i] = ssm_from_sv(ssm_new_sv(DUMMY_VALUE));
-  }
   check_starts_initialized();
 }
 
@@ -88,6 +88,7 @@ void event_queue_sort_string(const char *input, const char *expected) {
     char c = (char)event_queue[1]->later_time;
     printf("%c", c);
     SSM_ASSERT(c == *expected++);
+    event_queue[1]->later_time = SSM_NEVER;
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
@@ -170,6 +171,7 @@ void event_queue_unschedule_string(const char *input, int n,
     char c = (char)event_queue[1]->later_time;
     printf("%c", c);
     SSM_ASSERT(c == *expected++);
+    event_queue[1]->later_time = SSM_NEVER;
     ssm_sv_t *to_insert = event_queue[event_queue_len--]; // get last
 
     if (event_queue_len) // Was this the last?
@@ -246,9 +248,10 @@ void act_queue_sort_tick(const char *input, const char *expected) {
   act_queue_consistency_check();
 
   SSM_ASSERT(*next_expected ==
-         0); // Did we end up at the end of the expected string?
+             0); // Did we end up at the end of the expected string?
 
-  SSM_ASSERT(act_queue_len == 0); // Should have emptied the activation record queue
+  SSM_ASSERT(act_queue_len ==
+             0); // Should have emptied the activation record queue
   printf("\n");
 
   // Make sure all the activation records were unscheduled

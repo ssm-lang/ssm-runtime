@@ -84,6 +84,19 @@ void ssm_set_now(ssm_time_t next);
  */
 void ssm_update(ssm_sv_t *sv);
 
+/** @ingroup sv
+ *  @brief Unschedule any pending events on a variable.
+ *
+ *  Should be called before the variable is dropped.
+ *
+ *  Nothing happens if the variable does not have a pending event.
+ *
+ *  @platformonly
+ *
+ *  @param var  the variable.
+ */
+void ssm_unschedule(ssm_sv_t *var);
+
 /** @ingroup act
  *  @brief Run the system for the next scheduled instant.
  *
