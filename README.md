@@ -1,32 +1,65 @@
-# ssm
-The Sparse Synchronous Model: A deterministic real-time execution
-technique that allows explicit, precise timing control.
+# The Sparse Synchronous Model Runtime
 
-Documentation: http://sedwards-lab.github.io/ssm-doc
+The Sparse Synchronous Model (SSM) is a deterministic real-time execution technique that allows explicit, precise timing control.
 
-An early version of this system is described in our FDL 2021 paper
-http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
+## Documentation
 
-To build and test the runtime system on your host,
+The operation of this library was first described in:
 
-1. `make`
+> Stephen A. Edwards and John Hui.
+> The Sparse Synchronous Model.
+> In Forum on Specification and Design Languages (FDL),
+> Kiel, Germany, September 2020.
+> http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
 
-To run the examples on embedded hardware,
+The generated documentation for this library maybe found [here](https://ssm-lang.github.io/ssm-runtime).
 
-1. Install the PlatformIO Core (CLI) build system from https://platformio.org/
+## Dependencies
 
-2. Under Linux, you may need to install the `99-platformio-udev.rules` file
-   to enable permissions to access your debugging probe.
-   See https://docs.platformio.org/en/latest/faq.html#platformio-udev-rules
+The core runtime, which includes the scheduler and memory manager, is written in C99, without library dependencies.
+The top-level Makefile is used to compile and test this core library, and has the following dependencies:
 
-3. cd into, e.g., examples/blink-platformio-zephyr
+-   Some C99-compatible compiler (`gcc` required for testing)
+-   [GNU make](https://www.gnu.org/software/make/manual/html_node/index.html)
+-   [GNU Bash](https://www.gnu.org/software/bash/) (required for testing)
+-   [Doxygen](https://www.doxygen.nl/index.html) (required for building documentation)
+-   [Graphviz](http://graphviz.org/) (required for building documentation)
+-   [valgrind](https://valgrind.org/) (required for testing)
+-   [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) (required for testing)
 
-4. E.g., for the Nordic nrf82840 discovery kit,
-   `pio run --environment nrf52840_dk --target upload --target monitor`
-   will compile, upload, and display the serial output of the example.
-   The monitor target is optional.
-   See the `platformio.ini` file for details about other targets.
+On Ubuntu, Debian, and other Linux distributions that use aptitude, these can be installed using:
 
-   Note that PlatformIO will download and compile a separate copy of this
-   (ssm runtime) library from github, not the one a few directories
-   above the examples.
+```shell
+sudo apt install build-essential gcc doxygen graphviz valgrind gcov
+```
+
+Platform-specific bindings are provided via the [PlatformIO Core (CLI)](https://platformio.org) toolchain manager;
+see their [installation instructions](https://docs.platformio.org/en/latest/core/installation.html).
+On Linux, make sure to install the `99-platformio-udev.rules`.
+
+Note that PlatformIO _does not use the top-level Makefile_ to build the SSM runtime.
+Instead, it uses the top-level library.json manifest to compile this library as a PlatformIO package.
+
+## Quickstart
+
+The top-level `Makefile` can be used to build the platform-generic library alone, without platform-specific bindings.
+To build just the library, just run:
+
+```shell
+make # `lib' is the default target
+```
+
+All build artifacts, including `libssm.a`, are placed in the `build` directory.
+
+To run the included test suite, run the included test script:
+
+```shell
+./runtests.sh
+```
+
+To build and run any individual example in the `examples/` directory, e.g., `examples/fib.c`:
+
+```shell
+make build/fib
+./build/fib 5
+```
