@@ -93,60 +93,14 @@ struct ssm_time;
  * @{
  */
 
-/** @brief SSM values are the size of a machine word. */
-#if UINTPTR_MAX == 0xffffffffu
-#define SSM_WORD_SIZE 32
+/** @brief Values are 32-bits, the largest supported machine word size. */
 typedef uint32_t ssm_word_t;
-#elif UINTPTR_MAX == 0xffffffffffffffffu
-#define SSM_WORD_SIZE 64
-typedef uint64_t ssm_word_t;
-#else
-#error Unsupported pointer size
-#endif
-
-/** @brief The metadata accompanying any heap-allocated object.
- *
- *  When @a val_count is 0, @a tag is to be interpreted as an #ssm_builtin.
- */
-struct ssm_mm {
-  uint8_t val_count; /**< Number of ssm_value_t values in payload. */
-  uint8_t tag;       /**< Which variant is inhabited by this object. */
-  uint8_t ref_count; /**< The number of references to this object. */
-};
-
-/** @brief Magic @a val_count value indicating a heap object is a builtin. */
-#define SSM_BUILTIN 0
-
-/** @brief Built-in types that are stored in the heap.
- *
- *  Type enumerated here are chosen because they cannot be easily or efficiently
- *  expressed as a product of words. For instance, 64-bit timestamps cannot be
- *  directly stored in the payload of an #ssm_object, where even-numbered
- *  timestamps may be misinterpreted as pointers.
- */
-enum ssm_builtin {
-  SSM_TIME_T = 1, /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_T,       /**< Scheduled variables, #ssm_sv_t */
-};
 
 /** @brief SSM values are either "packed" values or heap-allocated. */
 typedef union {
   struct ssm_mm *heap_ptr; /**< Pointer to a heap-allocated object. */
   ssm_word_t packed_val;   /**< Packed value. */
 } ssm_value_t;
-
-/** @brief Heap-allocated SSM object, with memory management metadata header.
- *
- *  The payload array is declared of size 1 here, but is of varying size in
- *  practice. The actual size should be looked up in the @a mm header.
- */
-struct ssm_object {
-  struct ssm_mm mm;       /**< Memory management metadata. */
-  ssm_value_t payload[1]; /**< Heap object payload. */
-};
-
-#define ssm_obj_payload_count(obj_t)                                           \
-  (sizeof(((obj_t *)0)->payload) / sizeof(ssm_value_t))
 
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
  *
@@ -170,133 +124,6 @@ struct ssm_object {
  */
 #define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
 
-/** @brief Whether an mm header is embedded in a builtin-type object.
- *
- *  It makes no sense to allocate zero-size objects, so when @a val_count is
- *  zero, it indicates that it is a builtin object.
- *
- *  @param mp pointer to the #ssm_mm.
- *  @returns  non-zero if it is builtin, zero otherwise.
- */
-#define ssm_mm_is_builtin(mp) ((mp)->val_count == SSM_BUILTIN)
-
-/** @brief Whether an mm header is embedded in a particular builtin-type object.
- *
- *  @param bt #ssm_builtin type enumeration.
- *  @param mp pointer to the #ssm_mm
- *  @returns  non-zero if it @a mm is of type @a bt, zero otherwise.
- *
- *  @sa #ssm_builtin.
- */
-#define ssm_mm_is(bt, mp) (ssm_mm_is_builtin(mp) && (mp)->tag == (bt))
-
-/** @brief Convert an #ssm_value_t to an #ssm_object.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_object in the heap.
- */
-#define ssm_to_obj(v) (container_of((v).heap_ptr, struct ssm_object, mm))
-
-/** @brief Convert an #ssm_object pointer to an #ssm_value_t.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param o  pointer to the #ssm_object.
- *  @returns  #ssm_value_t of the pointer to @a o.
- */
-#define ssm_from_obj(o)                                                        \
-  (ssm_value_t) { .heap_ptr = &(o)->mm }
-
-/** @brief Lookup the size of a builtin.
- *
- *  @param b  an #ssm_builtin indicating the type.
- *  @returns  the size of a builtin of type @a b, in bytes.
- */
-#define SSM_BUILTIN_SIZE(b)                                                    \
-  (size_t[]){                                                                  \
-      [SSM_TIME_T] = sizeof(struct ssm_time),                                  \
-      [SSM_SV_T] = sizeof(ssm_sv_t),                                           \
-  }[b]
-
-/** @brief Compute the size of a heap object.
- *
- *  @param val_count  the number of values in the #ssm_object.
- *  @returns          the size of the #ssm_object, in bytes.
- */
-#define SSM_OBJ_SIZE(val_count)                                                \
-  (sizeof(struct ssm_mm) + sizeof(struct ssm_object) * (val_count))
-
-/** @brief Allocate a new heap object to store word-size values.
- *
- *  @a val_count must be greater than 0, i.e., not equal to #SSM_BUILTIN.
- *
- *  The @a mm header in the returned #ssm_object is initialized, but the
- *  @a payload is not.
- *
- *  @param val_count  the number of #ssm_value_t values to be stored in the
- *                    object payload.
- *  @param tag        the tag to initialize the @a mm header with.
- *  @returns          pointer to a newly allocated and initialized #ssm_object.
- *
- *  @throws SSM_INTERNAL_ERROR  @a val_count was not greater than 0.
- *
- *  @invariant `!ssm_mm_builtin(&ssm_new(any)->mm)`.
- */
-struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag);
-
-/** @brief Duplicate a reference to a heap item, incrementing its ref count.
- *
- *  @param mm   pointer to the #ssm_mm header of the heap item.
- */
-void ssm_dup(struct ssm_mm *mm);
-
-/** @brief Drop a reference to a heap item, and free it if necessary.
- *
- *  If @a mm is freed, all references held by the heap item itself will also be
- *  be dropped.
- *
- *  @param mm   pointer to the #ssm_mm header of the heap item.
- */
-void ssm_drop(struct ssm_mm *mm);
-
-/** @brief Reuse heap-allocated memory.
- *
- * @TODO: reconsider interface and document ssm_reuse().
- */
-struct ssm_mm *ssm_reuse(struct ssm_mm *mm);
-
-/** @brief Allocate a contiguous range of memory.
- *
- *  Memory will be allocated from an appropriately sized memory pool, if one is
- *  available. Guaranteed to be aligned against the smallest power of 2 greater
- *  than @a size.
- *
- *  @param size   the requested memory range size, in bytes.
- *  @returns      pointer to the first byte of the allocate memory block.
- */
-void *ssm_mem_alloc(size_t size);
-
-/** @brief Preallocate memory pages to ensure capacity in memory pools.
- *
- *  Does nothing if no memory pool will fit a block of @a size.
- *
- *  @param size       size whose memory pool should be preallocaed pages.
- *  @param num_pages  number of pages to allocate.
- */
-void ssm_mem_prealloc(size_t size, size_t num_pages);
-
-/** @brief Deallocate memory allocated by ssm_mem_alloc().
- *
- *  The behavior of freeing memory not allocated by ssm_mem_alloc() is
- *  undefined.
- *
- *  @param m      pointer to the memory range allocated by ssm_mem_alloc().
- *  @param size   the size of the memory range allocated by ssm_mem_alloc().
- */
-void ssm_mem_free(void *m, size_t size);
-
 /** @} */
 
 /**
@@ -312,15 +139,6 @@ typedef uint64_t ssm_time_t;
  *  The value of this must be derived from the underlying type of #ssm_time_t.
  */
 #define SSM_NEVER UINT64_MAX
-
-/** @brief Time value object, stored in the heap.
- *
- *  @invariant For all `struct ssm_time t`, `ssm_mm_is_builtin(SSM_TIME_T, t)`.
- */
-struct ssm_time {
-  struct ssm_mm mm;
-  ssm_time_t time;
-};
 
 /** Ticks per nanosecond */
 #define SSM_NANOSECOND 1L
@@ -340,38 +158,6 @@ struct ssm_time {
  *  @returns the current model time.
  */
 ssm_time_t ssm_now(void);
-
-/** @brief Allocate a time object on the heap.
- *
- *  Use ssm_drop() on the @a mm header to free.
- *
- *  @param time value to initialize the time object with.
- *  @returns    pointer to an #ssm_time in the heap.
- *
- *  @throws SSM_EXHAUSTED_MEMORY out of memory.
- *
- *  @invariant `ssm_mm_is(SSM_TIME_T, &ssm_new_time(any)->mm)`.
- */
-struct ssm_time *ssm_new_time(ssm_time_t time);
-
-/** @brief Convert an #ssm_value_t to an #ssm_time.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_time in the heap.
- */
-#define ssm_to_time(v) (container_of((v).heap_ptr, struct ssm_time, mm))
-
-/** @brief Convert an #ssm_time pointer to an #ssm_value_t.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param t  pointer to the #ssm_object.
- *  @returns  #ssm_value_t of the pointer to @a t.
- */
-#define ssm_from_time(t)                                                       \
-  (ssm_value_t) { .heap_ptr = &(t)->mm }
 
 /** @} */
 
@@ -499,8 +285,11 @@ extern ssm_act_t ssm_top_parent;
 
 /** @brief A scheduled variable that supported scheduled updates with triggers.
  *
- *  Scheduled variables are heap-allocated structures that represent variables
- *  with reference-like semantics in SSM.
+ *  Scheduled variables are heap-allocated built-in types that represent
+ *  variables with reference-like semantics in SSM. This struct only represents
+ *  the data specific to scheduled variables, and is not meant to be declared on
+ *  its own. Instead, it should be allocated as part of an #ssm_mm using
+ *  ssm_new().
  *
  *  Routines may directly assign to them in the current instant (ssm_assign()),
  *  or schedule a delayed assignment to them (ssm_later()). The @a last_updated
@@ -511,10 +300,8 @@ extern ssm_act_t ssm_top_parent;
  *  update may wake any number of sensitive routines.
  *
  *  @invariant @a later_time != #SSM_NEVER iff this variable in the event queue.
- *  @invariant For all `struct ssm_time t`, `ssm_mm_is_builtin(SSM_SV_T, t)`.
  */
 typedef struct ssm_sv {
-  struct ssm_mm mm;        /**< Memory management metadata. */
   ssm_time_t later_time;   /**< When the variable should be next updated. */
   ssm_time_t last_updated; /**< When the variable was last updated. */
   ssm_trigger_t *triggers; /**< List of sensitive continuations. */
@@ -522,64 +309,24 @@ typedef struct ssm_sv {
   ssm_value_t later_value; /**< Buffered value for delayed assignment. */
 } ssm_sv_t;
 
-/** @brief Allocate and initialize a scheduled variable.
+/** @brief Initial value of an #ssm_sv.
  *
- *  Initializes the @a value field with @a val, but leaves @a later_value
- *  uninitialized. Other field are initialized appropriately.
+ *  For example:
  *
- *  The scheduled variable is allocated on the heap.
+ *      ssm_value_t sv = ssm_new(SSM_BUILTIN, SSM_SV_T);
+ *      ssm_to_sv(sv) = ssm_sv_init(ssm_marshal(0));
  *
- *  Call ssm_drop() on the @a mm header to free.
+ *  @note Initialization does not count as an update event, so @a last_updated
+ *        is initialized to #SSM_NEVER.
+ *  @note @a later_value is left uninitialized.
  *
- *  @param val  value to initialize the sv value with.
- *  @returns    pointer to the allocated #ssm_sv_t object.
- *
- *  @throws SSM_EXHAUSTED_MEMORY out of memory.
- *
- *  @invariant `ssm_mm_is(SSM_SV_T, &ssm_new_sv(any)->mm)`.
+ *  @param val  the initial value of the schedueld variable.
  */
-struct ssm_sv *ssm_new_sv(ssm_value_t val);
-
-/** @brief Convert an #ssm_value_t to an #ssm_time.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_time in the heap.
- */
-#define ssm_to_sv(v) (container_of((v).heap_ptr, struct ssm_sv, mm))
-
-/** @brief Convert an #ssm_time pointer to an #ssm_value_t.
- *
- *  Provided for convenience; zero runtime cost.
- *
- *  @param s  pointer to the #ssm_object.
- *  @returns  #ssm_value_t of the pointer to @a t.
- */
-#define ssm_from_sv(s)                                                         \
-  (ssm_value_t) { .heap_ptr = &(s)->mm }
-
-/** @brief Whether there the variable was updated in the current instant.
- *
- *  @param v  #ssm_value_t that points to a scheduled variable.
- *  @returns  non-zero if the variable was updated in the current instant; zero
- *            otherwise.
- */
-#define ssm_event_on(v) (ssm_to_sv(v)->last_updated == ssm_now())
-
-/** @brief Obtain the value of a scheduled variable.
- *
- *  @param v  #ssm_value_t that points to a scheduled variable.
- *  @returns  the value that @a v points to.
- */
-#define ssm_deref(v) (ssm_to_sv(v)->value)
-
-/** @brief Obtain memory management header of a scheduled variable.
- *
- *  @param v  #ssm_value_t that points to a scheduled variable.
- *  @returns  a pointer to the #ssm_mm header of @a v.
- */
-#define ssm_sv_mm(v) (&ssm_to_sv(v)->mm)
+#define ssm_sv_init(val)                                                       \
+  (ssm_sv_t) {                                                                 \
+    .later_time = SSM_NEVER, .last_updated = SSM_NEVER, .triggers = NULL,      \
+    .value = val                                                               \
+  }
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
@@ -630,6 +377,203 @@ void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trig);
  *  @param trig the trigger.
  */
 void ssm_desensitize(ssm_trigger_t *trig);
+
+/** @} */
+
+/**
+ * @addtogroup mem
+ * @{
+ */
+
+/** @brief Magic @a val_count value indicating a heap object is a builtin. */
+#define SSM_BUILTIN 0
+
+/** @brief Built-in types that are stored in the heap.
+ *
+ *  Type enumerated here are chosen because they cannot be easily or efficiently
+ *  expressed as a product of words. For instance, 64-bit timestamps cannot be
+ *  directly stored in the payload of an #ssm_object, where even-numbered
+ *  timestamps may be misinterpreted as pointers.
+ */
+enum ssm_builtin {
+  SSM_TIME_T = 1, /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_T,       /**< Scheduled variables, #ssm_sv_t */
+};
+
+/** @brief The metadata accompanying any heap-allocated object.
+ *
+ *  When @a val_count is 0, @a tag is to be interpreted as an #ssm_builtin.
+ */
+struct ssm_mm_header {
+  uint8_t val_count; /**< Number of ssm_value_t values in payload. */
+  uint8_t tag;       /**< Which variant is inhabited by this object. */
+  uint8_t ref_count; /**< The number of references to this object. */
+};
+
+/** @brief The metadata accompanying any heap-allocated object.
+ *
+ *  When @a val_count is 0, @a tag is to be interpreted as an #ssm_builtin.
+ */
+struct ssm_mm {
+  struct ssm_mm_header mm;
+  union {
+    ssm_value_t obj[1];
+    ssm_time_t time;
+    struct ssm_sv sv;
+  } data;
+};
+
+/** @brief Whether an mm header is embedded in a builtin-type object.
+ *
+ *  It makes no sense to allocate zero-size objects, so when @a val_count is
+ *  zero, it indicates that it is a builtin object.
+ *
+ *  @param mp pointer to the #ssm_mm.
+ *  @returns  non-zero if it is builtin, zero otherwise.
+ */
+#define ssm_mm_is_builtin(mp) ((mp)->mm.val_count == SSM_BUILTIN)
+
+/** @brief Whether an mm header is embedded in a particular builtin-type object.
+ *
+ *  @param bt #ssm_builtin type enumeration.
+ *  @param mp pointer to the #ssm_mm
+ *  @returns  non-zero if it @a mm is of type @a bt, zero otherwise.
+ *
+ *  @sa #ssm_builtin.
+ */
+#define ssm_mm_is(bt, mp) (ssm_mm_is_builtin(mp) && (mp)->mm.tag == (bt))
+
+/** @brief Lookup the size of a builtin.
+ *
+ *  @param b  an #ssm_builtin indicating the type.
+ *  @returns  the size of a builtin of type @a b, in bytes.
+ */
+#define SSM_BUILTIN_SIZE(b)                                                    \
+  (sizeof(struct ssm_mm_header) + (size_t[]){                                  \
+                                      [SSM_TIME_T] = sizeof(ssm_time_t),       \
+                                      [SSM_SV_T] = sizeof(ssm_sv_t),           \
+                                  }[b])
+
+/** @brief Compute the size of a heap object.
+ *
+ *  @param val_count  the number of values in the #ssm_object.
+ *  @returns          the size of the #ssm_object, in bytes.
+ */
+#define SSM_OBJ_SIZE(val_count)                                                \
+  (sizeof(struct ssm_mm_header) + sizeof(ssm_value_t) * (val_count))
+
+/** @todo DOCUMENT */
+#define SSM_SIZEOF(val_count, tag)                                            \
+  (val_count == SSM_BUILTIN ? SSM_BUILTIN_SIZE(tag) : SSM_OBJ_SIZE(val_count))
+
+/** @brief Allocate a new heap object to store word-size values.
+ *
+ *  When @a val_count is equal to #SSM_BUILTIN, @a tag is interpreted as an
+ *  #ssm_builtin enumeration, and a memory block of that size is allocated.
+ *
+ *  The @a mm header in the returned #ssm_object is initialized, but the
+ *  @a data payload is not.
+ *
+ *  @param val_count  the number of #ssm_value_t values to be stored in the
+ *                    object payload.
+ *  @param tag        the tag to initialize the @a mm header with.
+ *  @returns          pointer to a newly allocated and initialized #ssm_object.
+ *
+ *  @sa SSM_BUILTIN_SIZE().
+ */
+struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
+
+/** @brief Access the heap object payload pointed to by an #ssm_value_t.
+ *
+ *  Provided for convenience.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *  point to a scheduled variable is undefined.
+ *
+ *  @param v  the #ssm_value_t
+ *  @returns  pointer to the #ssm_object in the heap.
+ */
+#define ssm_to_obj(v) (v.heap_ptr->data.obj)
+
+/** @brief Access the heap-allocated time pointed to by an #ssm_value_t.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *  point to a scheduled variable is undefined.
+ *
+ *  @param v  the #ssm_value_t
+ *  @returns  pointer to the #ssm_time in the heap.
+ */
+#define ssm_to_time(v) (v.heap_ptr->data.time)
+
+/** @brief Access the scheduled variable payload pointed to by an #ssm_value_t.
+ *
+ *  Provided for convenience.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *  point to a scheduled variable is undefined.
+ *
+ *  @param v  the #ssm_value_t
+ *  @returns  pointer to the #ssm_time in the heap.
+ */
+#define ssm_to_sv(v) ((v).heap_ptr->data.sv)
+
+/** @brief Obtain the value of a scheduled variable.
+ *
+ *  @param v  #ssm_value_t that points to a scheduled variable.
+ *  @returns  the value that @a v points to.
+ */
+#define ssm_deref(v) (ssm_to_sv(v)->value)
+
+/** @brief Duplicate a reference to a heap item, incrementing its ref count.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
+void ssm_dup(struct ssm_mm *mm);
+
+/** @brief Drop a reference to a heap item, and free it if necessary.
+ *
+ *  If @a mm is freed, all references held by the heap item itself will also be
+ *  be dropped.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
+void ssm_drop(struct ssm_mm *mm);
+
+/** @brief Reuse heap-allocated memory.
+ *
+ * @TODO: reconsider interface and document ssm_reuse().
+ */
+struct ssm_mm *ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag);
+
+/** @brief Allocate a contiguous range of memory.
+ *
+ *  Memory will be allocated from an appropriately sized memory pool, if one is
+ *  available. Guaranteed to be aligned against the smallest power of 2 greater
+ *  than @a size.
+ *
+ *  @param size   the requested memory range size, in bytes.
+ *  @returns      pointer to the first byte of the allocate memory block.
+ */
+void *ssm_mem_alloc(size_t size);
+
+/** @brief Preallocate memory pages to ensure capacity in memory pools.
+ *
+ *  Does nothing if no memory pool will fit a block of @a size.
+ *
+ *  @param size       size whose memory pool should be preallocaed pages.
+ *  @param num_pages  number of pages to allocate.
+ */
+void ssm_mem_prealloc(size_t size, size_t num_pages);
+
+/** @brief Deallocate memory allocated by ssm_mem_alloc().
+ *
+ *  The behavior of freeing memory not allocated by ssm_mem_alloc() is
+ *  undefined.
+ *
+ *  @param m      pointer to the memory range allocated by ssm_mem_alloc().
+ *  @param size   the size of the memory range allocated by ssm_mem_alloc().
+ */
+void ssm_mem_free(void *m, size_t size);
 
 /** @} */
 
