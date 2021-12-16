@@ -463,7 +463,7 @@ struct ssm_mm {
   (sizeof(struct ssm_mm_header) + sizeof(ssm_value_t) * (val_count))
 
 /** @todo DOCUMENT */
-#define SSM_SIZEOF(val_count, tag)                                            \
+#define SSM_SIZEOF(val_count, tag)                                             \
   (val_count == SSM_BUILTIN ? SSM_BUILTIN_SIZE(tag) : SSM_OBJ_SIZE(val_count))
 
 /** @brief Allocate a new heap object to store word-size values.
@@ -491,21 +491,11 @@ struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
  *  point to a scheduled variable is undefined.
  *
  *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_object in the heap.
+ *  @returns  pointer to the beginning of the value payload in the heap.
  */
-#define ssm_to_obj(v) (v.heap_ptr->data.obj)
+#define ssm_to_obj(v) (&(v).heap_ptr->data.obj)
 
 /** @brief Access the heap-allocated time pointed to by an #ssm_value_t.
- *
- *  @note The behavior of using this macro on an #ssm_value_t that does not
- *  point to a scheduled variable is undefined.
- *
- *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_time in the heap.
- */
-#define ssm_to_time(v) (v.heap_ptr->data.time)
-
-/** @brief Access the scheduled variable payload pointed to by an #ssm_value_t.
  *
  *  Provided for convenience.
  *
@@ -515,7 +505,19 @@ struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
  *  @param v  the #ssm_value_t
  *  @returns  pointer to the #ssm_time in the heap.
  */
-#define ssm_to_sv(v) ((v).heap_ptr->data.sv)
+#define ssm_to_time(v) (&(v).heap_ptr->data.time)
+
+/** @brief Access the scheduled variable payload pointed to by an #ssm_value_t.
+ *
+ *  Provided for convenience.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *  point to a scheduled variable is undefined.
+ *
+ *  @param v  the #ssm_value_t
+ *  @returns  pointer to the #ssm_sv_t in the heap.
+ */
+#define ssm_to_sv(v) (&(v).heap_ptr->data.sv)
 
 /** @brief Obtain the value of a scheduled variable.
  *
