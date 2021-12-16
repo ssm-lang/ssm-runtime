@@ -70,13 +70,13 @@ void step_map_inc(ssm_act_t *act) {
     }
     SSM_ASSERT(0);
   match_Nil_0:
-    *cont->__ret = ssm_new(1, Nil); // FIXME: not ok
-    ssm_to_obj(*cont->__ret)[0] = ssm_marshal(0);
+    *cont->__ret = ssm_marshal(Nil);
     break;
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
     ssm_value_t __l = ssm_to_obj(cont->l)[1];
-    ssm_dup(__l.heap_ptr);
+    if (ssm_on_heap(__l))
+      ssm_dup(__l.heap_ptr);
 
     ssm_drop(cont->l.heap_ptr);
 
@@ -131,7 +131,7 @@ void step_print_list(ssm_act_t *act) {
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
     ssm_value_t __l = ssm_to_obj(cont->l)[1];
-    ssm_dup(__l.heap_ptr);
+    if (ssm_on_heap(__l)) ssm_dup(__l.heap_ptr);
 
     ssm_drop(cont->l.heap_ptr);
 
@@ -191,8 +191,7 @@ void step_main(struct ssm_act *act) {
 
 void ssm_program_init(void) {
   ssm_value_t v;
-  v = ssm_new(1, Nil); // FIXME: not ok
-  ssm_to_obj(v)[0] = ssm_marshal(0);
+  v = ssm_marshal(Nil);
   list = v;
   int i = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
   for (; i >= 1; i--) {
