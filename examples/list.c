@@ -5,7 +5,7 @@
 
 type List = Cons Int List | Nil
 
-list = [1, 2, 3]
+list = [0, 1, 2]
 
 print_list (l: List) =
   match l
@@ -20,13 +20,13 @@ map_inc (l: List) -> List =
 
 main =
   print_list list
-  let list' = map_inc list
+  let list' = map_inc (map_inc list)
   print_list list'
 
 should print:
 
+  0::1::2::[]
   1::2::3::[]
-  2::3::4::[]
  */
 
 enum { List_size = 2 };
@@ -189,23 +189,24 @@ void step_main(struct ssm_act *act) {
   case 3:
     break;
   }
+  printf("going");
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
 void ssm_program_init(void) {
   ssm_value_t v;
-  v= ssm_new(List_size, Nil);
+  v = ssm_new(List_size, Nil);
   list = v;
-  for (int i = 3; i >= 1; i++) {
+  int i = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
+  for (; i >= 1; i--) {
     v = ssm_new(List_size, Cons);
     ssm_to_obj(v)[0] = ssm_marshal(i);
     ssm_to_obj(v)[1] = list;
     list = v;
   }
   ssm_dup(list.heap_ptr); // main captures reference to global by closure
-  ssm_act_t *act =
-      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
-  ssm_activate(act);
+  ssm_activate(
+      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
 }
 
 void ssm_program_exit(void) { ssm_drop(list.heap_ptr); }

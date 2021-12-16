@@ -67,6 +67,7 @@ rm -f build/examples.out
   run onetwo
   run clock
   run counter
+  run list
 } >> build/examples.out
 
 if diff build/examples.out test/examples.out &> build/examples.diff ; then
