@@ -410,6 +410,7 @@ struct ssm_mm_header {
   uint8_t val_count; /**< Number of ssm_value_t values in payload. */
   uint8_t tag;       /**< Which variant is inhabited by this object. */
   uint8_t ref_count; /**< The number of references to this object. */
+  uint32_t padding;  /**< @todo: get rid of this. */
 };
 
 /** @brief The metadata accompanying any heap-allocated object.

@@ -68,6 +68,7 @@ rm -f build/examples.out
   run clock
   run counter
   run list
+  run list 2048
 } >> build/examples.out
 
 if diff build/examples.out test/examples.out &> build/examples.diff ; then

@@ -29,13 +29,11 @@ should print:
   1::2::3::[]
  */
 
-enum { List_size = 2 };
-enum List { Nil = 0, Cons };
-
-typedef struct {
-  struct ssm_mm mm;
-  ssm_value_t payload[List_size];
-} List;
+enum List { Nil = 0, Cons, List_variants };
+uint8_t List_size[List_variants] = {
+    [Nil] = 0,
+    [Cons] = 2,
+};
 
 ssm_value_t list;
 
@@ -72,8 +70,8 @@ void step_map_inc(ssm_act_t *act) {
     }
     SSM_ASSERT(0);
   match_Nil_0:
-    ssm_drop(cont->l.heap_ptr);
-    *cont->__ret = ssm_new(List_size, Nil);
+    *cont->__ret = ssm_new(1, Nil); // FIXME: not ok
+    ssm_to_obj(*cont->__ret)[0] = ssm_marshal(0);
     break;
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
@@ -89,7 +87,7 @@ void step_map_inc(ssm_act_t *act) {
     act->pc = 1;
     return;
   case 1:;
-    *cont->__ret = ssm_new(List_size, Cons);
+    *cont->__ret = ssm_new(List_size[Cons], Cons);
     ssm_to_obj(*cont->__ret)[0] = cont->__tmp0;
     ssm_to_obj(*cont->__ret)[1] = cont->__tmp1;
     break;
@@ -129,7 +127,6 @@ void step_print_list(ssm_act_t *act) {
     SSM_ASSERT(0);
   match_Nil_0:
     printf("[]\r\n");
-    ssm_drop(cont->l.heap_ptr);
     break;
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
@@ -189,17 +186,17 @@ void step_main(struct ssm_act *act) {
   case 3:
     break;
   }
-  printf("going");
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
 void ssm_program_init(void) {
   ssm_value_t v;
-  v = ssm_new(List_size, Nil);
+  v = ssm_new(1, Nil); // FIXME: not ok
+  ssm_to_obj(v)[0] = ssm_marshal(0);
   list = v;
   int i = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
   for (; i >= 1; i--) {
-    v = ssm_new(List_size, Cons);
+    v = ssm_new(List_size[Cons], Cons);
     ssm_to_obj(v)[0] = ssm_marshal(i);
     ssm_to_obj(v)[1] = list;
     list = v;
