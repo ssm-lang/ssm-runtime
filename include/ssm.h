@@ -85,7 +85,6 @@ void ssm_throw(ssm_error_t reason, const char *file, int line,
 struct ssm_sv;
 struct ssm_trigger;
 struct ssm_act;
-struct ssm_time;
 
 /**
  * @addtogroup mem
