@@ -169,12 +169,12 @@ static inline void drop_children(struct ssm_mm *mm) {
   }
 }
 
-struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag) {
+ssm_value_t ssm_new(uint8_t val_count, uint8_t tag) {
   struct ssm_mm *mm = ssm_mem_alloc(SSM_SIZEOF(val_count, tag));
   mm->mm.val_count = val_count;
   mm->mm.tag = tag;
   mm->mm.ref_count = 1;
-  return mm;
+  return (ssm_value_t){.heap_ptr = mm};
 }
 
 void ssm_dup(struct ssm_mm *mm) { ++mm->mm.ref_count; }
@@ -186,7 +186,7 @@ void ssm_drop(struct ssm_mm *mm) {
   }
 }
 
-struct ssm_mm *ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag) {
+ssm_value_t ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag) {
   SSM_ASSERT(SSM_SIZEOF(mm->mm.val_count, mm->mm.tag) ==
              SSM_SIZEOF(val_count, tag));
   if (--mm->mm.ref_count == 0) {
@@ -194,7 +194,7 @@ struct ssm_mm *ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag) {
     mm->mm.val_count = val_count;
     mm->mm.tag = tag;
     mm->mm.ref_count = 1;
-    return mm;
+    return (ssm_value_t){.heap_ptr = mm};
   } else {
     return ssm_new(val_count, tag);
   }

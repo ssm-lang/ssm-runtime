@@ -60,7 +60,7 @@ void step_second_clock(struct ssm_act *act) {
   act_second_clock_t *cont = container_of(act, act_second_clock_t, act);
   switch (act->pc) {
   case 0:
-    cont->timer.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    cont->timer = ssm_new(SSM_BUILTIN, SSM_SV_T);
     ssm_sv_init(cont->timer, EVENT_VALUE);
     for (;;) {
       ssm_assign(ssm_to_sv(cont->second_event), act->priority, EVENT_VALUE);
@@ -96,7 +96,7 @@ void step_report_seconds(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:
-    cont->seconds.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    cont->seconds = ssm_new(SSM_BUILTIN, SSM_SV_T);
     ssm_sv_init(cont->seconds, ssm_marshal(0));
     for (;;) {
       cont->trigger1.act = act;
@@ -132,7 +132,7 @@ void step_main(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0: {
-    cont->second.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    cont->second = ssm_new(SSM_BUILTIN, SSM_SV_T);
     ssm_sv_init(cont->second, EVENT_VALUE);
     ssm_depth_t new_depth = act->depth - 1;
     ssm_priority_t new_priority = act->priority;

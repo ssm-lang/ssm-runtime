@@ -73,7 +73,7 @@ void step_map_inc(ssm_act_t *act) {
     SSM_ASSERT(0);
   match_Nil_0:
     ssm_drop(cont->l.heap_ptr);
-    cont->__ret->heap_ptr = ssm_new(List_size, Nil);
+    *cont->__ret = ssm_new(List_size, Nil);
     break;
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
@@ -89,7 +89,7 @@ void step_map_inc(ssm_act_t *act) {
     act->pc = 1;
     return;
   case 1:;
-    cont->__ret->heap_ptr = ssm_new(List_size, Cons);
+    *cont->__ret = ssm_new(List_size, Cons);
     ssm_to_obj(*cont->__ret)[0] = cont->__tmp0;
     ssm_to_obj(*cont->__ret)[1] = cont->__tmp1;
     break;
@@ -194,10 +194,10 @@ void step_main(struct ssm_act *act) {
 
 void ssm_program_init(void) {
   ssm_value_t v;
-  v.heap_ptr = ssm_new(List_size, Nil);
+  v= ssm_new(List_size, Nil);
   list = v;
   for (int i = 3; i >= 1; i++) {
-    v.heap_ptr = ssm_new(List_size, Cons);
+    v = ssm_new(List_size, Cons);
     ssm_to_obj(v)[0] = ssm_marshal(i);
     ssm_to_obj(v)[1] = list;
     list = v;

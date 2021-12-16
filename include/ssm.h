@@ -483,7 +483,28 @@ struct ssm_mm {
  *
  *  @sa SSM_BUILTIN_SIZE().
  */
-struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
+ssm_value_t ssm_new(uint8_t val_count, uint8_t tag);
+
+/** @brief Duplicate a reference to a heap item, incrementing its ref count.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
+void ssm_dup(struct ssm_mm *mm);
+
+/** @brief Drop a reference to a heap item, and free it if necessary.
+ *
+ *  If @a mm is freed, all references held by the heap item itself will also be
+ *  be dropped.
+ *
+ *  @param mm   pointer to the #ssm_mm header of the heap item.
+ */
+void ssm_drop(struct ssm_mm *mm);
+
+/** @brief Reuse heap-allocated memory.
+ *
+ * @TODO: reconsider interface and document ssm_reuse().
+ */
+ssm_value_t ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag);
 
 /** @brief Retrieve the tag of an SSM heap object.
  *
@@ -536,27 +557,6 @@ struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
  *  @returns  the value that @a v points to.
  */
 #define ssm_deref(v) (ssm_to_sv(v)->value)
-
-/** @brief Duplicate a reference to a heap item, incrementing its ref count.
- *
- *  @param mm   pointer to the #ssm_mm header of the heap item.
- */
-void ssm_dup(struct ssm_mm *mm);
-
-/** @brief Drop a reference to a heap item, and free it if necessary.
- *
- *  If @a mm is freed, all references held by the heap item itself will also be
- *  be dropped.
- *
- *  @param mm   pointer to the #ssm_mm header of the heap item.
- */
-void ssm_drop(struct ssm_mm *mm);
-
-/** @brief Reuse heap-allocated memory.
- *
- * @TODO: reconsider interface and document ssm_reuse().
- */
-struct ssm_mm *ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag);
 
 /** @brief Allocate a contiguous range of memory.
  *

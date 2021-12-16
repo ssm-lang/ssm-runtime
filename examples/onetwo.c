@@ -109,7 +109,7 @@ void step_main(struct ssm_act *act) {
   act_main_t *cont = container_of(act, act_main_t, act);
   switch (act->pc) {
   case 0:
-    cont->a.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    cont->a = ssm_new(SSM_BUILTIN, SSM_SV_T);
     ssm_sv_init(cont->a, ssm_marshal(0));
 
     ssm_later(ssm_to_sv(cont->a), ssm_now() + 100, ssm_marshal(10));
