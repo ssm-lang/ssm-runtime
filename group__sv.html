@@ -140,6 +140,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga6057c5089f21df48a1e618b83886144e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">ssm_update</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *sv)</td></tr>
 <tr class="memdesc:ga6057c5089f21df48a1e618b83886144e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a (delayed) update on a variable.  <a href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">More...</a><br /></td></tr>
 <tr class="separator:ga6057c5089f21df48a1e618b83886144e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga507f4f10f494c4bf1d9254e32a976c09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">ssm_unschedule</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var)</td></tr>
+<tr class="memdesc:ga507f4f10f494c4bf1d9254e32a976c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unschedule any pending events on a variable.  <a href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">More...</a><br /></td></tr>
+<tr class="separator:ga507f4f10f494c4bf1d9254e32a976c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gacb1b13a45f8315e8ec30a10958c11dcb"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structssm__sv.html">ssm_sv</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb">ssm_new_sv</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
 <tr class="memdesc:gacb1b13a45f8315e8ec30a10958c11dcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and initialize a scheduled variable.  <a href="group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb">More...</a><br /></td></tr>
 <tr class="separator:gacb1b13a45f8315e8ec30a10958c11dcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,9 +158,6 @@ Functions</h2></td></tr>
 <tr class="memitem:ga415fa87c32772f0cced29b552845c85b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">ssm_desensitize</a> (<a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *trig)</td></tr>
 <tr class="memdesc:ga415fa87c32772f0cced29b552845c85b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Desensitize a variable from a trigger.  <a href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">More...</a><br /></td></tr>
 <tr class="separator:ga415fa87c32772f0cced29b552845c85b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga507f4f10f494c4bf1d9254e32a976c09"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">ssm_unschedule</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var)</td></tr>
-<tr class="memdesc:ga507f4f10f494c4bf1d9254e32a976c09"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unschedule any pending events on a variable.  <a href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">More...</a><br /></td></tr>
-<tr class="separator:ga507f4f10f494c4bf1d9254e32a976c09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga4f64d15b72fdd6f8f3085929a492582a"></a>
@@ -366,6 +366,37 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00422">422</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
+
+</div>
+</div>
+<a id="ga507f4f10f494c4bf1d9254e32a976c09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga507f4f10f494c4bf1d9254e32a976c09">&#9670;&nbsp;</a></span>ssm_unschedule()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ssm_unschedule </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *&#160;</td>
+          <td class="paramname"><em>var</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Unschedule any pending events on a variable. </p>
+<p>Should be called before the variable is dropped.</p>
+<p>Nothing happens if the variable does not have a pending event.</p>
+<dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">var</td><td>the variable. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00383">383</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
@@ -579,37 +610,6 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00374">374</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
-
-</div>
-</div>
-<a id="ga507f4f10f494c4bf1d9254e32a976c09"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga507f4f10f494c4bf1d9254e32a976c09">&#9670;&nbsp;</a></span>ssm_unschedule()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ssm_unschedule </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *&#160;</td>
-          <td class="paramname"><em>var</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Unschedule any pending events on a variable. </p>
-<p>Should be called before the variable is dropped.</p>
-<p>Nothing happens if the variable does not have a pending event.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>move this to ssm-internal, since this will just be part of drop.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">var</td><td>the variable. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00383">383</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>

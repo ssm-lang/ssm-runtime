@@ -12,6 +12,7 @@ var ssm_internal_8h =
     [ "ssm_reset", "group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6", null ],
     [ "ssm_set_now", "group__time.html#gabdccd038383abd0cefc8066f0c8b6237", null ],
     [ "ssm_update", "group__sv.html#ga6057c5089f21df48a1e618b83886144e", null ],
+    [ "ssm_unschedule", "group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09", null ],
     [ "ssm_tick", "group__act.html#gaba874593a4027732c9a8c84a25a8bb8d", null ],
     [ "ssm_mem_init", "group__mem.html#gafe56b79f41cfe1522669c35cbc423231", null ]
 ];

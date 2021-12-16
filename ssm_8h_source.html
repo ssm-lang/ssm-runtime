@@ -725,84 +725,71 @@ $(document).ready(function(){initNavTree('ssm_8h_source.html',''); initResizable
 <div class="line"><a name="l00631"></a><span class="lineno">  631</span>&#160;<span class="comment"> */</span></div>
 <div class="line"><a name="l00632"></a><span class="lineno">  632</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">ssm_desensitize</a>(<a class="code" href="structssm__trigger.html">ssm_trigger_t</a> *trig);</div>
 <div class="line"><a name="l00633"></a><span class="lineno">  633</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;<span class="comment">/** @brief Unschedule any pending events on a variable.</span></div>
-<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="comment"> *  Should be called before the variable is dropped.</span></div>
-<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="comment"> *  Nothing happens if the variable does not have a pending event.</span></div>
+<div class="line"><a name="l00634"></a><span class="lineno">  634</span>&#160;<span class="comment">/** @} */</span></div>
+<div class="line"><a name="l00635"></a><span class="lineno">  635</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00636"></a><span class="lineno">  636</span>&#160;<span class="comment">/** @ingroup util</span></div>
+<div class="line"><a name="l00637"></a><span class="lineno">  637</span>&#160;<span class="comment"> *  @def member_type</span></div>
+<div class="line"><a name="l00638"></a><span class="lineno">  638</span>&#160;<span class="comment"> *  @brief Obtain the type of a struct member.</span></div>
 <div class="line"><a name="l00639"></a><span class="lineno">  639</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="comment"> *  @todo move this to ssm-internal, since this will just be part of drop.</span></div>
+<div class="line"><a name="l00640"></a><span class="lineno">  640</span>&#160;<span class="comment"> *  Intended for use in #container_of, for type safety.</span></div>
 <div class="line"><a name="l00641"></a><span class="lineno">  641</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;<span class="comment"> *  @param var  the variable.</span></div>
-<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="keywordtype">void</span> <a class="code" href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">ssm_unschedule</a>(<a class="code" href="structssm__sv.html">ssm_sv_t</a> *var);</div>
-<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="comment">/** @} */</span></div>
-<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="comment">/** @ingroup util</span></div>
-<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="comment"> *  @def member_type</span></div>
-<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="comment"> *  @brief Obtain the type of a struct member.</span></div>
-<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="comment"> *  Intended for use in #container_of, for type safety.</span></div>
-<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="comment"> *  When GNU C is not available, falls back to ISO C99 and returns `const void`</span></div>
-<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;<span class="comment"> *  (see https://stackoverflow.com/a/10269925/10497710).</span></div>
-<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<span class="comment"> *  For instance, given the following struct definition:</span></div>
-<div class="line"><a name="l00658"></a><span class="lineno">  658</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;<span class="comment"> *  ~~~{.c}</span></div>
-<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="comment"> *  struct foo { int bar; float baz; };</span></div>
-<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="comment"> *  ~~~</span></div>
-<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="comment"> *  `member_type(struct foo, baz)` expands to `float`.</span></div>
-<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;<span class="comment"> *  @param type   the struct type.</span></div>
-<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;<span class="comment"> *  @param member the name of the member in @a type.</span></div>
-<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;<span class="comment"> *  @returns      the type of @a member in @a type.</span></div>
-<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
-<div class="line"><a name="l00670"></a><span class="lineno"><a class="line" href="group__util.html#ga744fbbb6363115680263e5a9e6734eed">  670</a></span>&#160;<span class="preprocessor">#define member_type(type, member) __typeof__(((type *)0)-&gt;member)</span></div>
-<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="preprocessor">#else</span></div>
-<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="preprocessor">#define member_type(type, member) const void</span></div>
-<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;<span class="comment"></span> </div>
-<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;<span class="comment">/** @ingroup util</span></div>
-<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="comment"> *  @brief Obtain the pointer to an outer, enclosing struct.</span></div>
-<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="comment"> *  For example, with the following struct definition:</span></div>
+<div class="line"><a name="l00642"></a><span class="lineno">  642</span>&#160;<span class="comment"> *  When GNU C is not available, falls back to ISO C99 and returns `const void`</span></div>
+<div class="line"><a name="l00643"></a><span class="lineno">  643</span>&#160;<span class="comment"> *  (see https://stackoverflow.com/a/10269925/10497710).</span></div>
+<div class="line"><a name="l00644"></a><span class="lineno">  644</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00645"></a><span class="lineno">  645</span>&#160;<span class="comment"> *  For instance, given the following struct definition:</span></div>
+<div class="line"><a name="l00646"></a><span class="lineno">  646</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00647"></a><span class="lineno">  647</span>&#160;<span class="comment"> *  ~~~{.c}</span></div>
+<div class="line"><a name="l00648"></a><span class="lineno">  648</span>&#160;<span class="comment"> *  struct foo { int bar; float baz; };</span></div>
+<div class="line"><a name="l00649"></a><span class="lineno">  649</span>&#160;<span class="comment"> *  ~~~</span></div>
+<div class="line"><a name="l00650"></a><span class="lineno">  650</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00651"></a><span class="lineno">  651</span>&#160;<span class="comment"> *  `member_type(struct foo, baz)` expands to `float`.</span></div>
+<div class="line"><a name="l00652"></a><span class="lineno">  652</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00653"></a><span class="lineno">  653</span>&#160;<span class="comment"> *  @param type   the struct type.</span></div>
+<div class="line"><a name="l00654"></a><span class="lineno">  654</span>&#160;<span class="comment"> *  @param member the name of the member in @a type.</span></div>
+<div class="line"><a name="l00655"></a><span class="lineno">  655</span>&#160;<span class="comment"> *  @returns      the type of @a member in @a type.</span></div>
+<div class="line"><a name="l00656"></a><span class="lineno">  656</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00657"></a><span class="lineno">  657</span>&#160;<span class="preprocessor">#ifdef __GNUC__</span></div>
+<div class="line"><a name="l00658"></a><span class="lineno"><a class="line" href="group__util.html#ga744fbbb6363115680263e5a9e6734eed">  658</a></span>&#160;<span class="preprocessor">#define member_type(type, member) __typeof__(((type *)0)-&gt;member)</span></div>
+<div class="line"><a name="l00659"></a><span class="lineno">  659</span>&#160;<span class="preprocessor">#else</span></div>
+<div class="line"><a name="l00660"></a><span class="lineno">  660</span>&#160;<span class="preprocessor">#define member_type(type, member) const void</span></div>
+<div class="line"><a name="l00661"></a><span class="lineno">  661</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00662"></a><span class="lineno">  662</span>&#160;<span class="comment"></span> </div>
+<div class="line"><a name="l00663"></a><span class="lineno">  663</span>&#160;<span class="comment">/** @ingroup util</span></div>
+<div class="line"><a name="l00664"></a><span class="lineno">  664</span>&#160;<span class="comment"> *  @brief Obtain the pointer to an outer, enclosing struct.</span></div>
+<div class="line"><a name="l00665"></a><span class="lineno">  665</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00666"></a><span class="lineno">  666</span>&#160;<span class="comment"> *  For example, with the following struct definition:</span></div>
+<div class="line"><a name="l00667"></a><span class="lineno">  667</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00668"></a><span class="lineno">  668</span>&#160;<span class="comment"> *  ~~~{.c}</span></div>
+<div class="line"><a name="l00669"></a><span class="lineno">  669</span>&#160;<span class="comment"> *  struct foo { int bar; float baz; };</span></div>
+<div class="line"><a name="l00670"></a><span class="lineno">  670</span>&#160;<span class="comment"> *  ~~~</span></div>
+<div class="line"><a name="l00671"></a><span class="lineno">  671</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00672"></a><span class="lineno">  672</span>&#160;<span class="comment"> *  Given some `float *p`, `container_of(p, struct foo, baz)` will return</span></div>
+<div class="line"><a name="l00673"></a><span class="lineno">  673</span>&#160;<span class="comment"> *  a pointer to the enclosing `struct foo`. The caller is responsible for</span></div>
+<div class="line"><a name="l00674"></a><span class="lineno">  674</span>&#160;<span class="comment"> *  ensuring that such an enclosing pointer actually exists.</span></div>
+<div class="line"><a name="l00675"></a><span class="lineno">  675</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00676"></a><span class="lineno">  676</span>&#160;<span class="comment"> *  Use this macro instead of pointer casting or pointer arithmetic; this macro</span></div>
+<div class="line"><a name="l00677"></a><span class="lineno">  677</span>&#160;<span class="comment"> *  is more principled in what it does and, with GNU C support, will trigger</span></div>
+<div class="line"><a name="l00678"></a><span class="lineno">  678</span>&#160;<span class="comment"> *  compiler warnings when @a ptr and the @a member type do not agree.</span></div>
 <div class="line"><a name="l00679"></a><span class="lineno">  679</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;<span class="comment"> *  ~~~{.c}</span></div>
-<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment"> *  struct foo { int bar; float baz; };</span></div>
-<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment"> *  ~~~</span></div>
-<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;<span class="comment"> *  Given some `float *p`, `container_of(p, struct foo, baz)` will return</span></div>
-<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment"> *  a pointer to the enclosing `struct foo`. The caller is responsible for</span></div>
-<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment"> *  ensuring that such an enclosing pointer actually exists.</span></div>
-<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00688"></a><span class="lineno">  688</span>&#160;<span class="comment"> *  Use this macro instead of pointer casting or pointer arithmetic; this macro</span></div>
-<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="comment"> *  is more principled in what it does and, with GNU C support, will trigger</span></div>
-<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="comment"> *  compiler warnings when @a ptr and the @a member type do not agree.</span></div>
-<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;<span class="comment"> *  Adapted from the Linux kernel source</span></div>
-<div class="line"><a name="l00693"></a><span class="lineno">  693</span>&#160;<span class="comment"> *  (see https://stackoverflow.com/a/10269925/10497710).</span></div>
-<div class="line"><a name="l00694"></a><span class="lineno">  694</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00695"></a><span class="lineno">  695</span>&#160;<span class="comment"> *  @param ptr    pointer to member.</span></div>
-<div class="line"><a name="l00696"></a><span class="lineno">  696</span>&#160;<span class="comment"> *  @param type   type of enclosing struct.</span></div>
-<div class="line"><a name="l00697"></a><span class="lineno">  697</span>&#160;<span class="comment"> *  @param member name of member in enclosing struct.</span></div>
-<div class="line"><a name="l00698"></a><span class="lineno">  698</span>&#160;<span class="comment"> *  @returns      pointer to enclosing struct.</span></div>
-<div class="line"><a name="l00699"></a><span class="lineno">  699</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00700"></a><span class="lineno"><a class="line" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">  700</a></span>&#160;<span class="preprocessor">#define container_of(ptr, type, member)                                        \</span></div>
-<div class="line"><a name="l00701"></a><span class="lineno">  701</span>&#160;<span class="preprocessor">  ((type *)((char *)(member_type(type, member) *){ptr} -                       \</span></div>
-<div class="line"><a name="l00702"></a><span class="lineno">  702</span>&#160;<span class="preprocessor">            offsetof(type, member)))</span></div>
-<div class="line"><a name="l00703"></a><span class="lineno">  703</span>&#160; </div>
-<div class="line"><a name="l00704"></a><span class="lineno">  704</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00680"></a><span class="lineno">  680</span>&#160;<span class="comment"> *  Adapted from the Linux kernel source</span></div>
+<div class="line"><a name="l00681"></a><span class="lineno">  681</span>&#160;<span class="comment"> *  (see https://stackoverflow.com/a/10269925/10497710).</span></div>
+<div class="line"><a name="l00682"></a><span class="lineno">  682</span>&#160;<span class="comment"> *</span></div>
+<div class="line"><a name="l00683"></a><span class="lineno">  683</span>&#160;<span class="comment"> *  @param ptr    pointer to member.</span></div>
+<div class="line"><a name="l00684"></a><span class="lineno">  684</span>&#160;<span class="comment"> *  @param type   type of enclosing struct.</span></div>
+<div class="line"><a name="l00685"></a><span class="lineno">  685</span>&#160;<span class="comment"> *  @param member name of member in enclosing struct.</span></div>
+<div class="line"><a name="l00686"></a><span class="lineno">  686</span>&#160;<span class="comment"> *  @returns      pointer to enclosing struct.</span></div>
+<div class="line"><a name="l00687"></a><span class="lineno">  687</span>&#160;<span class="comment"> */</span></div>
+<div class="line"><a name="l00688"></a><span class="lineno"><a class="line" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">  688</a></span>&#160;<span class="preprocessor">#define container_of(ptr, type, member)                                        \</span></div>
+<div class="line"><a name="l00689"></a><span class="lineno">  689</span>&#160;<span class="preprocessor">  ((type *)((char *)(member_type(type, member) *){ptr} -                       \</span></div>
+<div class="line"><a name="l00690"></a><span class="lineno">  690</span>&#160;<span class="preprocessor">            offsetof(type, member)))</span></div>
+<div class="line"><a name="l00691"></a><span class="lineno">  691</span>&#160; </div>
+<div class="line"><a name="l00692"></a><span class="lineno">  692</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__sv_html_ga507f4f10f494c4bf1d9254e32a976c09"><div class="ttname"><a href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">ssm_unschedule</a></div><div class="ttdeci">void ssm_unschedule(ssm_sv_t *var)</div><div class="ttdoc">Unschedule any pending events on a variable.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00383">ssm-scheduler.c:383</a></div></div>
 <div class="ttc" id="agroup__mem_html_ga1e1f76a5ae1699bf2358c3e2e2224c24"><div class="ttname"><a href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24">ssm_word_t</a></div><div class="ttdeci">uint32_t ssm_word_t</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00099">ssm.h:99</a></div></div>
 <div class="ttc" id="agroup__act_html_ga70103fe73a28cb722f8e3caf1629f5b5"><div class="ttname"><a href="group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5">ssm_leave</a></div><div class="ttdeci">void ssm_leave(ssm_act_t *act, size_t size)</div><div class="ttdoc">Destroy the activation record of a routine before leaving.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00290">ssm-scheduler.c:290</a></div></div>
 <div class="ttc" id="agroup__sv_html_ga5aa7b2c2566032f8a4e646bcb010ecd1"><div class="ttname"><a href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm_sensitize</a></div><div class="ttdeci">void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trig)</div><div class="ttdoc">Sensitize a variable to a trigger.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00359">ssm-scheduler.c:359</a></div></div>
-<div class="ttc" id="agroup__mem_html_gaf01d70767e121a2fb2e766f00603d599"><div class="ttname"><a href="group__mem.html#gaf01d70767e121a2fb2e766f00603d599">ssm_new</a></div><div class="ttdeci">struct ssm_object * ssm_new(uint8_t val_count, uint8_t tag)</div><div class="ttdoc">Allocate a new heap object to store word-size values.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00174">ssm-mem.c:174</a></div></div>
+<div class="ttc" id="agroup__mem_html_gaf01d70767e121a2fb2e766f00603d599"><div class="ttname"><a href="group__mem.html#gaf01d70767e121a2fb2e766f00603d599">ssm_new</a></div><div class="ttdeci">struct ssm_object * ssm_new(uint8_t val_count, uint8_t tag)</div><div class="ttdoc">Allocate a new heap object to store word-size values.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00175">ssm-mem.c:175</a></div></div>
 <div class="ttc" id="agroup__sv_html_ga3ff20b6ba9aa056f1cf64051c20dd779"><div class="ttname"><a href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a></div><div class="ttdeci">struct ssm_sv ssm_sv_t</div><div class="ttdoc">A scheduled variable that supported scheduled updates with triggers.</div></div>
 <div class="ttc" id="astructssm__time_html"><div class="ttname"><a href="structssm__time.html">ssm_time</a></div><div class="ttdoc">Time value object, stored in the heap.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00320">ssm.h:320</a></div></div>
 <div class="ttc" id="astructssm__mm_html_a50ffde9be79dd080d9e8effe3ee52d66"><div class="ttname"><a href="structssm__mm.html#a50ffde9be79dd080d9e8effe3ee52d66">ssm_mm::tag</a></div><div class="ttdeci">uint8_t tag</div><div class="ttdoc">Which variant is inhabited by this object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00113">ssm.h:113</a></div></div>
@@ -831,7 +818,7 @@ $(document).ready(function(){initNavTree('ssm_8h_source.html',''); initResizable
 <div class="ttc" id="astructssm__object_html_af6f11677e3b3ca42a54a71982a72f23f"><div class="ttname"><a href="structssm__object.html#af6f11677e3b3ca42a54a71982a72f23f">ssm_object::mm</a></div><div class="ttdeci">struct ssm_mm mm</div><div class="ttdoc">Memory management metadata.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00144">ssm.h:144</a></div></div>
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5a7015b434aac17124ed03afa7029ac56a"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5a7015b434aac17124ed03afa7029ac56a">SSM_NOT_READY</a></div><div class="ttdeci">@ SSM_NOT_READY</div><div class="ttdoc">Not yet ready to perform the requested action.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00045">ssm.h:45</a></div></div>
 <div class="ttc" id="astructssm__trigger_html_aae428fca2593d8dbf549bbef7c6c50a1"><div class="ttname"><a href="structssm__trigger.html#aae428fca2593d8dbf549bbef7c6c50a1">ssm_trigger::next</a></div><div class="ttdeci">struct ssm_trigger * next</div><div class="ttdoc">Next sensitive trigger, if any.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00427">ssm.h:427</a></div></div>
-<div class="ttc" id="agroup__mem_html_gaa19e5773ed713940dcc8f61a1dfc8e2f"><div class="ttname"><a href="group__mem.html#gaa19e5773ed713940dcc8f61a1dfc8e2f">ssm_drop</a></div><div class="ttdeci">void ssm_drop(struct ssm_mm *mm)</div><div class="ttdoc">Drop a reference to a heap item, and free it if necessary.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00185">ssm-mem.c:185</a></div></div>
+<div class="ttc" id="agroup__mem_html_gaa19e5773ed713940dcc8f61a1dfc8e2f"><div class="ttname"><a href="group__mem.html#gaa19e5773ed713940dcc8f61a1dfc8e2f">ssm_drop</a></div><div class="ttdeci">void ssm_drop(struct ssm_mm *mm)</div><div class="ttdoc">Drop a reference to a heap item, and free it if necessary.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00186">ssm-mem.c:186</a></div></div>
 <div class="ttc" id="astructssm__mm_html_a22b4bc1b68ad5db3213f12c8676a2369"><div class="ttname"><a href="structssm__mm.html#a22b4bc1b68ad5db3213f12c8676a2369">ssm_mm::val_count</a></div><div class="ttdeci">uint8_t val_count</div><div class="ttdoc">Number of ssm_value_t values in payload.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00112">ssm.h:112</a></div></div>
 <div class="ttc" id="agroup__mem_html_ga3087c5edfa451e28309ea0cb234ad02e"><div class="ttname"><a href="group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e">ssm_mem_free</a></div><div class="ttdeci">void ssm_mem_free(void *m, size_t size)</div><div class="ttdoc">Deallocate memory allocated by ssm_mem_alloc().</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00140">ssm-mem.c:140</a></div></div>
 <div class="ttc" id="astructssm__trigger_html"><div class="ttname"><a href="structssm__trigger.html">ssm_trigger</a></div><div class="ttdoc">Indicates a routine should run when a scheduled variable is written.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00426">ssm.h:426</a></div></div>
@@ -846,7 +833,7 @@ $(document).ready(function(){initNavTree('ssm_8h_source.html',''); initResizable
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5afcfb35936a0d709de1368a4d95ed78de"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5afcfb35936a0d709de1368a4d95ed78de">SSM_INVALID_TIME</a></div><div class="ttdeci">@ SSM_INVALID_TIME</div><div class="ttdoc">Specified invalid time, e.g., scheduled assignment at an earlier time.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00047">ssm.h:47</a></div></div>
 <div class="ttc" id="astructssm__sv_html_add57450d6e98f2d5734f44ec3d00a8ca"><div class="ttname"><a href="structssm__sv.html#add57450d6e98f2d5734f44ec3d00a8ca">ssm_sv::triggers</a></div><div class="ttdeci">ssm_trigger_t * triggers</div><div class="ttdoc">List of sensitive continuations.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00520">ssm.h:520</a></div></div>
 <div class="ttc" id="astructssm__act_html_a1ecbbda7bed718687040306d1a1e42bb"><div class="ttname"><a href="structssm__act.html#a1ecbbda7bed718687040306d1a1e42bb">ssm_act::children</a></div><div class="ttdeci">uint16_t children</div><div class="ttdoc">Number of running child threads.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00414">ssm.h:414</a></div></div>
-<div class="ttc" id="agroup__mem_html_gaa8e3503b367e5ea3248060ce10488916"><div class="ttname"><a href="group__mem.html#gaa8e3503b367e5ea3248060ce10488916">ssm_dup</a></div><div class="ttdeci">void ssm_dup(struct ssm_mm *mm)</div><div class="ttdoc">Duplicate a reference to a heap item, incrementing its ref count.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00183">ssm-mem.c:183</a></div></div>
+<div class="ttc" id="agroup__mem_html_gaa8e3503b367e5ea3248060ce10488916"><div class="ttname"><a href="group__mem.html#gaa8e3503b367e5ea3248060ce10488916">ssm_dup</a></div><div class="ttdeci">void ssm_dup(struct ssm_mm *mm)</div><div class="ttdoc">Duplicate a reference to a heap item, incrementing its ref count.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00184">ssm-mem.c:184</a></div></div>
 <div class="ttc" id="agroup__sv_html_gacb1b13a45f8315e8ec30a10958c11dcb"><div class="ttname"><a href="group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb">ssm_new_sv</a></div><div class="ttdeci">struct ssm_sv * ssm_new_sv(ssm_value_t val)</div><div class="ttdoc">Allocate and initialize a scheduled variable.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00309">ssm-scheduler.c:309</a></div></div>
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5a1f2cca36b8a5807812788f4a97796ba1"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5a1f2cca36b8a5807812788f4a97796ba1">SSM_INVALID_MEMORY</a></div><div class="ttdeci">@ SSM_INVALID_MEMORY</div><div class="ttdoc">Invalid memory layout, e.g., using a pointer where int was expected.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00049">ssm.h:49</a></div></div>
 <div class="ttc" id="astructssm__sv_html"><div class="ttname"><a href="structssm__sv.html">ssm_sv</a></div><div class="ttdoc">A scheduled variable that supported scheduled updates with triggers.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00516">ssm.h:516</a></div></div>
@@ -869,7 +856,7 @@ $(document).ready(function(){initNavTree('ssm_8h_source.html',''); initResizable
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5a12d319c194dd2f276d8c95809e43c824"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5a12d319c194dd2f276d8c95809e43c824">SSM_EXHAUSTED_ACT_QUEUE</a></div><div class="ttdeci">@ SSM_EXHAUSTED_ACT_QUEUE</div><div class="ttdoc">Tried to insert into full activation record queue.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00037">ssm.h:37</a></div></div>
 <div class="ttc" id="astructssm__act_html_af355f64d47598017faf10e3147db1be6"><div class="ttname"><a href="structssm__act.html#af355f64d47598017faf10e3147db1be6">ssm_act::scheduled</a></div><div class="ttdeci">bool scheduled</div><div class="ttdoc">True when in the schedule queue.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00417">ssm.h:417</a></div></div>
 <div class="ttc" id="agroup__error_html_gaca45923425917b02a000ff716a2c8ed5"><div class="ttname"><a href="group__error.html#gaca45923425917b02a000ff716a2c8ed5">ssm_error</a></div><div class="ttdeci">ssm_error</div><div class="ttdoc">Error codes indicating reason for failure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00034">ssm.h:34</a></div></div>
-<div class="ttc" id="agroup__mem_html_gab468491385e10631bf4687fa3f005ae5"><div class="ttname"><a href="group__mem.html#gab468491385e10631bf4687fa3f005ae5">ssm_reuse</a></div><div class="ttdeci">struct ssm_mm * ssm_reuse(struct ssm_mm *mm)</div><div class="ttdoc">Reuse heap-allocated memory.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00193">ssm-mem.c:193</a></div></div>
+<div class="ttc" id="agroup__mem_html_gab468491385e10631bf4687fa3f005ae5"><div class="ttname"><a href="group__mem.html#gab468491385e10631bf4687fa3f005ae5">ssm_reuse</a></div><div class="ttdeci">struct ssm_mm * ssm_reuse(struct ssm_mm *mm)</div><div class="ttdoc">Reuse heap-allocated memory.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00194">ssm-mem.c:194</a></div></div>
 <div class="ttc" id="astructssm__object_html"><div class="ttname"><a href="structssm__object.html">ssm_object</a></div><div class="ttdoc">Heap-allocated SSM object, with memory management metadata header.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00143">ssm.h:143</a></div></div>
 <div class="ttc" id="agroup__act_html_gadb557bb02081e7d883bcc7d133eb96f6"><div class="ttname"><a href="group__act.html#gadb557bb02081e7d883bcc7d133eb96f6">ssm_stepf_t</a></div><div class="ttdeci">void ssm_stepf_t(struct ssm_act *)</div><div class="ttdoc">The function that does an instant's work for a routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00402">ssm.h:402</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->

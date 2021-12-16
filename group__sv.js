@@ -15,10 +15,10 @@ var group__sv =
     [ "ssm_sv_mm", "group__sv.html#gac42c8c7eb78aa01c534584a44af8c90e", null ],
     [ "ssm_sv_t", "group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779", null ],
     [ "ssm_update", "group__sv.html#ga6057c5089f21df48a1e618b83886144e", null ],
+    [ "ssm_unschedule", "group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09", null ],
     [ "ssm_new_sv", "group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb", null ],
     [ "ssm_assign", "group__sv.html#gac7071d416ab1beecab8acf1b0bf09825", null ],
     [ "ssm_later", "group__sv.html#gaec47ada342876e79b21c53151001c888", null ],
     [ "ssm_sensitize", "group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1", null ],
-    [ "ssm_desensitize", "group__sv.html#ga415fa87c32772f0cced29b552845c85b", null ],
-    [ "ssm_unschedule", "group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09", null ]
+    [ "ssm_desensitize", "group__sv.html#ga415fa87c32772f0cced29b552845c85b", null ]
 ];

@@ -73,6 +73,5 @@ var ssm_8h =
     [ "ssm_later", "group__sv.html#gaec47ada342876e79b21c53151001c888", null ],
     [ "ssm_sensitize", "group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1", null ],
     [ "ssm_desensitize", "group__sv.html#ga415fa87c32772f0cced29b552845c85b", null ],
-    [ "ssm_unschedule", "group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09", null ],
     [ "ssm_top_parent", "group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5", null ]
 ];
