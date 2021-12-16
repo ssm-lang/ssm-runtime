@@ -1,3 +1,4 @@
+<!-- HTML header for doxygen 1.8.20-->
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -9,10 +10,18 @@
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
 <link href="search/search.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
 <link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only.css" rel="stylesheet" type="text/css"/>
+<link href="doxygen-awesome-sidebar-only-darkmode-toggle.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="doxygen-awesome-darkmode-toggle.js"></script>
 </head>
 <body>
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
@@ -47,6 +56,23 @@ $(function() {
 });
 /* @license-end */</script>
 <div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:cf05388f2679ee054f2beb29a391d25f4e673ac3&amp;dn=gpl-2.0.txt GPL-v2 */
+$(document).ready(function(){initNavTree('ssm-top-act_8c_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
 <!-- window showing the filter options -->
 <div id="MSearchSelectWindow"
      onmouseover="return searchBox.OnSearchSelectShow()"
@@ -61,11 +87,6 @@ $(function() {
 </iframe>
 </div>
 
-<div id="nav-path" class="navpath">
-  <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li>  </ul>
-</div>
-</div><!-- top -->
 <div class="header">
   <div class="headertitle">
 <div class="title">ssm-top-act.c</div>  </div>
@@ -81,16 +102,29 @@ $(function() {
 <div class="line"><a name="l00008"></a><span class="lineno">    8</span>&#160; </div>
 <div class="line"><a name="l00009"></a><span class="lineno"><a class="line" href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">    9</a></span>&#160;<a class="code" href="structssm__act.html">ssm_act_t</a> <a class="code" href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a> = { .<a class="code" href="structssm__act.html#abeaed0d0bd520d546e34eab27ef2242e">step</a> = <a class="code" href="ssm-top-act_8c.html#ad97966a1ab94482fd0f37f7915543f06">ssm_top_return</a> };</div>
 </div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
 <div class="ttc" id="agroup__act_html_gaec0cb9b65b0fae98389b310a6d34e5f5"><div class="ttname"><a href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a></div><div class="ttdeci">ssm_act_t ssm_top_parent</div><div class="ttdoc">An activation record for the parent of the top-most routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-top-act_8c_source.html#l00009">ssm-top-act.c:9</a></div></div>
 <div class="ttc" id="assm-top-act_8c_html_ad97966a1ab94482fd0f37f7915543f06"><div class="ttname"><a href="ssm-top-act_8c.html#ad97966a1ab94482fd0f37f7915543f06">ssm_top_return</a></div><div class="ttdeci">static void ssm_top_return(ssm_act_t *act)</div><div class="ttdoc">The top-level parent does nothing.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-top-act_8c_source.html#l00007">ssm-top-act.c:7</a></div></div>
 <div class="ttc" id="assm_8h_html"><div class="ttname"><a href="ssm_8h.html">ssm.h</a></div><div class="ttdoc">Interface to the SSM runtime.</div></div>
 <div class="ttc" id="astructssm__act_html_abeaed0d0bd520d546e34eab27ef2242e"><div class="ttname"><a href="structssm__act.html#abeaed0d0bd520d546e34eab27ef2242e">ssm_act::step</a></div><div class="ttdeci">ssm_stepf_t * step</div><div class="ttdoc">C function for running this continuation.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00411">ssm.h:411</a></div></div>
 <div class="ttc" id="astructssm__act_html"><div class="ttname"><a href="structssm__act.html">ssm_act</a></div><div class="ttdoc">Activation record for an SSM routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00410">ssm.h:410</a></div></div>
+<!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
-<hr class="footer"/><address class="footer"><small>
-Generated by &#160;<a href="http://www.doxygen.org/index.html">
-<img class="footer" src="doxygen.png" alt="doxygen"/>
-</a> 1.8.17
-</small></address>
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="ssm-top-act_8c.html">ssm-top-act.c</a></li>
+    <li class="footer">Generated by <a href="http://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.8.17 </li>
+  </ul>
+</div>
+<script type="text/javascript">
+    // script for doxygen 1.9.1
+    $(function() {
+        $(document).ready(function(){
+           toggleButton = document.createElement('doxygen-awesome-dark-mode-toggle')
+           toggleButton.title = "Toggle Light/Dark Mode"
+           document.getElementById("MSearchBox").parentNode.appendChild(toggleButton)
+       })
+    })
+</script>
 </body>
 </html>
