@@ -182,11 +182,16 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            =
-HTML_FOOTER            =
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  =
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = doc/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js
+HTML_EXTRA_STYLESHEET  = doc/doxygen-awesome-css/doxygen-awesome.css \
+                         doc/doxygen-awesome-css/doxygen-awesome-sidebar-only.css \
+                         doc/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css
+HTML_HEADER            = doc/header.html
+HTML_FOOTER            = doc/footer.html
+
+GENERATE_TREEVIEW      = YES
+TOC_EXPAND             = NO
 
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
@@ -197,8 +202,6 @@ HTML_TIMESTAMP         = NO
 HTML_DYNAMIC_SECTIONS  = YES
 HTML_INDEX_NUM_ENTRIES = 100
 
-TOC_EXPAND             = NO
-GENERATE_TREEVIEW      = NO
 
 ENUM_VALUES_PER_LINE   = 4
 
