@@ -85,7 +85,6 @@ void ssm_throw(ssm_error_t reason, const char *file, int line,
 struct ssm_sv;
 struct ssm_trigger;
 struct ssm_act;
-struct ssm_object;
 struct ssm_time;
 
 /**
@@ -394,7 +393,7 @@ void ssm_desensitize(ssm_trigger_t *trig);
  *
  *  Type enumerated here are chosen because they cannot be easily or efficiently
  *  expressed as a product of words. For instance, 64-bit timestamps cannot be
- *  directly stored in the payload of an #ssm_object, where even-numbered
+ *  directly stored in the payload of a regular heap object, where even-numbered
  *  timestamps may be misinterpreted as pointers.
  */
 enum ssm_builtin {
@@ -459,8 +458,8 @@ struct ssm_mm {
 
 /** @brief Compute the size of a heap object.
  *
- *  @param val_count  the number of values in the #ssm_object.
- *  @returns          the size of the #ssm_object, in bytes.
+ *  @param val_count  the number of values in a heap-allocated object.
+ *  @returns          the size of the object, in bytes.
  */
 #define SSM_OBJ_SIZE(val_count)                                                \
   (sizeof(struct ssm_mm_header) + sizeof(ssm_value_t) * (val_count))
@@ -474,13 +473,13 @@ struct ssm_mm {
  *  When @a val_count is equal to #SSM_BUILTIN, @a tag is interpreted as an
  *  #ssm_builtin enumeration, and a memory block of that size is allocated.
  *
- *  The @a mm header in the returned #ssm_object is initialized, but the
+ *  The @a mm header in the returned object is initialized, but the
  *  @a data payload is not.
  *
  *  @param val_count  the number of #ssm_value_t values to be stored in the
  *                    object payload.
  *  @param tag        the tag to initialize the @a mm header with.
- *  @returns          pointer to a newly allocated and initialized #ssm_object.
+ *  @returns          value pointing to the newly allocated object.
  *
  *  @sa SSM_BUILTIN_SIZE().
  */
@@ -536,7 +535,7 @@ ssm_value_t ssm_reuse(struct ssm_mm *mm, uint8_t val_count, uint8_t tag);
  *  point to a scheduled variable is undefined.
  *
  *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_time in the heap.
+ *  @returns  pointer to the #ssm_time_t in the heap.
  */
 #define ssm_to_time(v) (&(v).heap_ptr->data.time)
 
