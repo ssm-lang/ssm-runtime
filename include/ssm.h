@@ -313,20 +313,22 @@ typedef struct ssm_sv {
  *
  *  For example:
  *
- *      ssm_value_t sv = ssm_new(SSM_BUILTIN, SSM_SV_T);
- *      ssm_to_sv(sv) = ssm_sv_init(ssm_marshal(0));
+ *      ssm_value_t sv;
+ *      sv.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+ *      ssm_sv_init(sv, ssm_marshal(0));
  *
  *  @note Initialization does not count as an update event, so @a last_updated
  *        is initialized to #SSM_NEVER.
  *  @note @a later_value is left uninitialized.
  *
+ *  @param sv   pointer to the scheduled variable.
  *  @param val  the initial value of the schedueld variable.
  */
-#define ssm_sv_init(val)                                                       \
-  (ssm_sv_t) {                                                                 \
-    .later_time = SSM_NEVER, .last_updated = SSM_NEVER, .triggers = NULL,      \
-    .value = val                                                               \
-  }
+#define ssm_sv_init(sv, val)                                                   \
+  (*ssm_to_sv(sv) = (ssm_sv_t){.later_time = SSM_NEVER,                        \
+                               .last_updated = SSM_NEVER,                      \
+                               .triggers = NULL,                               \
+                               .value = val})
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
@@ -483,6 +485,15 @@ struct ssm_mm {
  */
 struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
 
+/** @brief Retrieve the tag of an SSM heap object.
+ *
+ *  Behavior is implementation defined for built-in types.
+ *
+ *  @param v  the #ssm_value_t whose tag is being retrieved.
+ *  @returns  the tag of @a v.
+ */
+#define ssm_tag(v) (ssm_on_heap(v) ? (v).heap_ptr->mm.tag : ssm_unmarshal(v))
+
 /** @brief Access the heap object payload pointed to by an #ssm_value_t.
  *
  *  Provided for convenience.
@@ -493,7 +504,7 @@ struct ssm_mm *ssm_new(uint8_t val_count, uint8_t tag);
  *  @param v  the #ssm_value_t
  *  @returns  pointer to the beginning of the value payload in the heap.
  */
-#define ssm_to_obj(v) (&(v).heap_ptr->data.obj)
+#define ssm_to_obj(v) (&*((v).heap_ptr->data.obj))
 
 /** @brief Access the heap-allocated time pointed to by an #ssm_value_t.
  *

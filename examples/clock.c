@@ -61,7 +61,7 @@ void step_second_clock(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     cont->timer.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_deref(cont->timer) = EVENT_VALUE;
+    ssm_sv_init(cont->timer, EVENT_VALUE);
     for (;;) {
       ssm_assign(ssm_to_sv(cont->second_event), act->priority, EVENT_VALUE);
       ssm_later(ssm_to_sv(cont->timer), ssm_now() + SSM_SECOND, EVENT_VALUE);
@@ -97,7 +97,7 @@ void step_report_seconds(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     cont->seconds.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_deref(cont->seconds) = ssm_marshal(0);
+    ssm_sv_init(cont->seconds, ssm_marshal(0));
     for (;;) {
       cont->trigger1.act = act;
       ssm_sensitize(ssm_to_sv(cont->second_event), &cont->trigger1);
@@ -133,7 +133,7 @@ void step_main(struct ssm_act *act) {
   switch (act->pc) {
   case 0: {
     cont->second.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_deref(cont->second) = EVENT_VALUE;
+    ssm_sv_init(cont->second, EVENT_VALUE);
     ssm_depth_t new_depth = act->depth - 1;
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;

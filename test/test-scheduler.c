@@ -37,24 +37,25 @@ void check_starts_initialized() {
 
 void reset_all() {
   for (int i = 0; i < NUM_VARIABLES; i++)
-    ssm_drop(&ssm_to_sv(variables[i])->mm);
+    ssm_drop(variables[i].heap_ptr);
   ssm_reset();
-  for (int i = 0; i < NUM_VARIABLES; i++)
-    variables[i] = ssm_from_sv(ssm_new_sv(DUMMY_VALUE));
+  for (int i = 0; i < NUM_VARIABLES; i++) {
+    variables[i].heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    ssm_sv_init(variables[i], DUMMY_VALUE);
+  }
   check_starts_initialized();
 }
 
 void event_queue_basic() {
   reset_all();
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
-  SSM_ASSERT(!ssm_event_on(variables[0]));
+  SSM_ASSERT(ssm_to_sv(variables[0])->last_updated != ssm_now());
   ssm_later(ssm_to_sv(variables[0]), 1, DUMMY_VALUE);
   SSM_ASSERT(event_queue_len == 1);
   SSM_ASSERT(ssm_next_event_time() == 1);
   event_queue_consistency_check();
   ssm_tick();
-  bool event_on = ssm_event_on(variables[0]);
-  SSM_ASSERT(event_on);
+  SSM_ASSERT(ssm_to_sv(variables[0])->last_updated == ssm_now());
   SSM_ASSERT(ssm_now() == 1);
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
   SSM_ASSERT(event_queue_len == 0);
@@ -437,8 +438,10 @@ static void free_mem(void *mem, size_t size) { free(mem); }
 int main(void) {
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
 
-  for (int i = 0; i < NUM_VARIABLES; i++)
-    variables[i] = ssm_from_sv(ssm_new_sv(DUMMY_VALUE));
+  for (int i = 0; i < NUM_VARIABLES; i++) {
+    variables[i].heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    ssm_sv_init(variables[i], DUMMY_VALUE);
+  }
 
   for (int i = 0; i < NUM_ACTS; i++)
     acts[i] = (ssm_act_t){
@@ -540,7 +543,7 @@ int main(void) {
   trigger_basic();
 
   for (int i = 0; i < NUM_VARIABLES; i++)
-    ssm_drop(&ssm_to_sv(variables[i])->mm);
+    ssm_drop(variables[i].heap_ptr);
 
   printf("PASSED\n");
   return 0;

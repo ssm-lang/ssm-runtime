@@ -60,7 +60,7 @@ void step_hello(ssm_act_t *act) {
     print_yield(14, '\n');
     print_yield(15, 0);
   }
-  ssm_drop(&ssm_to_sv(cont->stdout)->mm);
+  ssm_drop(cont->stdout.heap_ptr);
   ssm_leave(&cont->act, sizeof(hello_act_t));
 }
 
@@ -93,7 +93,7 @@ void step_print(ssm_act_t *act) {
       }
     }
   }
-  ssm_drop(&ssm_to_sv(cont->stdout)->mm);
+  ssm_drop(cont->stdout.heap_ptr);
   ssm_leave(&cont->act, sizeof(hello_act_t));
 }
 
@@ -110,14 +110,15 @@ void step_main(ssm_act_t *act) {
   main_act_t *cont = container_of(act, main_act_t, act);
   switch (act->pc) {
   case 0:
-    cont->stdout = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
-    ssm_depth_t new_depth = act->depth - 1; // 2 children
+    cont->stdout.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    ssm_sv_init(cont->stdout, ssm_marshal(0));
+    ssm_depth_t new_depth = act->depth - 1;
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
-    ssm_dup(ssm_sv_mm(cont->stdout));
+    ssm_dup(cont->stdout.heap_ptr);
     ssm_activate(enter_hello(act, new_priority, new_depth, cont->stdout));
     new_priority += pinc;
-    ssm_dup(ssm_sv_mm(cont->stdout));
+    ssm_dup(cont->stdout.heap_ptr);
     ssm_activate(enter_print(act, new_priority, new_depth, cont->stdout));
     act->pc = 1;
     return;

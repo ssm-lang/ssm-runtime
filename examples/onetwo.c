@@ -62,7 +62,7 @@ void step_one(struct ssm_act *act) {
     ssm_assign(ssm_to_sv(cont->a), act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) + 1));
   }
-  ssm_drop(ssm_sv_mm(cont->a));
+  ssm_drop(cont->a.heap_ptr);
   ssm_leave(act, sizeof(act_one_t));
 }
 
@@ -91,7 +91,7 @@ void step_two(struct ssm_act *act) {
     ssm_assign(ssm_to_sv(cont->a), act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) * 2));
   }
-  ssm_drop(ssm_sv_mm(cont->a));
+  ssm_drop(cont->a.heap_ptr);
   ssm_leave(act, sizeof(act_two_t));
 }
 
@@ -109,7 +109,8 @@ void step_main(struct ssm_act *act) {
   act_main_t *cont = container_of(act, act_main_t, act);
   switch (act->pc) {
   case 0:
-    cont->a = ssm_from_sv(ssm_new_sv(ssm_marshal(0)));
+    cont->a.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    ssm_sv_init(cont->a, ssm_marshal(0));
 
     ssm_later(ssm_to_sv(cont->a), ssm_now() + 100, ssm_marshal(10));
     {
@@ -117,11 +118,11 @@ void step_main(struct ssm_act *act) {
       ssm_priority_t new_priority = act->priority;
       ssm_priority_t pinc = 1 << new_depth;
 
-      ssm_dup(ssm_sv_mm(cont->a));
+      ssm_dup(cont->a.heap_ptr);
       ssm_activate(ssm_enter_one(act, new_priority, new_depth, cont->a));
 
       new_priority += pinc;
-      ssm_dup(ssm_sv_mm(cont->a));
+      ssm_dup(cont->a.heap_ptr);
       ssm_activate(ssm_enter_two(act, new_priority, new_depth, cont->a));
     }
     act->pc = 1;
@@ -129,7 +130,7 @@ void step_main(struct ssm_act *act) {
   case 1:
     printf("a = %d\n", (int)ssm_unmarshal(ssm_deref(cont->a)));
   }
-  ssm_drop(ssm_sv_mm(cont->a));
+  ssm_drop(cont->a.heap_ptr);
   ssm_leave(act, sizeof(act_main_t));
 }
 
