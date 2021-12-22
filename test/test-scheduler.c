@@ -37,7 +37,7 @@ void check_starts_initialized() {
 
 void reset_all() {
   for (int i = 0; i < NUM_VARIABLES; i++)
-    ssm_drop(variables[i].heap_ptr);
+    ssm_drop(variables[i]);
   ssm_reset();
   for (int i = 0; i < NUM_VARIABLES; i++) {
     variables[i] = ssm_new(SSM_BUILTIN, SSM_SV_T);
@@ -543,7 +543,7 @@ int main(void) {
   trigger_basic();
 
   for (int i = 0; i < NUM_VARIABLES; i++)
-    ssm_drop(variables[i].heap_ptr);
+    ssm_drop(variables[i]);
 
   printf("PASSED\n");
   return 0;

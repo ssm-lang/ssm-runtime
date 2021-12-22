@@ -65,7 +65,7 @@ void step_mywait(struct ssm_act *act) {
     ssm_desensitize(&cont->trigger1);
     break;
   }
-  ssm_drop(cont->r.heap_ptr);
+  ssm_drop(cont->r);
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -90,10 +90,10 @@ void step_sum(struct ssm_act *act) {
     ssm_depth_t new_depth = act->depth - 1; // 2 children
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
-    ssm_dup(cont->r1.heap_ptr);
+    ssm_dup(cont->r1);
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r1));
     new_priority += pinc;
-    ssm_dup(cont->r2.heap_ptr);
+    ssm_dup(cont->r2);
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r2));
   }
     act->pc = 1;
@@ -104,9 +104,9 @@ void step_sum(struct ssm_act *act) {
                           ssm_unmarshal(ssm_deref(cont->r2))));
     break;
   }
-  ssm_drop(cont->r.heap_ptr);
-  ssm_drop(cont->r2.heap_ptr);
-  ssm_drop(cont->r1.heap_ptr);
+  ssm_drop(cont->r);
+  ssm_drop(cont->r2);
+  ssm_drop(cont->r1);
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -136,29 +136,29 @@ void step_fib(struct ssm_act *act) {
       ssm_depth_t new_depth = act->depth - 2; // 4 children
       ssm_priority_t new_priority = act->priority;
       ssm_priority_t pinc = 1 << new_depth;
-      ssm_dup(cont->r1.heap_ptr);
+      ssm_dup(cont->r1);
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 1),
                                  cont->r1));
       new_priority += pinc;
-      ssm_dup(cont->r2.heap_ptr);
+      ssm_dup(cont->r2);
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 2),
                                  cont->r2));
       new_priority += pinc;
-      ssm_dup(cont->r1.heap_ptr);
-      ssm_dup(cont->r2.heap_ptr);
-      ssm_dup(cont->r.heap_ptr);
+      ssm_dup(cont->r1);
+      ssm_dup(cont->r2);
+      ssm_dup(cont->r);
       ssm_activate(ssm_enter_sum(act, new_priority, new_depth, cont->r1,
                                  cont->r2, cont->r));
       act->pc = 1;
       return;
     case 1:;
-      ssm_drop(cont->r1.heap_ptr);
-      ssm_drop(cont->r2.heap_ptr);
+      ssm_drop(cont->r1);
+      ssm_drop(cont->r2);
     }
   }
-  ssm_drop(cont->r.heap_ptr);
+  ssm_drop(cont->r);
   ssm_leave(&cont->act, sizeof(*cont));
 }
 
@@ -168,7 +168,7 @@ void ssm_program_init(void) {
   ssm_sv_init(result, ssm_marshal(0xdeadbeef));
 
   int n = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
-  ssm_dup(result.heap_ptr);
+  ssm_dup(result);
   ssm_activate(ssm_enter_fib(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH,
                              ssm_marshal(n), result));
 }
