@@ -5,7 +5,7 @@
 
 type List = Cons Int List | Nil
 
-list = [1, 2, 3]
+list = [0, 1, 2]
 
 print_list (l: List) =
   match l
@@ -20,22 +20,20 @@ map_inc (l: List) -> List =
 
 main =
   print_list list
-  let list' = map_inc list
+  let list' = map_inc (map_inc list)
   print_list list'
 
 should print:
 
+  0::1::2::[]
   1::2::3::[]
-  2::3::4::[]
  */
 
-enum { List_size = 2 };
-enum List { Nil = 0, Cons };
-
-typedef struct {
-  struct ssm_mm mm;
-  ssm_value_t payload[List_size];
-} List;
+enum List { Nil = 0, Cons, List_variants };
+uint8_t List_size[List_variants] = {
+    [Nil] = 0,
+    [Cons] = 2,
+};
 
 ssm_value_t list;
 
@@ -64,7 +62,7 @@ void step_map_inc(ssm_act_t *act) {
 
   switch (act->pc) {
   case 0:
-    switch (ssm_to_obj(cont->l)->mm.tag) {
+    switch (ssm_tag(cont->l)) {
     case Nil:
       goto match_Nil_0;
     case Cons:
@@ -72,27 +70,25 @@ void step_map_inc(ssm_act_t *act) {
     }
     SSM_ASSERT(0);
   match_Nil_0:
-    ssm_drop(&ssm_to_obj(cont->l)->mm);
-    *cont->__ret = ssm_from_obj(ssm_new(List_size, Nil));
+    *cont->__ret = ssm_marshal(Nil);
     break;
   match_Cons_0:;
-    ssm_value_t __tmp0 = ssm_to_obj(cont->l)->payload[0];
-    ssm_value_t __tmp1 = ssm_to_obj(cont->l)->payload[1];
-    ssm_dup(&ssm_to_obj(__tmp1)->mm);
+    ssm_value_t __i = ssm_to_obj(cont->l)[0];
+    ssm_value_t __l = ssm_to_obj(cont->l)[1];
+    ssm_dup(__l);
 
-    ssm_drop(&ssm_to_obj(cont->l)->mm);
+    ssm_drop(cont->l);
 
-    cont->__tmp0 = ssm_marshal(ssm_unmarshal(__tmp0) + 1);
+    cont->__tmp0 = ssm_marshal(ssm_unmarshal(__i) + 1);
 
-    ssm_activate(enter_map_inc(act, act->priority, act->depth,
-                               ssm_to_obj(cont->l)->payload[1], &cont->__tmp1));
+    ssm_activate(
+        enter_map_inc(act, act->priority, act->depth, __l, &cont->__tmp1));
     act->pc = 1;
     return;
   case 1:;
-    struct ssm_object *__tmp3 = ssm_new(List_size, Cons);
-    __tmp3->payload[0] = cont->__tmp0;
-    __tmp3->payload[1] = cont->__tmp1;
-    *cont->__ret = ssm_from_obj(__tmp3);
+    *cont->__ret = ssm_new(List_size[Cons], Cons);
+    ssm_to_obj(*cont->__ret)[0] = cont->__tmp0;
+    ssm_to_obj(*cont->__ret)[1] = cont->__tmp1;
     break;
   }
   ssm_leave(&cont->act, sizeof(act_map_inc_t));
@@ -121,7 +117,7 @@ void step_print_list(ssm_act_t *act) {
   act_print_list_t *cont = container_of(act, act_print_list_t, act);
   switch (act->pc) {
   case 0:
-    switch (ssm_to_obj(cont->l)->mm.tag) {
+    switch (ssm_tag(cont->l)) {
     case Nil:
       goto match_Nil_0;
     case Cons:
@@ -130,18 +126,17 @@ void step_print_list(ssm_act_t *act) {
     SSM_ASSERT(0);
   match_Nil_0:
     printf("[]\r\n");
-    ssm_drop(&ssm_to_obj(cont->l)->mm);
     break;
   match_Cons_0:;
-    ssm_value_t __tmp0 = ssm_to_obj(cont->l)->payload[0];
-    ssm_value_t __tmp1 = ssm_to_obj(cont->l)->payload[1];
-    ssm_dup(&ssm_to_obj(__tmp1)->mm);
+    ssm_value_t __i = ssm_to_obj(cont->l)[0];
+    ssm_value_t __l = ssm_to_obj(cont->l)[1];
+    ssm_dup(__l);
 
-    ssm_drop(&ssm_to_obj(cont->l)->mm);
+    ssm_drop(cont->l);
 
-    printf("%ld::", ssm_unmarshal(__tmp0));
+    printf("%d::", ssm_unmarshal(__i));
 
-    ssm_activate(enter_print_list(act, act->priority, act->depth, __tmp1));
+    ssm_activate(enter_print_list(act, act->priority, act->depth, __l));
     act->pc = 1;
     return;
   case 1:
@@ -165,7 +160,6 @@ ssm_act_t *ssm_enter_main(struct ssm_act *parent, ssm_priority_t priority,
       ssm_enter(sizeof(act_main_t), step_main, parent, priority, depth),
       act_main_t, act);
 
-  ssm_dup(&ssm_to_obj(list)->mm); // capture global by closure
   cont->list = list;
   return &cont->act;
 }
@@ -175,7 +169,7 @@ void step_main(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:
-    ssm_dup(&ssm_to_obj(cont->list)->mm);
+    ssm_dup(cont->list);
     ssm_activate(enter_print_list(act, act->priority, act->depth, cont->list));
     act->pc = 1;
     return;
@@ -195,25 +189,19 @@ void step_main(struct ssm_act *act) {
 }
 
 void ssm_program_init(void) {
-  struct ssm_object *obj = ssm_new(List_size, Nil);
-  list = ssm_from_obj(obj);
-  obj = ssm_new(List_size, Cons);
-  obj->payload[0] = ssm_marshal(3);
-  obj->payload[1] = list;
-  list = ssm_from_obj(obj);
-  obj = ssm_new(List_size, Cons);
-  obj->payload[0] = ssm_marshal(2);
-  obj->payload[1] = list;
-  list = ssm_from_obj(obj);
-  obj = ssm_new(List_size, Cons);
-  obj->payload[0] = ssm_marshal(1);
-  obj->payload[1] = list;
-  list = ssm_from_obj(obj);
-  ssm_act_t *act =
-      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH);
-  ssm_activate(act);
+  ssm_value_t v;
+  v = ssm_marshal(Nil);
+  list = v;
+  int i = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
+  for (; i >= 1; i--) {
+    v = ssm_new(List_size[Cons], Cons);
+    ssm_to_obj(v)[0] = ssm_marshal(i);
+    ssm_to_obj(v)[1] = list;
+    list = v;
+  }
+  ssm_dup(list); // main captures reference to global by closure
+  ssm_activate(
+      ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
 }
 
-void ssm_program_exit(void) {
-  ssm_drop(&ssm_to_obj(list)->mm);
-}
+void ssm_program_exit(void) { ssm_drop(list); }
