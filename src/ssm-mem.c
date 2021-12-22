@@ -160,6 +160,7 @@ static inline void drop_children(struct ssm_mm *mm) {
     switch (mm->tag) {
     case SSM_SV_T: {
       ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
+      ssm_unschedule(obj);
       if (ssm_on_heap(obj->value)) {
         ssm_drop(obj->value.heap_ptr);
       }

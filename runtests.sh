@@ -19,21 +19,35 @@ BUILD_DIR=./build
 scriptname="$(basename "$0")"
 
 say () {
-  echo "[$scriptname]" "$@"
+  echo "[$scriptname]" "$@" >&2
 }
 
 run () {
   local exe="$BUILD_DIR/$1"
   shift
   echo "$exe" "$@"
+  set +e
   "$exe" "$@" 2>&1 | sed 's/^/# /'
+  local exit_code="$?"
+  set -e
+  if [ "$exit_code" -ne 0 ]; then
+    say "Non-zero exit code $exit_code encountered while running:" "$exe" "$@"
+    exit "$exit_code"
+  fi
 }
 
 vg () {
   local exe="$BUILD_DIR/$1"
   shift
   echo "$exe" "$@"
+  set +e
   valgrind "$exe" "$@" 2>&1 | sed 's/^/# /'
+  local exit_code="$?"
+  set -e
+  if [ "$exit_code" -ne 0 ]; then
+    say "Non-zero exit code $exit_code encountered with valgrind:" "$exe" "$@"
+    exit "$exit_code"
+  fi
 }
 
 make exes tests

@@ -631,18 +631,6 @@ void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trig);
  */
 void ssm_desensitize(ssm_trigger_t *trig);
 
-/** @brief Unschedule any pending events on a variable.
- *
- *  Should be called before the variable is dropped.
- *
- *  Nothing happens if the variable does not have a pending event.
- *
- *  @todo move this to ssm-internal, since this will just be part of drop.
- *
- *  @param var  the variable.
- */
-void ssm_unschedule(ssm_sv_t *var);
-
 /** @} */
 
 /** @ingroup util
