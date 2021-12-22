@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('structssm__time.html',''); initResizab
 </div><!--header-->
 <div class="contents">
 
-<p>Time value object, stored in the heap.  
+<p>Heap-allocated time values.  
  <a href="structssm__time.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ssm_8h_source.html">ssm.h</a>&gt;</code></p>
@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('structssm__time.html',''); initResizab
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="structssm__time__coll__graph.png" border="0" usemap="#ssm__time_coll__map" alt="Collaboration graph"/></div>
 <map name="ssm__time_coll__map" id="ssm__time_coll__map">
-<area shape="rect" title="Time value object, stored in the heap." alt="" coords="5,95,92,121"/>
+<area shape="rect" title="Heap&#45;allocated time values." alt="" coords="5,95,92,121"/>
 <area shape="rect" href="structssm__mm.html" title="The metadata accompanying any heap&#45;allocated object." alt="" coords="7,5,90,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
@@ -114,15 +114,17 @@ $(document).ready(function(){initNavTree('structssm__time.html',''); initResizab
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:af6f11677e3b3ca42a54a71982a72f23f"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structssm__mm.html">ssm_mm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__time.html#af6f11677e3b3ca42a54a71982a72f23f">mm</a></td></tr>
+<tr class="memdesc:af6f11677e3b3ca42a54a71982a72f23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Embedded memory management header.  <a href="structssm__time.html#af6f11677e3b3ca42a54a71982a72f23f">More...</a><br /></td></tr>
 <tr class="separator:af6f11677e3b3ca42a54a71982a72f23f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab47b25be881e86c09787a75b97c0ee63"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__time.html#ab47b25be881e86c09787a75b97c0ee63">time</a></td></tr>
+<tr class="memdesc:ab47b25be881e86c09787a75b97c0ee63"><td class="mdescLeft">&#160;</td><td class="mdescRight">Time value payload.  <a href="structssm__time.html#ab47b25be881e86c09787a75b97c0ee63">More...</a><br /></td></tr>
 <tr class="separator:ab47b25be881e86c09787a75b97c0ee63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Time value object, stored in the heap. </p>
-<dl class="section invariant"><dt>Invariant</dt><dd>For all <code>struct <a class="el" href="structssm__time.html" title="Time value object, stored in the heap.">ssm_time</a> t</code>, <code><a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff" title="Whether an mm header is embedded in a builtin-type object.">ssm_mm_is_builtin(SSM_TIME_T, t)</a></code>. </dd></dl>
+<div class="textblock"><p>Heap-allocated time values. </p>
+<dl class="section invariant"><dt>Invariant</dt><dd>for all <code>struct <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a> t</code>, <code>ssm_mm_is(SSM_TIME_T, &amp;t.mm)</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00320">320</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00153">153</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -136,7 +138,9 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00321">321</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p>Embedded memory management header. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00154">154</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -152,7 +156,9 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00322">322</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p>Time value payload. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00155">155</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

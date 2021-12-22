@@ -1,5 +1,0 @@
-<map id="ssm_object" name="ssm_object">
-<area shape="rect" id="node1" title="Heap&#45;allocated SSM object, with memory management metadata header." alt="" coords="5,184,101,211"/>
-<area shape="rect" id="node2" href="$structssm__mm.html" title="The metadata accompanying any heap&#45;allocated object." alt="" coords="12,5,95,32"/>
-<area shape="rect" id="node3" href="$unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="87,95,191,121"/>
-</map>

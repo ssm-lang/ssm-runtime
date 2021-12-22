@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>drop_children()
-: <a class="el" href="ssm-mem_8c.html#a4f65317cd4db9b3d410b63b112726a5c">ssm-mem.c</a>
+: <a class="el" href="ssm-mem_8c.html#a0ebb67ba3e6cf92464c51fa85c64d2d5">ssm-mem.c</a>
 </li>
 </ul>
 
@@ -143,13 +143,13 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 : <a class="el" href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">ssm-scheduler.c</a>
 , <a class="el" href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">ssm.h</a>
 </li>
-<li>ssm_drop()
-: <a class="el" href="group__mem.html#gaa19e5773ed713940dcc8f61a1dfc8e2f">ssm.h</a>
-, <a class="el" href="group__mem.html#gaa19e5773ed713940dcc8f61a1dfc8e2f">ssm-mem.c</a>
+<li>ssm_drop_unsafe()
+: <a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">ssm.h</a>
+, <a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">ssm-mem.c</a>
 </li>
-<li>ssm_dup()
-: <a class="el" href="group__mem.html#gaa8e3503b367e5ea3248060ce10488916">ssm-mem.c</a>
-, <a class="el" href="group__mem.html#gaa8e3503b367e5ea3248060ce10488916">ssm.h</a>
+<li>ssm_dup_unsafe()
+: <a class="el" href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">ssm-mem.c</a>
+, <a class="el" href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">ssm.h</a>
 </li>
 <li>ssm_enter()
 : <a class="el" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm-scheduler.c</a>
@@ -180,47 +180,39 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 , <a class="el" href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">ssm.h</a>
 </li>
 <li>ssm_new()
-: <a class="el" href="group__mem.html#gaf01d70767e121a2fb2e766f00603d599">ssm-mem.c</a>
-, <a class="el" href="group__mem.html#gaf01d70767e121a2fb2e766f00603d599">ssm.h</a>
-</li>
-<li>ssm_new_sv()
-: <a class="el" href="group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb">ssm-scheduler.c</a>
-, <a class="el" href="group__sv.html#gacb1b13a45f8315e8ec30a10958c11dcb">ssm.h</a>
-</li>
-<li>ssm_new_time()
-: <a class="el" href="group__time.html#gae07922ccc28ff734e8e1fa802b7e9655">ssm-scheduler.c</a>
-, <a class="el" href="group__time.html#gae07922ccc28ff734e8e1fa802b7e9655">ssm.h</a>
+: <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm-mem.c</a>
+, <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm.h</a>
 </li>
 <li>ssm_next_event_time()
-: <a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm-internal.h</a>
-, <a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm-scheduler.c</a>
+: <a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm-scheduler.c</a>
+, <a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm-internal.h</a>
 </li>
 <li>ssm_now()
 : <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff">ssm-scheduler.c</a>
 , <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff">ssm.h</a>
 </li>
 <li>ssm_reset()
-: <a class="el" href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">ssm-scheduler.c</a>
-, <a class="el" href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">ssm-internal.h</a>
+: <a class="el" href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">ssm-internal.h</a>
+, <a class="el" href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">ssm-scheduler.c</a>
 </li>
-<li>ssm_reuse()
-: <a class="el" href="group__mem.html#gab468491385e10631bf4687fa3f005ae5">ssm.h</a>
-, <a class="el" href="group__mem.html#gab468491385e10631bf4687fa3f005ae5">ssm-mem.c</a>
+<li>ssm_reuse_unsafe()
+: <a class="el" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm.h</a>
+, <a class="el" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm-mem.c</a>
 </li>
 <li>ssm_sensitize()
-: <a class="el" href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm.h</a>
-, <a class="el" href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm-scheduler.c</a>
+: <a class="el" href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm-scheduler.c</a>
+, <a class="el" href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm.h</a>
 </li>
 <li>ssm_set_now()
-: <a class="el" href="group__time.html#gabdccd038383abd0cefc8066f0c8b6237">ssm-scheduler.c</a>
-, <a class="el" href="group__time.html#gabdccd038383abd0cefc8066f0c8b6237">ssm-internal.h</a>
+: <a class="el" href="group__time.html#gabdccd038383abd0cefc8066f0c8b6237">ssm-internal.h</a>
+, <a class="el" href="group__time.html#gabdccd038383abd0cefc8066f0c8b6237">ssm-scheduler.c</a>
 </li>
 <li>ssm_throw()
 : <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c">ssm.h</a>
 </li>
 <li>ssm_tick()
-: <a class="el" href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">ssm-internal.h</a>
-, <a class="el" href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">ssm-scheduler.c</a>
+: <a class="el" href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">ssm-scheduler.c</a>
+, <a class="el" href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">ssm-internal.h</a>
 </li>
 <li>ssm_top_return()
 : <a class="el" href="ssm-top-act_8c.html#ad97966a1ab94482fd0f37f7915543f06">ssm-top-act.c</a>
@@ -230,8 +222,8 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 , <a class="el" href="group__sv.html#ga507f4f10f494c4bf1d9254e32a976c09">ssm-internal.h</a>
 </li>
 <li>ssm_update()
-: <a class="el" href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">ssm-scheduler.c</a>
-, <a class="el" href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">ssm-internal.h</a>
+: <a class="el" href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">ssm-internal.h</a>
+, <a class="el" href="group__sv.html#ga6057c5089f21df48a1e618b83886144e">ssm-scheduler.c</a>
 </li>
 </ul>
 </div><!-- contents -->

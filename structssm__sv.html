@@ -117,7 +117,6 @@ $(document).ready(function(){initNavTree('structssm__sv.html',''); initResizable
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:af6f11677e3b3ca42a54a71982a72f23f"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structssm__mm.html">ssm_mm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__sv.html#af6f11677e3b3ca42a54a71982a72f23f">mm</a></td></tr>
-<tr class="memdesc:af6f11677e3b3ca42a54a71982a72f23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Memory management metadata.  <a href="structssm__sv.html#af6f11677e3b3ca42a54a71982a72f23f">More...</a><br /></td></tr>
 <tr class="separator:af6f11677e3b3ca42a54a71982a72f23f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2527ff359c176c26db2570b0216ba9da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__sv.html#a2527ff359c176c26db2570b0216ba9da">later_time</a></td></tr>
 <tr class="memdesc:a2527ff359c176c26db2570b0216ba9da"><td class="mdescLeft">&#160;</td><td class="mdescRight">When the variable should be next updated.  <a href="structssm__sv.html#a2527ff359c176c26db2570b0216ba9da">More...</a><br /></td></tr>
@@ -137,14 +136,14 @@ Data Fields</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A scheduled variable that supported scheduled updates with triggers. </p>
-<p>Scheduled variables are heap-allocated structures that represent variables with reference-like semantics in SSM.</p>
+<p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. This struct only represents the data specific to scheduled variables, and is not meant to be declared on its own. Instead, it should be allocated as part of an <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a> using <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb" title="Allocate a new heap object to store word-size values.">ssm_new()</a>.</p>
 <p>Routines may directly assign to them in the current instant (<a class="el" href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>), or schedule a delayed assignment to them (<a class="el" href="group__sv.html#gaec47ada342876e79b21c53151001c888" title="Delayed assignment to a scheduled variable.">ssm_later()</a>). The <em>last_updated</em> time is recorded in each case, sensitive routines, i.e., <em>triggers</em>, are woken up.</p>
 <p>At most one delayed assignment may be scheduled at a time, but a single update may wake any number of sensitive routines.</p>
 <dl class="section invariant"><dt>Invariant</dt><dd><em>later_time</em> != <a class="el" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f" title="Time indicating something will never happen.">SSM_NEVER</a> iff this variable in the event queue. </dd>
 <dd>
-For all <code>struct <a class="el" href="structssm__time.html" title="Time value object, stored in the heap.">ssm_time</a> t</code>, <code><a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff" title="Whether an mm header is embedded in a builtin-type object.">ssm_mm_is_builtin(SSM_SV_T, t)</a></code>. </dd></dl>
+for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00516">516</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00326">326</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -158,9 +157,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
       </table>
 </div><div class="memdoc">
 
-<p>Memory management metadata. </p>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00517">517</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00327">327</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -178,7 +175,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 
 <p>When the variable should be next updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00518">518</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00328">328</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -196,7 +193,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 
 <p>When the variable was last updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00519">519</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00329">329</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -214,7 +211,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 
 <p>List of sensitive continuations. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00520">520</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00330">330</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +229,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 
 <p>Current value. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00521">521</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00331">331</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -250,7 +247,7 @@ For all <code>struct <a class="el" href="structssm__time.html" title="Time value
 
 <p>Buffered value for delayed assignment. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00522">522</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00332">332</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

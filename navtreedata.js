@@ -51,7 +51,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"ssm-scheduler_8c.html#ae517897aca56cd08720db2d23aa50043"
+"ssm-top-act_8c.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
