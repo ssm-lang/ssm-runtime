@@ -75,8 +75,7 @@ void step_map_inc(ssm_act_t *act) {
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
     ssm_value_t __l = ssm_to_obj(cont->l)[1];
-    if (ssm_on_heap(__l))
-      ssm_dup(__l);
+    ssm_dup(__l);
 
     ssm_drop(cont->l);
 
@@ -131,8 +130,7 @@ void step_print_list(ssm_act_t *act) {
   match_Cons_0:;
     ssm_value_t __i = ssm_to_obj(cont->l)[0];
     ssm_value_t __l = ssm_to_obj(cont->l)[1];
-    if (ssm_on_heap(__l))
-      ssm_dup(__l);
+    ssm_dup(__l);
 
     ssm_drop(cont->l);
 
@@ -171,8 +169,7 @@ void step_main(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:
-    if (ssm_on_heap(cont->list))
-      ssm_dup(cont->list);
+    ssm_dup(cont->list);
     ssm_activate(enter_print_list(act, act->priority, act->depth, cont->list));
     act->pc = 1;
     return;
@@ -202,13 +199,9 @@ void ssm_program_init(void) {
     ssm_to_obj(v)[1] = list;
     list = v;
   }
-  if (ssm_on_heap(list))
-    ssm_dup(list); // main captures reference to global by closure
+  ssm_dup(list); // main captures reference to global by closure
   ssm_activate(
       ssm_enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH));
 }
 
-void ssm_program_exit(void) {
-  if (ssm_on_heap(list))
-    ssm_drop(list);
-}
+void ssm_program_exit(void) { ssm_drop(list); }
