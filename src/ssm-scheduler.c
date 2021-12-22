@@ -263,14 +263,6 @@ void act_queue_consistency_check(void) {
 
 ssm_time_t ssm_now(void) { return now; }
 
-struct ssm_time *ssm_new_time(ssm_time_t time) {
-  struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(SSM_TIME_T));
-  ssm_initialize_builtin(mm, SSM_TIME_T);
-  struct ssm_time *t = container_of(mm, struct ssm_time, mm);
-  t->time = time;
-  return t;
-}
-
 ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
                      ssm_priority_t priority, ssm_depth_t depth) {
   ssm_act_t *act = ssm_mem_alloc(size);
@@ -304,17 +296,6 @@ void ssm_activate(ssm_act_t *act) {
     SSM_THROW(SSM_EXHAUSTED_ACT_QUEUE);
 
   act_queue_percolate_up(hole, act);
-}
-
-ssm_sv_t *ssm_new_sv(ssm_value_t val) {
-  struct ssm_mm *mm = ssm_mem_alloc(SSM_BUILTIN_SIZE(SSM_SV_T));
-  ssm_initialize_builtin(mm, SSM_SV_T);
-  ssm_sv_t *sv = container_of(mm, ssm_sv_t, mm);
-  sv->triggers = NULL;
-  sv->later_time = SSM_NEVER;
-  sv->last_updated = SSM_NEVER;
-  sv->value = val;
-  return sv;
 }
 
 void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value) {
