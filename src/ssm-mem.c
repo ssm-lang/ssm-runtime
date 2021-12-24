@@ -149,59 +149,52 @@ void ssm_mem_free(void *m, size_t size) {
   mem_pools[pool].free_list_head = new_head;
 }
 
-/** @brief Recursively drop all children of a heap object. */
-static inline void drop_children(struct ssm_mm *mm) {
-  if (!ssm_mm_is_builtin(mm)) {
-    struct ssm_object *obj = container_of(mm, struct ssm_object, mm);
-    for (size_t i = 0; i < mm->val_count; i++)
-      if (ssm_on_heap(obj->payload[i]))
-        ssm_drop(obj->payload[i].heap_ptr);
+/** @brief Recursively drop all children of a heap object.
+ *
+ *  @note assumes @a v is a valid @a heap_ptr.
+ */
+static inline void drop_children(ssm_value_t v) {
+  if (!ssm_mm_is_builtin(v.heap_ptr)) {
+    for (size_t i = 0; i < v.heap_ptr->val_count; i++)
+      ssm_drop(ssm_to_obj(v)[i]);
   } else {
-    switch (mm->tag) {
-    case SSM_SV_T: {
-      ssm_sv_t *obj = container_of(mm, ssm_sv_t, mm);
-      if (ssm_on_heap(obj->value)) {
-        ssm_drop(obj->value.heap_ptr);
-      }
-      if (obj->later_time != SSM_NEVER && ssm_on_heap(obj->later_value)) {
-        ssm_drop(obj->later_value.heap_ptr);
-      }
-    } break;
+    switch (v.heap_ptr->tag) {
+    case SSM_SV_T:
+      ssm_unschedule(ssm_to_sv(v));
+      ssm_drop(ssm_to_sv(v)->value);
+      if (ssm_to_sv(v)->later_time != SSM_NEVER)
+        ssm_drop(ssm_to_sv(v)->later_value);
+      break;
     }
   }
 }
 
-struct ssm_object *ssm_new(uint8_t val_count, uint8_t tag) {
-  SSM_ASSERT(val_count > 0);
-  struct ssm_mm *mm = ssm_mem_alloc(SSM_OBJ_SIZE(val_count));
+ssm_value_t ssm_new(uint8_t val_count, uint8_t tag) {
+  struct ssm_mm *mm = ssm_mem_alloc(SSM_SIZEOF(val_count, tag));
   mm->val_count = val_count;
   mm->tag = tag;
   mm->ref_count = 1;
-  return container_of(mm, struct ssm_object, mm);
+  return (ssm_value_t){.heap_ptr = mm};
 }
 
-void ssm_dup(struct ssm_mm *mm) { ++mm->ref_count; }
+void ssm_dup_unsafe(ssm_value_t v) { ++v.heap_ptr->ref_count; }
 
-void ssm_drop(struct ssm_mm *mm) {
-  if (--mm->ref_count == 0) {
-    drop_children(mm);
-    ssm_mem_free(mm, ssm_mm_is_builtin(mm) ? SSM_BUILTIN_SIZE(mm->tag)
-                                           : SSM_OBJ_SIZE(mm->val_count));
+void ssm_drop_unsafe(ssm_value_t v) {
+  if (--v.heap_ptr->ref_count == 0) {
+    drop_children(v);
+    ssm_mem_free(v.heap_ptr,
+                 SSM_SIZEOF(v.heap_ptr->val_count, v.heap_ptr->tag));
   }
 }
 
-struct ssm_mm *ssm_reuse(struct ssm_mm *mm) {
-  /** @TODO implement ssm_reuse(), with size considerations. */
-  SSM_ASSERT(0);
-  return NULL;
-  /* if (--mm->ref_count == 0) { */
-  /*   drop_children(mm); */
-  /*   return mm; */
-  /* } else { */
-  /*   if (ssm_mm_is_builtin(mm)) { */
-  /*     return ssm_new_builtin(mm->tag); */
-  /*   } else { */
-  /*     return &ssm_new(mm->val_count, mm->tag)->mm; */
-  /*   } */
-  /* } */
+ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t val_count, uint8_t tag) {
+  if (--v.heap_ptr->ref_count == 0) {
+    drop_children(v);
+    v.heap_ptr->val_count = val_count;
+    v.heap_ptr->tag = tag;
+    v.heap_ptr->ref_count = 1;
+    return v;
+  } else {
+    return ssm_new(val_count, tag);
+  }
 }
