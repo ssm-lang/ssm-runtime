@@ -118,6 +118,7 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 }
 
 void *ssm_mem_alloc(size_t size) {
+    return alloc_mem(size);
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
     return alloc_mem(size);
@@ -138,6 +139,8 @@ void *ssm_mem_alloc(size_t size) {
 }
 
 void ssm_mem_free(void *m, size_t size) {
+    free_mem(m, size);
+    return;
   size_t pool = find_pool_size(size);
   if (pool >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);

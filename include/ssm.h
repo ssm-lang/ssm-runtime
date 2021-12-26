@@ -686,6 +686,16 @@ void ssm_mem_free(void *m, size_t size);
 
 /** @} */
 
+/** @ingroup platform
+ *  @brief Initialize user program code before first invocation of ssm_tick().
+ *
+ *  @userprovided
+ *
+ *  @returns  zero on success, non-zero otherwise.
+ */
+int ssm_program_initialize(void);
+
+#ifndef container_of
 /** @ingroup util
  *  @def member_type
  *  @brief Obtain the type of a struct member.
@@ -741,5 +751,6 @@ void ssm_mem_free(void *m, size_t size);
 #define container_of(ptr, type, member)                                        \
   ((type *)((char *)(member_type(type, member) *){ptr} -                       \
             offsetof(type, member)))
+#endif /* container_of */
 
 #endif
