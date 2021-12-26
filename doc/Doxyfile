@@ -86,7 +86,9 @@ GENERATE_TODOLIST      = YES
 ALIASES                += TODO="\todo"
 ALIASES                += FIXME="\todo"
 ALIASES                += fixme="\todo"
-ALIASES                += platformonly="\note Intended for platform code; should not be used in user code."
+ALIASES                += platformonly="\note Intended for use by platform code; should not be used in user code."
+ALIASES                += platformprovided="\note Must be defined by platform code."
+ALIASES                += userprovided="\note Must be defined by user code."
 
 GENERATE_TESTLIST      = YES
 GENERATE_BUGLIST       = YES

@@ -54,11 +54,12 @@ TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = cc
-CFLAGS = -g -I$(INC_DIR) -O -Wall -pedantic -std=c99
-TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
+CFLAGS = -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT
+LIB_CFLAGS = $(CFLAGS) -std=c99
+TEST_CFLAGS = $(CFLAGS) -DSSM_DEBUG --coverage
 
 LD = cc
-LDFLAGS = -L$(BUILD_DIR)
+LDFLAGS = -L$(BUILD_DIR) -rdynamic
 TEST_LDFLAGS = $(LDFLAGS) --coverage
 
 AR = ar
@@ -80,10 +81,10 @@ $(TLIB_TGT): $(TLIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $+
 
 $(EXE_TGT): %: %.o $(LIB_TGT)
-	$(LD) $(LDFLAGS) -o $@ $@.o -l$(LIB_NAME)
+	$(LD) $(LDFLAGS) -o $@ $@.o -l$(LIB_NAME) -lpthread
 
 $(TEST_TGT): %: %.o $(TLIB_TGT)
-	$(LD) $(TEST_LDFLAGS) -o $@ $@.o -l$(TLIB_NAME)
+	$(LD) $(TEST_LDFLAGS) -o $@ $@.o -l$(TLIB_NAME) -lpthread
 
 vpath %.c $(SRC_DIR) $(EXE_DIR) $(TEST_DIR)
 
@@ -91,7 +92,7 @@ $(EXE_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) $(EXE_INC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(LIB_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
-	$(CC) $(CFLAGS) -c -o $@ $<
+	$(CC) $(LIB_CFLAGS) -c -o $@ $<
 
 $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
