@@ -94,7 +94,7 @@ void step_print(ssm_act_t *act) {
     }
   }
   ssm_drop(cont->stdout);
-  ssm_leave(&cont->act, sizeof(hello_act_t));
+  ssm_leave(&cont->act, sizeof(print_act_t));
 }
 
 ssm_act_t *enter_main(ssm_act_t *parent, ssm_priority_t priority,
