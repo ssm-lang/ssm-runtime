@@ -14,6 +14,8 @@
 #ifndef SSM_TIMER64_PRESENT
 #error This example needs to be compiled with SSM_TIMER64_PRESENT
 #endif
+// #define DBG(...) fprintf(stderr, __VA_ARGS__)
+#define DBG(...) do {} while(0)
 
 #define NANOS 1000000000L
 
@@ -36,7 +38,7 @@
 #define timespec_lt(a, b)                                                      \
   (a).tv_sec == (b).tv_sec ? (a).tv_nsec < (b).tv_nsec : (a).tv_sec < (b).tv_sec
 
-#define timespec_time(t) (t).tv_sec *NANOS + (t).tv_nsec
+#define timespec_time(t) (((t).tv_sec * NANOS) + (t).tv_nsec)
 
 #define timespec_of(ns)                                                        \
   (struct timespec) { .tv_sec = (ns) / NANOS, .tv_nsec = (ns) % NANOS }
@@ -195,6 +197,17 @@ static void *alloc_mem(size_t size) { return malloc(size); }
 
 static void free_mem(void *mem, size_t size) { free(mem); }
 
+static inline void poll_input_queue(size_t *r, size_t *w) {
+  static size_t scaled = 0;
+  // eventfd_t e;
+  // eventfd_read(ssm_sem_fd, &e);
+  *r = atomic_load(&rb_r);
+  *w = atomic_load(&rb_w);
+  for (; scaled < *w; scaled++)
+    ssm_input_get(scaled)->time =
+        ssm_raw_time64_scale(ssm_input_get(scaled)->time, 1);
+}
+
 int main(void) {
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
   ssm_sem_fd = eventfd(0, EFD_NONBLOCK);
@@ -204,25 +217,59 @@ int main(void) {
   ssm_set_now(timespec_time(init_time));
   ssm_program_init();
 
-  size_t scaled = 0;
   for (;;) {
+    ssm_time_t next_time, wall_time;
+    struct timespec wall_spec;
     size_t r, w;
 
-    eventfd_t e;
-    eventfd_read(ssm_sem_fd, &e);
+    DBG("before getting wall time\n");
+    clock_gettime(CLOCK_MONOTONIC, &wall_spec);
+    wall_time = timespec_time(wall_spec);
+    next_time = ssm_next_event_time();
 
-    r = atomic_load(&rb_r);
-    w = atomic_load(&rb_w);
+    poll_input_queue(&r, &w);
+    if (ssm_input_read_ready(r, w)) {
+      if (ssm_input_get(r)->time.ssm_time <= next_time) {
+        DBG("Consuming input of time: %ld\n", ssm_input_get(r)->time.ssm_time);
+        r = ssm_input_consume(r, w);
+        atomic_store(&rb_r, r);
+        goto do_tick;
+      }
+    }
 
-    for (; scaled < w; scaled++)
-      ssm_input_get(scaled)->time =
-          ssm_raw_time64_scale(ssm_input_get(scaled)->time, 1);
+    if (next_time <= wall_time) {
+    do_tick:
+      ssm_tick();
+    } else {
+      fd_set in_fds;
+      FD_SET(ssm_sem_fd, &in_fds);
+      if (next_time == SSM_NEVER) {
+        DBG("Sleeping indefinitely\n");
+        pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, NULL, NULL);
+        DBG("Woke from sleeping indefinitely\n");
+      } else {
+        struct timespec next_spec = timespec_of(next_time);
+        struct timespec sleep_time = timespec_diff(next_spec, wall_spec);
+        DBG("Sleeping\n");
+        pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, &sleep_time, NULL);
+        DBG("Woke up from sleeping\n");
+      }
+      eventfd_t e;
+      eventfd_read(ssm_sem_fd, &e);
+    }
+  }
 
+#if 0
+  for (;;) {
+    size_t r, w;
+    poll_input_queue(&r, &w);
+  consume_loop:
     do {
       r = ssm_input_consume(r, w);
       atomic_store(&rb_r, r);
       ssm_tick();
     } while (ssm_input_read_ready(r, w));
+
     fflush(stdout);
 
     fd_set in_fds;
@@ -236,6 +283,11 @@ int main(void) {
       struct timespec next_time = timespec_of(next);
       struct timespec wall_time;
       clock_gettime(CLOCK_MONOTONIC, &wall_time);
+
+      poll_input_queue(&r, &w);
+      if (ssm_input_read_ready(r, w))
+        goto consume_loop;
+
       // printf("%s: next time is %ld (currently (%ld)\n", __FUNCTION__,
       //        timespec_time(next_time), timespec_time(wall_time));
       if (timespec_lt(wall_time, next_time)) {
@@ -246,6 +298,7 @@ int main(void) {
       }
     }
   }
+#endif
 
   ssm_program_exit();
 
