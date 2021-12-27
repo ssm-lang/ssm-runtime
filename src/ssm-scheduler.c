@@ -459,10 +459,12 @@ size_t ssm_input_consume(size_t r, size_t w) {
 
   ssm_time_t packet_time = ssm_input_get(r)->time.ssm_time;
 
-  if (packet_time < ssm_next_event_time())
-    do {
-      ssm_later(ssm_input_get(r)->sv, packet_time, ssm_input_get(r)->payload);
-    } while (ssm_input_read_ready(++r, w) &&
-             packet_time == ssm_input_get(r)->time.ssm_time);
+  if (ssm_next_event_time() < packet_time)
+    return r;
+
+  do {
+    ssm_later(ssm_input_get(r)->sv, packet_time, ssm_input_get(r)->payload);
+  } while (ssm_input_read_ready(++r, w) &&
+           packet_time == ssm_input_get(r)->time.ssm_time);
   return r;
 }
