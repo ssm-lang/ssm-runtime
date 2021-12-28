@@ -183,7 +183,8 @@ GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
 HTML_STYLESHEET        =
-HTML_EXTRA_FILES       = doc/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js
+HTML_EXTRA_FILES       = doc/doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js \
+                         doc/doxygen.png
 HTML_EXTRA_STYLESHEET  = doc/doxygen-awesome-css/doxygen-awesome.css \
                          doc/doxygen-awesome-css/doxygen-awesome-sidebar-only.css \
                          doc/doxygen-awesome-css/doxygen-awesome-sidebar-only-darkmode-toggle.css
