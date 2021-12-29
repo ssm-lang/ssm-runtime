@@ -19,7 +19,7 @@ TAB_SIZE               = 4
 CREATE_SUBDIRS         = NO
 ALLOW_UNICODE_NAMES    = NO
 FULL_PATH_NAMES        = NO
-TOC_INCLUDE_HEADINGS   = 0
+TOC_INCLUDE_HEADINGS   = 3
 AUTOLINK_SUPPORT       = YES
 
 JAVADOC_AUTOBRIEF      = YES
@@ -84,8 +84,8 @@ STRICT_PROTO_MATCHING  = NO
 
 GENERATE_TODOLIST      = YES
 ALIASES                += TODO="\todo"
-ALIASES                += FIXME="\todo"
-ALIASES                += fixme="\todo"
+ALIASES                += FIXME="\bug"
+ALIASES                += fixme="\bug"
 ALIASES                += platformonly="\note Intended for platform code; should not be used in user code."
 
 GENERATE_TESTLIST      = YES
