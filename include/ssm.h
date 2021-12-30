@@ -363,10 +363,12 @@ typedef struct ssm_sv {
  *  @param val  the initial value of the schedueld variable.
  */
 #define ssm_sv_init(sv, val)                                                   \
-  (*ssm_to_sv(sv) = (ssm_sv_t){.later_time = SSM_NEVER,                        \
-                               .last_updated = SSM_NEVER,                      \
-                               .triggers = NULL,                               \
-                               .value = val})
+  do {                                                                         \
+    ssm_to_sv(sv)->later_time = SSM_NEVER;                                     \
+    ssm_to_sv(sv)->last_updated = SSM_NEVER;                                   \
+    ssm_to_sv(sv)->triggers = NULL;                                            \
+    ssm_to_sv(sv)->value = val;                                                \
+  } while (0)
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
