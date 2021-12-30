@@ -126,9 +126,6 @@ typedef union {
   ssm_word_t packed_val;   /**< Packed value. */
 } ssm_value_t;
 
-#define SSM_NIL                                                                \
-  (ssm_value_t) { .heap_ptr = 0L }
-
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
  *
  *  @param v  the 31-bit integral value.
@@ -150,6 +147,8 @@ typedef union {
  *  @returns  non-zero if on heap, zero otherwise.
  */
 #define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
+
+#define SSM_NIL (ssm_value_t) { .packed_val = 0xffffffff }
 
 /** @} */
 
@@ -351,13 +350,12 @@ typedef struct ssm_sv {
  *
  *  For example:
  *
- *      ssm_value_t sv;
- *      sv.heap_ptr = ssm_new(SSM_BUILTIN, SSM_SV_T);
+ *      ssm_value_t sv = ssm_new_builtin(SSM_SV_T);
  *      ssm_sv_init(sv, ssm_marshal(0));
  *
  *  @note Initialization does not count as an update event, so @a last_updated
  *        is initialized to #SSM_NEVER.
- *  @note @a later_value is left uninitialized.
+ *  @note The initial value of @a later_value is left unspecified.
  *
  *  @param sv   pointer to the scheduled variable.
  *  @param val  the initial value of the schedueld variable.
@@ -368,6 +366,7 @@ typedef struct ssm_sv {
     ssm_to_sv(sv)->last_updated = SSM_NEVER;                                   \
     ssm_to_sv(sv)->triggers = NULL;                                            \
     ssm_to_sv(sv)->value = val;                                                \
+    ssm_to_sv(sv)->later_value = SSM_NIL;                                      \
   } while (0)
 
 /** @brief Instantaneous assignment to a scheduled variable.
@@ -427,12 +426,14 @@ void ssm_desensitize(ssm_trigger_t *trig);
  * @{
  */
 
-#define SSM_SIZE_COMPATIBLE(a, b) ((a) == (b))
+#define ssm_mm_val(mp, vo, vi) ((ssm_value_t *)((uint8_t *)(mp) + (vo)))[vi]
 
 #define SSM_OBJ_SIZE(vc, vo) ((vo) + (sizeof(ssm_value_t) * (vc)))
 
 #define ssm_obj_size(v)                                                        \
   SSM_OBJ_SIZE((v).heap_ptr->val_count, (v).heap_ptr->val_offset)
+
+#define SSM_SIZE_COMPATIBLE(a, b) ((a) == (b))
 
 #define SSM_ADT_SIZE(vc)                                                       \
   sizeof(struct {                                                              \
@@ -448,8 +449,7 @@ void ssm_desensitize(ssm_trigger_t *trig);
       },                                                                       \
       payload)
 
-#define ssm_adt_val(v, i)                                                      \
-  (((ssm_value_t *)((v).heap_ptr + SSM_ADT_VAL_OFFSET))[i])
+#define ssm_adt_val(v, i) ssm_mm_val((v).heap_ptr, SSM_ADT_VAL_OFFSET, i)
 
 /** @brief Tags equal to and greater than this value are builtin types. */
 #define SSM_BUILTIN_BASE (1u << 7)

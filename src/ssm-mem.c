@@ -6,6 +6,8 @@
  */
 #include <ssm-internal.h>
 
+#define SSM_MM_VAL(mp, idx) ((ssm_value_t *) ((mp)
+
 /** @brief (The beginning of) a block of memory.
  *
  *  The size of each block varies depending on which memory pool it resides in.
@@ -158,18 +160,15 @@ void ssm_mem_free(void *m, size_t size) {
  *  @note assumes @a v is a valid @a heap_ptr.
  */
 static inline void drop_children(ssm_value_t v) {
-  if (!ssm_is_builtin(v.heap_ptr->tag)) {
-    for (size_t i = 0; i < v.heap_ptr->val_count; i++)
-      ssm_drop(ssm_adt_val(v, i));
-  } else {
-    switch (v.heap_ptr->tag) {
-    case SSM_SV_T:
-      ssm_unschedule(ssm_to_sv(v));
-      ssm_drop(ssm_to_sv(v)->value);
-      if (ssm_to_sv(v)->later_time != SSM_NEVER)
-        ssm_drop(ssm_to_sv(v)->later_value);
-      break;
-    }
+  switch (v.heap_ptr->tag) {
+  case SSM_SV_T:
+    ssm_unschedule(ssm_to_sv(v));
+  }
+
+  for (size_t i = 0; i < v.heap_ptr->val_count; i++) {
+    ssm_value_t val = ssm_mm_val(v.heap_ptr, v.heap_ptr->val_offset, i);
+    if (ssm_on_heap(val))
+      ssm_drop(val);
   }
 }
 
