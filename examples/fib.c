@@ -129,9 +129,9 @@ void step_fib(struct ssm_act *act) {
     if (ssm_unmarshal(cont->n) < 2) {
       ssm_later(ssm_to_sv(cont->r), ssm_now() + SSM_SECOND, ssm_marshal(1));
     } else {
-      cont->r1 = ssm_new(SSM_BUILTIN, SSM_SV_T);
+      cont->r1 = ssm_new_builtin(SSM_SV_T);
       ssm_sv_init(cont->r1, ssm_marshal(0));
-      cont->r2 = ssm_new(SSM_BUILTIN, SSM_SV_T);
+      cont->r2 = ssm_new_builtin(SSM_SV_T);
       ssm_sv_init(cont->r2, ssm_marshal(0));
       ssm_depth_t new_depth = act->depth - 2; // 4 children
       ssm_priority_t new_priority = act->priority;
@@ -164,7 +164,7 @@ void step_fib(struct ssm_act *act) {
 
 ssm_u32_t result;
 void ssm_program_init(void) {
-  result = ssm_new(SSM_BUILTIN, SSM_SV_T);
+  result = ssm_new_builtin(SSM_SV_T);
   ssm_sv_init(result, ssm_marshal(0xdeadbeef));
 
   int n = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;

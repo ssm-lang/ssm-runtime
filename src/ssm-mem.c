@@ -4,11 +4,7 @@
  *  @author John Hui (j-hui)
  *  @author Daniel Scanteianu (Scanteianu)
  */
-#include <assert.h>
 #include <ssm-internal.h>
-#include <ssm.h>
-#include <stdio.h>
-#include <stdlib.h>
 
 /** @brief (The beginning of) a block of memory.
  *
@@ -154,9 +150,9 @@ void ssm_mem_free(void *m, size_t size) {
  *  @note assumes @a v is a valid @a heap_ptr.
  */
 static inline void drop_children(ssm_value_t v) {
-  if (!ssm_mm_is_builtin(v.heap_ptr)) {
+  if (!ssm_is_builtin(v.heap_ptr->tag)) {
     for (size_t i = 0; i < v.heap_ptr->val_count; i++)
-      ssm_drop(ssm_to_obj(v)[i]);
+      ssm_drop(ssm_adt_val(v, i));
   } else {
     switch (v.heap_ptr->tag) {
     case SSM_SV_T:
@@ -169,11 +165,12 @@ static inline void drop_children(ssm_value_t v) {
   }
 }
 
-ssm_value_t ssm_new(uint8_t val_count, uint8_t tag) {
-  struct ssm_mm *mm = ssm_mem_alloc(SSM_SIZEOF(val_count, tag));
-  mm->val_count = val_count;
-  mm->tag = tag;
+ssm_value_t ssm_new_unsafe(uint8_t tag, uint8_t val_count, uint8_t val_offset) {
+  struct ssm_mm *mm = ssm_mem_alloc(SSM_OBJ_SIZE(val_count, val_offset));
   mm->ref_count = 1;
+  mm->tag = tag;
+  mm->val_count = val_count;
+  mm->val_offset = val_offset;
   return (ssm_value_t){.heap_ptr = mm};
 }
 
@@ -182,19 +179,20 @@ void ssm_dup_unsafe(ssm_value_t v) { ++v.heap_ptr->ref_count; }
 void ssm_drop_unsafe(ssm_value_t v) {
   if (--v.heap_ptr->ref_count == 0) {
     drop_children(v);
-    ssm_mem_free(v.heap_ptr,
-                 SSM_SIZEOF(v.heap_ptr->val_count, v.heap_ptr->tag));
+    ssm_mem_free(v.heap_ptr, ssm_obj_size(v));
   }
 }
 
-ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t val_count, uint8_t tag) {
+ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t tag, uint8_t val_count,
+                             uint8_t val_offset) {
   if (--v.heap_ptr->ref_count == 0) {
     drop_children(v);
-    v.heap_ptr->val_count = val_count;
-    v.heap_ptr->tag = tag;
     v.heap_ptr->ref_count = 1;
+    v.heap_ptr->tag = tag;
+    v.heap_ptr->val_count = val_count;
+    v.heap_ptr->val_offset = val_offset;
     return v;
   } else {
-    return ssm_new(val_count, tag);
+    return ssm_new_unsafe(tag, val_count, val_offset);
   }
 }

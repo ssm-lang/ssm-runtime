@@ -29,11 +29,8 @@ should print:
   1::2::3::[]
  */
 
-enum List { Nil = 0, Cons, List_variants };
-uint8_t List_size[List_variants] = {
-    [Nil] = 0,
-    [Cons] = 2,
-};
+enum { Nil = 0, Cons };
+enum { List_val_count = 2 };
 
 ssm_value_t list;
 
@@ -73,8 +70,8 @@ void step_map_inc(ssm_act_t *act) {
     *cont->__ret = ssm_marshal(Nil);
     break;
   match_Cons_0:;
-    ssm_value_t __i = ssm_to_obj(cont->l)[0];
-    ssm_value_t __l = ssm_to_obj(cont->l)[1];
+    ssm_value_t __i = ssm_adt_val(cont->l, 0);
+    ssm_value_t __l = ssm_adt_val(cont->l, 1);
     ssm_dup(__l);
 
     ssm_drop(cont->l);
@@ -86,9 +83,9 @@ void step_map_inc(ssm_act_t *act) {
     act->pc = 1;
     return;
   case 1:;
-    *cont->__ret = ssm_new(List_size[Cons], Cons);
-    ssm_to_obj(*cont->__ret)[0] = cont->__tmp0;
-    ssm_to_obj(*cont->__ret)[1] = cont->__tmp1;
+    *cont->__ret = ssm_new(Cons, List_val_count);
+    ssm_adt_val(*cont->__ret, 0) = cont->__tmp0;
+    ssm_adt_val(*cont->__ret, 1) = cont->__tmp1;
     break;
   }
   ssm_leave(&cont->act, sizeof(act_map_inc_t));
@@ -128,8 +125,8 @@ void step_print_list(ssm_act_t *act) {
     printf("[]\r\n");
     break;
   match_Cons_0:;
-    ssm_value_t __i = ssm_to_obj(cont->l)[0];
-    ssm_value_t __l = ssm_to_obj(cont->l)[1];
+    ssm_value_t __i = ssm_adt_val(cont->l, 0);
+    ssm_value_t __l = ssm_adt_val(cont->l, 1);
     ssm_dup(__l);
 
     ssm_drop(cont->l);
@@ -194,9 +191,9 @@ void ssm_program_init(void) {
   list = v;
   int i = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
   for (; i >= 1; i--) {
-    v = ssm_new(List_size[Cons], Cons);
-    ssm_to_obj(v)[0] = ssm_marshal(i);
-    ssm_to_obj(v)[1] = list;
+    v = ssm_new(Cons, List_val_count);
+    ssm_adt_val(v, 0) = ssm_marshal(i);
+    ssm_adt_val(v, 1) = list;
     list = v;
   }
   ssm_dup(list); // main captures reference to global by closure

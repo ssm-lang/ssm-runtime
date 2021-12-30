@@ -95,24 +95,39 @@ struct ssm_act;
 /** @brief Values are 32-bits, the largest supported machine word size. */
 typedef uint32_t ssm_word_t;
 
+/** @brief The metadata accompanying any heap-allocated object.
+ *
+ *  Should be embedded in heap-allocated objects as the first field (at memory
+ *  offset 0).
+ *
+ *  The @a ref_count is used by ssm_new(), ssm_dup(), ssm_drop(), and
+ *  ssm_reuse() for reference counting, and should always be greater than 1 for
+ *  live objects.
+ *
+ *  In any heap-allocated object, #ssm_value_t fields that point to other
+ *  heap-allocated appear last and be packed contiguously. The @a val_count
+ *  indicates how many of them exist in the payload, and @a val_offset indicates
+ *  the number of bytes past the beginning of the memory header at which the
+ *  first #ssm_value_t may be found.
+ *
+ *  @a tag values greater than #SSM_BUILTIN_BASE indicate that the payload
+ *  inhabits a builtin type.
+ */
+struct ssm_mm {
+  uint8_t ref_count;  /**< The number of references to this object. */
+  uint8_t tag;        /**< Which variant is inhabited by this object. */
+  uint8_t val_count;  /**< Number of #ssm_value_t values in payload. */
+  uint8_t val_offset; /**< Number of bytes at which values can be found. */
+};
+
 /** @brief SSM values are either "packed" values or heap-allocated. */
 typedef union {
   struct ssm_mm *heap_ptr; /**< Pointer to a heap-allocated object. */
   ssm_word_t packed_val;   /**< Packed value. */
 } ssm_value_t;
 
-/** @brief The metadata accompanying any heap-allocated object.
- *
- * Should be embedded in heap-allocated objects as the first field (at memory
- * offset 0).
- *
- *  When @a val_count is 0, @a tag is to be interpreted as an #ssm_builtin.
- */
-struct ssm_mm {
-  uint8_t val_count; /**< Number of ssm_value_t values in payload. */
-  uint8_t tag;       /**< Which variant is inhabited by this object. */
-  uint8_t ref_count; /**< The number of references to this object. */
-};
+#define SSM_NIL                                                                \
+  (ssm_value_t) { .heap_ptr = 0L }
 
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
  *
@@ -410,33 +425,32 @@ void ssm_desensitize(ssm_trigger_t *trig);
  * @{
  */
 
-/** @brief Magic @a val_count value indicating a heap object is a builtin. */
-#define SSM_BUILTIN 0
+#define SSM_SIZE_COMPATIBLE(a, b) ((a) == (b))
 
-/** @brief Built-in types that are stored in the heap.
- *
- *  Type enumerated here are chosen because they cannot be easily or efficiently
- *  expressed as a product of words. For instance, 64-bit timestamps cannot be
- *  directly stored in the payload of a regular heap object, where even-numbered
- *  timestamps may be misinterpreted as pointers.
- */
-enum ssm_builtin {
-  SSM_TIME_T = 1, /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_T,       /**< Scheduled variables, #ssm_sv_t */
-};
+#define SSM_OBJ_SIZE(vc, vo) ((vo) + (sizeof(ssm_value_t) * (vc)))
 
-/** @brief The struct type of a heap object of the given size.
- *
- *  This is primarily useful for measuing object size and for casting.
- *
- *  @param val_count  the number of values in the heap object.
- *  @returns          a struct definition of an object with @a val_count values.
- */
-#define ssm_obj_t(val_count)                                                   \
-  struct {                                                                     \
+#define ssm_obj_size(v)                                                        \
+  SSM_OBJ_SIZE((v).heap_ptr->val_count, (v).heap_ptr->val_offset)
+
+#define SSM_ADT_SIZE(vc)                                                       \
+  sizeof(struct {                                                              \
     struct ssm_mm mm;                                                          \
-    ssm_value_t payload[val_count];                                            \
-  }
+    ssm_value_t payload[vc];                                                   \
+  })
+
+#define SSM_ADT_VAL_OFFSET                                                     \
+  offsetof(                                                                    \
+      struct {                                                                 \
+        struct ssm_mm mm;                                                      \
+        ssm_value_t payload[1];                                                \
+      },                                                                       \
+      payload)
+
+#define ssm_adt_val(v, i)                                                      \
+  (((ssm_value_t *)((v).heap_ptr + SSM_ADT_VAL_OFFSET))[i])
+
+/** @brief Tags equal to and greater than this value are builtin types. */
+#define SSM_BUILTIN_BASE (1u << 7)
 
 /** @brief Whether an mm header is embedded in a builtin-type object.
  *
@@ -446,69 +460,50 @@ enum ssm_builtin {
  *  @param mp pointer to the #ssm_mm.
  *  @returns  non-zero if it is builtin, zero otherwise.
  */
-#define ssm_mm_is_builtin(mp) ((mp)->val_count == SSM_BUILTIN)
+#define ssm_is_builtin(tg) ((tg) >= SSM_BUILTIN_BASE)
 
-/** @brief Whether an mm header is embedded in a particular builtin-type object.
+/** @brief Built-in types that are stored in the heap.
  *
- *  @param bt #ssm_builtin type enumeration.
- *  @param mp pointer to the #ssm_mm
- *  @returns  non-zero if it @a mm is of type @a bt, zero otherwise.
- *
- *  @sa #ssm_builtin.
+ *  Type enumerated here are chosen because they cannot be easily or efficiently
+ *  expressed as a product of words. For instance, 64-bit timestamps cannot be
+ *  directly stored in the payload of a regular heap object, where even-numbered
+ *  timestamps may be misinterpreted as pointers.
  */
-#define ssm_mm_is(bt, mp) (ssm_mm_is_builtin(mp) && (mp)->tag == (bt))
+enum ssm_builtin {
+  SSM_TIME_T = SSM_BUILTIN_BASE + 1, /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_T,                          /**< Scheduled variables, #ssm_sv_t */
+};
+
+#define SSM_BUILTIN_SIZE(tg)                                                   \
+  ((size_t[]){                                                                 \
+      [SSM_TIME_T - SSM_BUILTIN_BASE] = sizeof(struct ssm_time),               \
+      [SSM_SV_T - SSM_BUILTIN_BASE] = sizeof(ssm_sv_t),                        \
+  }[(tg)-SSM_BUILTIN_BASE])
+
+#define SSM_BUILTIN_VAL_COUNT(tg)                                              \
+  ((size_t[]){                                                                 \
+      [SSM_TIME_T - SSM_BUILTIN_BASE] = 0,                                     \
+      [SSM_SV_T - SSM_BUILTIN_BASE] = 2,                                       \
+  }[(tg)-SSM_BUILTIN_BASE])
 
 /** @brief Lookup the size of a builtin.
  *
  *  @param b  an #ssm_builtin indicating the type.
  *  @returns  the size of a builtin of type @a b, in bytes.
  */
-#define SSM_BUILTIN_SIZE(b)                                                    \
+#define SSM_BUILTIN_VAL_OFFSET(tg)                                             \
   ((size_t[]){                                                                 \
-      [SSM_TIME_T] = sizeof(struct ssm_time),                                  \
-      [SSM_SV_T] = sizeof(ssm_sv_t),                                           \
-  }[b])
+      [SSM_TIME_T - SSM_BUILTIN_BASE] = offsetof(struct ssm_time, time),       \
+      [SSM_SV_T - SSM_BUILTIN_BASE] = offsetof(ssm_sv_t, value),               \
+  }[(tg)-SSM_BUILTIN_BASE])
 
-/** @brief Compute the size of a heap object.
- *
- *  This macro is designed to be robust against struct padding inserted by the
- *  compiler.
- *
- *  @note this does not compute the right size for values of @a val_count less
- *  than 1.
- *
- *  @param val_count  the number of values in a heap-allocated object.
- *  @returns          the size of the object, in bytes.
- */
-#define SSM_OBJ_SIZE(val_count)                                                \
-  (sizeof(ssm_obj_t(1)) +                                                      \
-   (val_count - 1) * (sizeof(ssm_obj_t(2)) - sizeof(ssm_obj_t(1))))
+#define ssm_new(tg, vc)                                                        \
+  ssm_is_builtin(tg) ? SSM_NIL : ssm_new_unsafe(tg, vc, SSM_ADT_VAL_OFFSET)
 
-/** @brief Size of a heap object with the given @a val_count and @a tag.
- *
- *  @param val_count  the @a val_count field of an #ssm_mm.
- *  @param tag        the @a val_count field of an #ssm_mm.
- *  @returns          the size of a heap object with these fields.
- */
-#define SSM_SIZEOF(val_count, tag)                                             \
-  (val_count == SSM_BUILTIN ? SSM_BUILTIN_SIZE(tag) : SSM_OBJ_SIZE(val_count))
-
-/** @brief Allocate a new heap object to store word-size values.
- *
- *  When @a val_count is equal to #SSM_BUILTIN, @a tag is interpreted as an
- *  #ssm_builtin enumeration, and a memory block of that size is allocated.
- *
- *  The @a mm header in the returned object is initialized, but the
- *  @a data payload is not.
- *
- *  @param val_count  the number of #ssm_value_t values to be stored in the
- *                    object payload.
- *  @param tag        the tag to initialize the @a mm header with.
- *  @returns          value pointing to the newly allocated object.
- *
- *  @sa SSM_BUILTIN_SIZE().
- */
-ssm_value_t ssm_new(uint8_t val_count, uint8_t tag);
+#define ssm_new_builtin(tg)                                                    \
+  ssm_is_builtin(tg) ? ssm_new_unsafe((tg), SSM_BUILTIN_VAL_COUNT(tg),         \
+                                      SSM_BUILTIN_VAL_OFFSET(tg))              \
+                     : SSM_NIL
 
 /** @brief Duplicate a possible heap reference, incrementing its ref count.
  *
@@ -537,9 +532,6 @@ ssm_value_t ssm_new(uint8_t val_count, uint8_t tag);
   if (ssm_on_heap(v))                                                          \
   ssm_drop_unsafe(v)
 
-#define ssm_compatible(v, vc, tg)                                              \
-  (SSM_SIZEOF(v.heap_ptr->val_count, v.heap_ptr->tag) == SSM_SIZEOF(vc, tg))
-
 /** @brief Try to reuse a potentially heap-allocated value.
  *
  *  Performs a runtime check to ensure that @a v actually points to a heap item
@@ -557,9 +549,34 @@ ssm_value_t ssm_new(uint8_t val_count, uint8_t tag);
  *  @param tg   the tag to initialize the @a mm header with.
  *  @returns    value pointing to the newly allocated object.
  */
-#define ssm_reuse(v, vc, tg)                                                   \
-  (ssm_on_heap(v) && ssm_compatible(v, vc, tg) ? ssm_reuse_unsafe(v, vc, tg)   \
-                                               : ssm_new(vc, tg))
+#define ssm_reuse(v, tg, vc)                                                   \
+  (ssm_on_heap(v) && SSM_SIZE_COMPATIBLE(ssm_obj_size(v), SSM_ADT_SIZE(vc))    \
+       ? ssm_reuse_unsafe(v, tg, vc, SSM_ADT_VAL_OFFSET)                       \
+       : ssm_new(tg, vc))
+
+#define ssm_reuse_builtin(v, tg)                                               \
+  (ssm_on_heap(v) &&                                                           \
+           SSM_SIZE_COMPATIBLE(ssm_obj_size(v), SSM_BUILTIN_SIZE(tg))          \
+       ? ssm_reuse_unsafe(v, tg, SSM_BUILTIN_VAL_COUNT(tg),                    \
+                          SSM_BUILTIN_VAL_OFFSET(tg))                          \
+       : ssm_new_builtin(tg))
+
+/** @brief Allocate a new heap object to store word-size values.
+ *
+ *  When @a val_count is equal to #SSM_BUILTIN, @a tag is interpreted as an
+ *  #ssm_builtin enumeration, and a memory block of that size is allocated.
+ *
+ *  The @a mm header in the returned object is initialized, but the
+ *  @a data payload is not.
+ *
+ *  @param tag        the tag to initialize the @a mm header with.
+ *  @param val_count  the number of #ssm_value_t to be stored in the payload.
+ *  @param val_offset the byte offset at which #ssm_value_t are stored.
+ *  @returns          value pointing to the newly allocated object.
+ *
+ *  @sa SSM_BUILTIN_SIZE().
+ */
+ssm_value_t ssm_new_unsafe(uint8_t tag, uint8_t val_count, uint8_t val_offset);
 
 /** @brief Duplicate a heap reference, incrementing its ref count.
  *
@@ -570,7 +587,6 @@ ssm_value_t ssm_new(uint8_t val_count, uint8_t tag);
  *  @param v  pointer to the #ssm_mm header of the heap item.
  */
 void ssm_dup_unsafe(ssm_value_t v);
-
 
 /** @brief Drop a reference to a heap item, and free it if necessary.
  *
@@ -600,7 +616,8 @@ void ssm_drop_unsafe(ssm_value_t v);
  *  @param tag        the tag to initialize the @a mm header with.
  *  @returns          value pointing to the newly allocated object.
  */
-ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t val_count, uint8_t tag);
+ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t tag, uint8_t val_count,
+                             uint8_t val_offset);
 
 /** @brief Retrieve the tag of an SSM heap object.
  *
