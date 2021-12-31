@@ -170,10 +170,12 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  (*<a class="code" href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(sv) = (<a class="code" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>){.later_time = <a class="code" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">SSM_NEVER</a>,                        \</div>
-<div class="line">                               .last_updated = <a class="code" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">SSM_NEVER</a>,                      \</div>
-<div class="line">                               .triggers = NULL,                               \</div>
-<div class="line">                               .value = val})</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                         \</div>
+<div class="line">    ssm_to_sv(sv)-&gt;later_time = <a class="code" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">SSM_NEVER</a>;                                     \</div>
+<div class="line">    ssm_to_sv(sv)-&gt;last_updated = <a class="code" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">SSM_NEVER</a>;                                   \</div>
+<div class="line">    ssm_to_sv(sv)-&gt;triggers = NULL;                                            \</div>
+<div class="line">    ssm_to_sv(sv)-&gt;value = val;                                                \</div>
+<div class="line">  } <span class="keywordflow">while</span> (0)</div>
 </div><!-- fragment -->
 <p>Initial value of an <a class="el" href="structssm__sv.html" title="A scheduled variable that supported scheduled updates with triggers.">ssm_sv</a>. </p>
 <p>For example: </p><pre class="fragment">ssm_value_t sv;
@@ -463,8 +465,6 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__sv_html_ga3ff20b6ba9aa056f1cf64051c20dd779"><div class="ttname"><a href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a></div><div class="ttdeci">struct ssm_sv ssm_sv_t</div><div class="ttdoc">A scheduled variable that supported scheduled updates with triggers.</div></div>
-<div class="ttc" id="agroup__mem_html_ga4f64d15b72fdd6f8f3085929a492582a"><div class="ttname"><a href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a></div><div class="ttdeci">#define ssm_to_sv(v)</div><div class="ttdoc">Access the scheduled variable payload pointed to by an ssm_value_t.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00648">ssm.h:648</a></div></div>
 <div class="ttc" id="agroup__time_html_ga21ad50b0c4e1feeaeb9c78af1a9d2d9f"><div class="ttname"><a href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">SSM_NEVER</a></div><div class="ttdeci">#define SSM_NEVER</div><div class="ttdoc">Time indicating something will never happen.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00162">ssm.h:162</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
