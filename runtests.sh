@@ -50,6 +50,7 @@ vg () {
   fi
 }
 
+make clean
 make exes tests
 
 if ! [ -d "$BUILD_DIR" ] ; then
@@ -91,6 +92,9 @@ else
   cat build/tests.diff
   exit 1
 fi
+
+make clean
+CFLAGS=-DSSM_DEBUG_NO_ALLOC make exes tests
 
 if command -v valgrind >/dev/null ; then
   rm -f build/examples.vg-out
