@@ -103,6 +103,8 @@ if command -v valgrind >/dev/null ; then
     vg onetwo
     vg clock
     vg counter
+    vg list
+    vg list 2048
   } >> build/examples.vg-out
   say "Examples do not have any memory errors"
 
