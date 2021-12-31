@@ -42,8 +42,9 @@ jobs:
         sudo apt-get install -y build-essential gcc valgrind clang
 
     # Shouldn't need to install dependencies for macos image; make and gcc
-    # (linked to clang) should already be installed, while valgrind is not
-    # supported.
+    # (symlinked to clang) should already be installed, while valgrind is not
+    # supported. Also Note that (macos-latest, gcc), (macos-latest, clang) are
+    # essentially the same test because of symlink.
 
     # Performed as separate step to more easily detect library build error
     - name: Build library
