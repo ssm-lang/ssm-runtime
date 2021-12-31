@@ -26,6 +26,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
+        cc: [gcc, clang]
     name: "Run test suite"
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
@@ -38,7 +39,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-latest' }}
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential gcc valgrind
+        sudo apt-get install -y build-essential gcc valgrind clang
 
     # Shouldn't need to install dependencies for macos image; make and gcc
     # (linked to clang) should already be installed, while valgrind is not
@@ -51,4 +52,4 @@ jobs:
 
     - name: Run tests
       run: |
-        ./runtests.sh
+        CC=${{ matrix.cc }} ./runtests.sh
