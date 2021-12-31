@@ -148,7 +148,8 @@ typedef union {
  */
 #define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
 
-#define SSM_NIL (ssm_value_t) { .packed_val = 0xffffffff }
+#define SSM_NIL                                                                \
+  (ssm_value_t) { .packed_val = 0xffffffff }
 
 /** @} */
 
@@ -495,7 +496,7 @@ enum ssm_builtin {
  */
 #define SSM_BUILTIN_VAL_OFFSET(tg)                                             \
   ((size_t[]){                                                                 \
-      [SSM_TIME_T - SSM_BUILTIN_BASE] = offsetof(struct ssm_time, time),       \
+      [SSM_TIME_T - SSM_BUILTIN_BASE] = sizeof(struct ssm_time),               \
       [SSM_SV_T - SSM_BUILTIN_BASE] = offsetof(ssm_sv_t, value),               \
   }[(tg)-SSM_BUILTIN_BASE])
 
