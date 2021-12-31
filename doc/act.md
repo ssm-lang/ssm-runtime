@@ -2,7 +2,9 @@ See @ref act.
 
 @defgroup act Activation records
 
-Under the Sparse Synchronous Model, computation is carried out by coroutines managed by the runtime scheduler. Each coroutine executes at most once per instant, and between these instants, their local state is saved in their <em>activation record</em>.
+@brief The local state of each user-defined coroutine is saved within its <em>activation record</em>.
+
+Each coroutine executes at most once per instant, and between instants, their activation records are managed by the runtime scheduler.
 
 In addition to the arguments and local variables of a coroutine, which are specific to each coroutine, activation records also contain some common fields, such as the priority and depth of a coroutine. These common fields are found in the #ssm_act_t "base class", which should be embedded in the beginning of each routine-specific activation record.
 
