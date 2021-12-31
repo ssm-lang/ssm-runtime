@@ -92,15 +92,18 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="title">The Sparse Synchronous Model Runtime </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><object type="image/svg+xml" data="https://github.com/ssm-lang/ssm-runtime/actions/workflows/test.yml/badge.svg?branch=dev" style="pointer-events: none;">tests</object> <a href="https://ssm-lang.github.io/ssm-runtime"><object type="image/svg+xml" data="https://github.com/ssm-lang/ssm-runtime/actions/workflows/doc.yml/badge.svg?branch=dev" style="pointer-events: none;">doc</object></a> <a href="https://codecov.io/gh/ssm-lang/ssm-runtime"><object type="image/svg+xml" data="https://codecov.io/gh/ssm-lang/ssm-runtime/branch/dev/graph/badge.svg?token=TYCPPY7Y92" style="pointer-events: none;">codecov</object></a></p>
-<p>The Sparse Synchronous Model (SSM) is a deterministic real-time execution technique that allows explicit, precise timing control.</p>
-<h1>Documentation</h1>
+<div class="textblock"><div>  <object type="image/svg+xml" data="https://github.com/ssm-lang/ssm-runtime/actions/workflows/test.yml/badge.svg?branch=dev" style="pointer-events: none;"></object>  <a href="https://ssm-lang.github.io/ssm-runtime"><object type="image/svg+xml" data="https://github.com/ssm-lang/ssm-runtime/actions/workflows/doc.yml/badge.svg?branch=dev" style="pointer-events: none;"></object> </a> <a href="https://codecov.io/gh/ssm-lang/ssm-runtime"><object type="image/svg+xml" data="https://codecov.io/gh/ssm-lang/ssm-runtime/branch/dev/graph/badge.svg?token=TYCPPY7Y92" style="pointer-events: none;"></object> </a> </div><p>The Sparse Synchronous Model (SSM) is a deterministic real-time execution technique that allows explicit, precise timing control.</p>
+<p>The source code for this library is hosted on GitHub at <a href="https://github.com/ssm-lang/ssm-runtime/tree/dev">https://github.com/ssm-lang/ssm-runtime/tree/dev</a>.</p>
+<h1><a class="anchor" id="autotoc_md1"></a>
+Documentation</h1>
+<p>The generated documentation for this library maybe found at <a href="https://ssm-lang.github.io/ssm-runtime">https://ssm-lang.github.io/ssm-runtime</a>.</p>
+<p>The code documentation is organized in terms of modules, which are listed at <a href="https://ssm-lang.github.io/ssm-runtime/modules.html">https://ssm-lang.github.io/ssm-runtime/modules.html</a>. Note that these modules do not reflect how the documented code is organized in files. Instead, they are purely logical: they group together related families of types and symbols across C translation units and public/private interfaces.</p>
 <p>The operation of this library was first described in:</p>
 <blockquote class="doxtable">
 <p>Stephen A. Edwards and John Hui. The Sparse Synchronous Model. In Forum on Specification and Design Languages (FDL), Kiel, Germany, September 2020. <a href="http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf">http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf</a> </p>
 </blockquote>
-<p>The generated documentation for this library maybe found <a href="https://ssm-lang.github.io/ssm-runtime">here</a>.</p>
-<h1>Dependencies</h1>
+<h1><a class="anchor" id="autotoc_md2"></a>
+Dependencies</h1>
 <p>The core runtime, which includes the scheduler and memory manager, is written in C99, without library dependencies. The top-level Makefile is used to compile and test this core library, and has the following dependencies:</p>
 <ul>
 <li>Some C99-compatible compiler (<code>gcc</code> required for testing)</li>
@@ -115,7 +118,8 @@ $(document).ready(function(){initNavTree('index.html',''); initResizable(); });
 <div class="fragment"><div class="line">sudo apt install build-essential gcc doxygen graphviz valgrind gcov</div>
 </div><!-- fragment --><p>Platform-specific bindings are provided via the <a href="https://platformio.org">PlatformIO Core (CLI)</a> toolchain manager; see their <a href="https://docs.platformio.org/en/latest/core/installation.html">installation instructions</a>. On Linux, make sure to install the <code>99-platformio-udev.rules</code>.</p>
 <p>Note that PlatformIO <em>does not use the top-level Makefile</em> to build the SSM runtime. Instead, it uses the top-level library.json manifest to compile this library as a PlatformIO package.</p>
-<h1>Quickstart</h1>
+<h1><a class="anchor" id="autotoc_md3"></a>
+Quickstart</h1>
 <p>The top-level <code>Makefile</code> can be used to build the platform-generic library alone, without platform-specific bindings. To build just the library, just run:</p>
 <div class="fragment"><div class="line">make # `lib&#39; is the default target</div>
 </div><!-- fragment --><p>All build artifacts, including <code>libssm.a</code>, are placed in the <code>build</code> directory.</p>

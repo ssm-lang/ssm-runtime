@@ -98,10 +98,11 @@ $(document).ready(function(){initNavTree('group__sv.html',''); initResizable(); 
 </div><!--header-->
 <div class="contents">
 
-<p><em>Scheduled variables</em> are special references to which instantaneous and delayed assignments may be made. When such an assignment is made, all <em>sensitive</em> routines (with a lower priority, for instantaneous assignments) are woken and scheduled for execution in that instant. A scheduled assignment is also referred to as an <em>event</em>.  
+<p><em>Scheduled variables</em> are special references to which instantaneous and delayed assignments may be made.  
 <a href="#details">More...</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Discussion</h2>
-<p><em>Scheduled variables</em> are special references to which instantaneous and delayed assignments may be made. When such an assignment is made, all <em>sensitive</em> routines (with a lower priority, for instantaneous assignments) are woken and scheduled for execution in that instant. A scheduled assignment is also referred to as an <em>event</em>. </p>
+<p><em>Scheduled variables</em> are special references to which instantaneous and delayed assignments may be made. </p>
+<p>When such an assignment is made, all <em>sensitive</em> routines (with a lower priority, for instantaneous assignments) are woken and scheduled for execution in that instant. A scheduled assignment is also referred to as an <em>event</em>.</p>
 <dl class="section note"><dt>Note</dt><dd>This SSM runtime only supports scheduling a single outstanding assignment to a each scheduled variable. Earlier delayed assignments will be overwritten by subsequent delayed asssignments, but not by instantaneous assignments.</dd></dl>
 <p>When the last reference to a scheduled variable is dropped, any outstanding scheduled assignments to it will be cancelled. Note, however, at that the current implementation of this is rather costly (linear in the total number of queued events at that time). </p>
 <table class="memberdecls">

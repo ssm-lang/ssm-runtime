@@ -60,4 +60,5 @@ var menudata={children:[
 {text:"e",url:"globals_defs.html#index_e"},
 {text:"m",url:"globals_defs.html#index_m"},
 {text:"s",url:"globals_defs.html#index_s"},
-{text:"u",url:"globals_defs.html#index_u"}]}]}]}]}
+{text:"u",url:"globals_defs.html#index_u"}]}]}]},
+{text:"Contributing",url:"contributing.html"}]}

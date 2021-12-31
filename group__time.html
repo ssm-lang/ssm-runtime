@@ -98,10 +98,11 @@ $(document).ready(function(){initNavTree('group__time.html',''); initResizable()
 </div><!--header-->
 <div class="contents">
 
-<p>SSM timestamps are 64-bit values which should never wraparound, and are represented by <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a>. The runtime library maintains a monotonically increasing "current time" which can be read using <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff" title="The current model time.">ssm_now()</a>.  
+<p>SSM timestamps are 64-bit values which should never wraparound, and are represented by <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a>.  
 <a href="#details">More...</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Discussion</h2>
-<p>SSM timestamps are 64-bit values which should never wraparound, and are represented by <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a>. The runtime library maintains a monotonically increasing "current time" which can be read using <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff" title="The current model time.">ssm_now()</a>. </p>
+<p>SSM timestamps are 64-bit values which should never wraparound, and are represented by <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a>. </p>
+<p>The runtime library maintains a monotonically increasing "current time" which can be read using <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff" title="The current model time.">ssm_now()</a>.</p>
 <p>For portability reasons, this particular runtime implementation uses nanoseconds as its time base; it is the responsibility of platform code to convert this resolution to the tick rate of the hardware timer. See <a href="https://github.com/ssm-lang/ssm-runtime/pull/1">https://github.com/ssm-lang/ssm-runtime/pull/1</a>. </p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>

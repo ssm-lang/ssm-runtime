@@ -2,6 +2,7 @@ var NAVTREEINDEX0 =
 {
 "annotated.html":[2,0],
 "classes.html":[2,1],
+"contributing.html":[4],
 "files.html":[3,0],
 "functions.html":[2,2,0],
 "functions_vars.html":[2,2,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "ssm-scheduler_8c.html#ab133aca43495cacd91d1070f1b13efac":[3,0,2,9],
 "ssm-scheduler_8c.html#ae517897aca56cd08720db2d23aa50043":[3,0,2,25],
 "ssm-scheduler_8c.html#aebf47b5a148097c1cb9d146071828637":[3,0,2,4],
-"ssm-scheduler_8c.html#af9e6713f8ed5be19aea426093e1d924f":[3,0,2,5],
-"ssm-scheduler_8c_source.html":[3,0,2]
+"ssm-scheduler_8c.html#af9e6713f8ed5be19aea426093e1d924f":[3,0,2,5]
 };

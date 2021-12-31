@@ -44,14 +44,15 @@ var NAVTREE =
         [ "Enumerator", "globals_eval.html", null ],
         [ "Macros", "globals_defs.html", null ]
       ] ]
-    ] ]
+    ] ],
+    [ "Contributing", "contributing.html", null ]
   ] ]
 ];
 
 var NAVTREEINDEX =
 [
 "annotated.html",
-"ssm-top-act_8c.html"
+"ssm-scheduler_8c_source.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';
