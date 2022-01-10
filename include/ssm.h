@@ -427,13 +427,46 @@ void ssm_desensitize(ssm_trigger_t *trig);
  * @{
  */
 
-#define ssm_mm_val(mp, vo, vi) ((ssm_value_t *)((uint8_t *)(mp) + (vo)))[vi]
+/** @brief Obtain pointer to #ssm_value_t in heap object at the given index.
+ *
+ *  @note This macro is unsafe in the sense that it does not check whether the
+ *  given @a vo is consistent to the @a val_offset in @a mp, nor does it check
+ *  that the given @a vi is within the bounds of the @a val_count in @a mp.
+ *  However, it only performs pure pointer arithmetic, and will not attempt to
+ *  access any memory itself.
+ *
+ *  @param mp pointer to the #ssm_mm header of the object.
+ *  @param vo val_offset of
+ *  @param vi index of the #ssm_value_t
+ *  @returns  pointer to the #ssm_value_t at index @a vi under @a mp.
+ */
+#define SSM_OBJ_VAL(mp, vo, vi) (&((ssm_value_t *)((uint8_t *)(mp) + (vo)))[vi])
 
+/** @brief Compute the size of heap object, given its @a val parameters.
+ *
+ *  @param vc the number of #ssm_value_t in the object, i.e., the @a val_count.
+ *  @param vo the @a val_offset of the object, in bytes.
+ *  @returns  the size of the heap object.
+ */
 #define SSM_OBJ_SIZE(vc, vo) ((vo) + (sizeof(ssm_value_t) * (vc)))
 
+/** @brief Compute the size of a heap object pointed to by an #ssm_value_t.
+ *
+ *  @note This is unsafe in that it does not check whether @a v is a valid heap
+ *  pointer. The behavior is only defined when `ssm_on_heap(v)`.
+ *
+ *  @param v  an #ssm_value_t that points to a heap object.
+ *  @returns  the size of the heap object pointed to by @a v.
+ */
 #define ssm_obj_size(v)                                                        \
   SSM_OBJ_SIZE((v).heap_ptr->val_count, (v).heap_ptr->val_offset)
 
+/** @brief Whether two sizes are compatible, for ssm_reuse().
+ *
+ *  @param a  the size of the object to be freed.
+ *  @param b  the size of the object to be allocated.
+ *  @returns  whether the heap space for @a a can be used for allocating @a b.
+ */
 #define SSM_SIZE_COMPATIBLE(a, b) ((a) == (b))
 
 #define SSM_ADT_SIZE(vc)                                                       \
@@ -450,7 +483,7 @@ void ssm_desensitize(ssm_trigger_t *trig);
       },                                                                       \
       payload)
 
-#define ssm_adt_val(v, i) ssm_mm_val((v).heap_ptr, SSM_ADT_VAL_OFFSET, i)
+#define ssm_adt_val(v, i) (*ssm_obj_val((v).heap_ptr, SSM_ADT_VAL_OFFSET, i))
 
 /** @brief Tags equal to and greater than this value are builtin types. */
 #define SSM_BUILTIN_BASE (1u << 7)

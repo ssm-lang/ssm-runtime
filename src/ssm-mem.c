@@ -166,7 +166,7 @@ static inline void drop_children(ssm_value_t v) {
   }
 
   for (size_t i = 0; i < v.heap_ptr->val_count; i++) {
-    ssm_value_t val = ssm_mm_val(v.heap_ptr, v.heap_ptr->val_offset, i);
+    ssm_value_t val = *SSM_OBJ_VAL(v.heap_ptr, v.heap_ptr->val_offset, i);
     if (ssm_on_heap(val))
       ssm_drop(val);
   }
