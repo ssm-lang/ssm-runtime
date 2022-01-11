@@ -110,7 +110,8 @@ void step_main(ssm_act_t *act) {
   main_act_t *cont = container_of(act, main_act_t, act);
   switch (act->pc) {
   case 0:
-    cont->stdout = ssm_new_sv(ssm_marshal(0));
+    cont->stdout = ssm_new(SSM_BUILTIN, SSM_SV_T);
+    ssm_sv_init(cont->stdout, ssm_marshal(0));
     ssm_depth_t new_depth = act->depth - 1;
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
