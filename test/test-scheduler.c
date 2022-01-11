@@ -39,10 +39,9 @@ void reset_all() {
   for (int i = 0; i < NUM_VARIABLES; i++)
     ssm_drop(variables[i]);
   ssm_reset();
-  for (int i = 0; i < NUM_VARIABLES; i++) {
-    variables[i] = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(variables[i], DUMMY_VALUE);
-  }
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    variables[i] = ssm_new_sv(DUMMY_VALUE);
+
   check_starts_initialized();
 }
 
@@ -438,10 +437,8 @@ static void free_mem(void *mem, size_t size) { free(mem); }
 int main(void) {
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
 
-  for (int i = 0; i < NUM_VARIABLES; i++) {
-    variables[i] = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(variables[i], DUMMY_VALUE);
-  }
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    variables[i] = ssm_new_sv(DUMMY_VALUE);
 
   for (int i = 0; i < NUM_ACTS; i++)
     acts[i] = (ssm_act_t){
