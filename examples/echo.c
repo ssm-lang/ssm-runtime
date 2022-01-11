@@ -159,11 +159,8 @@ void *ssm_stdin_handler(void *sv) {
 }
 
 void ssm_program_init(void) {
-  ssm_stdin = ssm_new(SSM_BUILTIN, SSM_SV_T);
-  ssm_sv_init(ssm_stdin, ssm_marshal(0));
-
-  ssm_stdout = ssm_new(SSM_BUILTIN, SSM_SV_T);
-  ssm_sv_init(ssm_stdout, ssm_marshal(0));
+  ssm_stdin = ssm_new_sv(ssm_marshal(0));
+  ssm_stdout = ssm_new_sv(ssm_marshal(0));
 
   ssm_activate(enter_stdout_handler(&ssm_top_parent, SSM_ROOT_PRIORITY,
                                     SSM_ROOT_DEPTH - 1));
