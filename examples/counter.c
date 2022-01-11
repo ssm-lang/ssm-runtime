@@ -302,16 +302,11 @@ void step_main(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:
-    cont->clk = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(cont->clk, ssm_marshal(0));
-    cont->q1 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(cont->q1, ssm_marshal(0));
-    cont->q2 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(cont->q2, ssm_marshal(0));
-    cont->d1 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(cont->d1, ssm_marshal(0));
-    cont->d2 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(cont->d2, ssm_marshal(0));
+    cont->clk = ssm_new_sv(ssm_marshal(0));
+    cont->q1 = ssm_new_sv(ssm_marshal(0));
+    cont->q2 = ssm_new_sv(ssm_marshal(0));
+    cont->d1 = ssm_new_sv(ssm_marshal(0));
+    cont->d2 = ssm_new_sv(ssm_marshal(0));
 
     ssm_depth_t new_depth;
     ssm_priority_t pinc;
