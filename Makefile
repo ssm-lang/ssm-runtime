@@ -54,7 +54,7 @@ TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = cc
-CFLAGS = -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT
+CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT
 LIB_CFLAGS = $(CFLAGS) -std=c99
 TEST_CFLAGS = $(CFLAGS) -DSSM_DEBUG --coverage
 

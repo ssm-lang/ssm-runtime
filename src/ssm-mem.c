@@ -118,7 +118,9 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 }
 
 void *ssm_mem_alloc(size_t size) {
-    return alloc_mem(size);
+#ifdef SSM_DEBUG_NO_ALLOC
+  return alloc_mem(size);
+#else
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
     return alloc_mem(size);
@@ -136,11 +138,13 @@ void *ssm_mem_alloc(size_t size) {
     pool->free_list_head = pool->free_list_head->free_list_next;
 
   return buf;
+#endif
 }
 
 void ssm_mem_free(void *m, size_t size) {
-    free_mem(m, size);
-    return;
+#ifdef SSM_DEBUG_NO_ALLOC
+  free_mem(m, size);
+#else
   size_t pool = find_pool_size(size);
   if (pool >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
@@ -150,6 +154,7 @@ void ssm_mem_free(void *m, size_t size) {
   block_t *new_head = m;
   new_head->free_list_next = mem_pools[pool].free_list_head;
   mem_pools[pool].free_list_head = new_head;
+#endif
 }
 
 /** @brief Recursively drop all children of a heap object.
