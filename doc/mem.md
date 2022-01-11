@@ -2,10 +2,14 @@ See @ref mem.
 
 @defgroup mem Memory management
 
+@brief Values are always word-sized, and may point to heap-allocated,
+reference-counted <em>objects</em>; heap memory is allocated from a set of
+size-indexed memory pools.
+
 For simplicity and flexibility, all values in SSM runtime are word-sized,
 represented using #ssm_value_t.
 When the size of a value exceeds what can be represented by a word, the value
-is a pointer to a heap-allocated object.
+is a pointer to a heap-allocated <em>object</em>.
 In particular, they point to a memory management metadata header, #ssm_mm.
 
 The SSM runtime uses reference counting to manage the lifetime of heap objects.

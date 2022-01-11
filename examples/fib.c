@@ -91,9 +91,9 @@ void step_sum(struct ssm_act *act) {
     ssm_priority_t new_priority = act->priority;
     ssm_priority_t pinc = 1 << new_depth;
     ssm_dup(cont->r1);
+    ssm_dup(cont->r2);
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r1));
     new_priority += pinc;
-    ssm_dup(cont->r2);
     ssm_activate(ssm_enter_mywait(act, new_priority, new_depth, cont->r2));
   }
     act->pc = 1;
@@ -128,34 +128,33 @@ void step_fib(struct ssm_act *act) {
   case 0:
     if (ssm_unmarshal(cont->n) < 2) {
       ssm_later(ssm_to_sv(cont->r), ssm_now() + SSM_SECOND, ssm_marshal(1));
+      break;
     } else {
       cont->r1 = ssm_new(SSM_BUILTIN, SSM_SV_T);
       ssm_sv_init(cont->r1, ssm_marshal(0));
+
       cont->r2 = ssm_new(SSM_BUILTIN, SSM_SV_T);
       ssm_sv_init(cont->r2, ssm_marshal(0));
+
+      ssm_dup(cont->r1);
+      ssm_dup(cont->r2);
+      ssm_dup(cont->r);
       ssm_depth_t new_depth = act->depth - 2; // 4 children
       ssm_priority_t new_priority = act->priority;
       ssm_priority_t pinc = 1 << new_depth;
-      ssm_dup(cont->r1);
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 1),
                                  cont->r1));
       new_priority += pinc;
-      ssm_dup(cont->r2);
       ssm_activate(ssm_enter_fib(act, new_priority, new_depth,
                                  ssm_marshal(ssm_unmarshal(cont->n) - 2),
                                  cont->r2));
       new_priority += pinc;
-      ssm_dup(cont->r1);
-      ssm_dup(cont->r2);
-      ssm_dup(cont->r);
       ssm_activate(ssm_enter_sum(act, new_priority, new_depth, cont->r1,
                                  cont->r2, cont->r));
       act->pc = 1;
       return;
     case 1:;
-      ssm_drop(cont->r1);
-      ssm_drop(cont->r2);
     }
   }
   ssm_drop(cont->r);
@@ -175,4 +174,5 @@ void ssm_program_init(void) {
 
 void ssm_program_exit(void) {
   printf("%d\n", (int)ssm_unmarshal(ssm_deref(result)));
+  ssm_drop(result);
 }
