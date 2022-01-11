@@ -214,6 +214,7 @@ int main(void) {
   ssm_set_now(timespec_time(init_time));
   ssm_program_init();
 
+#if 1
   for (;;) {
     ssm_time_t next_time, wall_time;
     struct timespec wall_spec;
@@ -256,7 +257,7 @@ int main(void) {
     }
   }
 
-#if 0
+#else
   for (;;) {
     size_t r, w;
     poll_input_queue(&r, &w);
