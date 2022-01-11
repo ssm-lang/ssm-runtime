@@ -1,0 +1,5 @@
+<map id="ssm_adt1" name="ssm_adt1">
+<area shape="rect" id="node1" title="The struct template of a heap&#45;allocated ADT object." alt="" coords="5,184,91,211"/>
+<area shape="rect" id="node2" href="$structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="7,5,89,32"/>
+<area shape="rect" id="node3" href="$unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="81,95,185,121"/>
+</map>

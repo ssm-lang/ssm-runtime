@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('structssm__sv.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 
-<p>A scheduled variable that supported scheduled updates with triggers.  
+<p>A scheduled variable that supports scheduled updates with triggers.  
  <a href="structssm__sv.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ssm_8h_source.html">ssm.h</a>&gt;</code></p>
@@ -106,10 +106,10 @@ $(document).ready(function(){initNavTree('structssm__sv.html',''); initResizable
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="structssm__sv__coll__graph.png" border="0" usemap="#ssm__sv_coll__map" alt="Collaboration graph"/></div>
 <map name="ssm__sv_coll__map" id="ssm__sv_coll__map">
-<area shape="rect" title="A scheduled variable that supported scheduled updates with triggers." alt="" coords="195,201,266,228"/>
+<area shape="rect" title="A scheduled variable that supports scheduled updates with triggers." alt="" coords="195,201,266,228"/>
 <area shape="rect" href="structssm__trigger.html" title="Indicates a routine should run when a scheduled variable is written." alt="" coords="5,96,104,123"/>
 <area shape="rect" href="structssm__act.html" title="Activation record for an SSM routine." alt="" coords="17,5,93,32"/>
-<area shape="rect" href="structssm__mm.html" title="The metadata accompanying any heap&#45;allocated object." alt="" coords="227,5,309,32"/>
+<area shape="rect" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="227,5,309,32"/>
 <area shape="rect" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="285,96,389,123"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
@@ -135,15 +135,15 @@ Data Fields</h2></td></tr>
 <tr class="separator:aec86c4639acbe2997a5599560ff6b034"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A scheduled variable that supported scheduled updates with triggers. </p>
-<p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. This struct only represents the data specific to scheduled variables, and is not meant to be declared on its own. Instead, it should be allocated as part of an <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a> using <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb" title="Allocate a new heap object to store word-size values.">ssm_new()</a>.</p>
+<div class="textblock"><p>A scheduled variable that supports scheduled updates with triggers. </p>
+<p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. These should be always allocated on the heap using <a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc" title="Allocate an ssm_sv on the heap.">ssm_new_sv()</a>.</p>
 <p>Routines may directly assign to them in the current instant (<a class="el" href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>), or schedule a delayed assignment to them (<a class="el" href="group__sv.html#gaec47ada342876e79b21c53151001c888" title="Delayed assignment to a scheduled variable.">ssm_later()</a>). The <em>last_updated</em> time is recorded in each case, sensitive routines, i.e., <em>triggers</em>, are woken up.</p>
 <p>At most one delayed assignment may be scheduled at a time, but a single update may wake any number of sensitive routines.</p>
 <dl class="section invariant"><dt>Invariant</dt><dd><em>later_time</em> != <a class="el" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f" title="Time indicating something will never happen.">SSM_NEVER</a> iff this variable in the event queue. </dd>
 <dd>
-for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </dd></dl>
+for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00326">326</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00421">421</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -157,7 +157,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00327">327</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00422">422</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -175,7 +175,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 
 <p>When the variable should be next updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00328">328</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00423">423</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -193,7 +193,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 
 <p>When the variable was last updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00329">329</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00424">424</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 
 <p>List of sensitive continuations. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00330">330</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00425">425</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -229,7 +229,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 
 <p>Current value. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00331">331</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00426">426</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -247,7 +247,7 @@ for all <code>ssm_sv_t v</code>, <code>ssm_mm_is(SSM_SV_T, &amp;v.mm)</code>. </
 
 <p>Buffered value for delayed assignment. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00332">332</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00427">427</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

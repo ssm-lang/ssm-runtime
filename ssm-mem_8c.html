@@ -174,21 +174,18 @@ Functions</h2></td></tr>
 <tr class="memitem:ga3087c5edfa451e28309ea0cb234ad02e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e">ssm_mem_free</a> (void *m, size_t size)</td></tr>
 <tr class="memdesc:ga3087c5edfa451e28309ea0cb234ad02e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deallocate memory allocated by <a class="el" href="group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f" title="Allocate a contiguous range of memory.">ssm_mem_alloc()</a>.  <a href="group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e">More...</a><br /></td></tr>
 <tr class="separator:ga3087c5edfa451e28309ea0cb234ad02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0ebb67ba3e6cf92464c51fa85c64d2d5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-mem_8c.html#a0ebb67ba3e6cf92464c51fa85c64d2d5">drop_children</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
-<tr class="memdesc:a0ebb67ba3e6cf92464c51fa85c64d2d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Recursively drop all children of a heap object.  <a href="ssm-mem_8c.html#a0ebb67ba3e6cf92464c51fa85c64d2d5">More...</a><br /></td></tr>
-<tr class="separator:a0ebb67ba3e6cf92464c51fa85c64d2d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga623bdf0832a98667526418e0f80228fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm_new</a> (uint8_t val_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga623bdf0832a98667526418e0f80228fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new heap object to store word-size values.  <a href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">More...</a><br /></td></tr>
-<tr class="separator:ga623bdf0832a98667526418e0f80228fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">ssm_dup_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
-<tr class="memdesc:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a heap reference, incrementing its ref count.  <a href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">More...</a><br /></td></tr>
-<tr class="separator:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">ssm_drop_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
-<tr class="memdesc:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop a reference to a heap item, and free it if necessary.  <a href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">More...</a><br /></td></tr>
-<tr class="separator:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5da14d487972b170b5a3155c96d1a128"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm_reuse_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v, uint8_t val_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga5da14d487972b170b5a3155c96d1a128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to reuse a heap-allocated value.  <a href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">More...</a><br /></td></tr>
-<tr class="separator:ga5da14d487972b170b5a3155c96d1a128"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">ssm_new_time</a> (<a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> time)</td></tr>
+<tr class="memdesc:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a> on the heap.  <a href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">More...</a><br /></td></tr>
+<tr class="separator:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">ssm_new_sv</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
+<tr class="memdesc:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an <a class="el" href="structssm__sv.html" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv</a> on the heap.  <a href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">More...</a><br /></td></tr>
+<tr class="separator:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga12f0353d3348de5943ea702d81659eaf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga12f0353d3348de5943ea702d81659eaf">ssm_new_adt</a> (uint8_t val_count, uint8_t tag)</td></tr>
+<tr class="memdesc:ga12f0353d3348de5943ea702d81659eaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new ADT object on the heap.  <a href="group__adt.html#ga12f0353d3348de5943ea702d81659eaf">More...</a><br /></td></tr>
+<tr class="separator:ga12f0353d3348de5943ea702d81659eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
+<tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
+<tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -361,37 +358,6 @@ Daniel Scanteianu (Scanteianu) </dd></dl>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00091">91</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
-
-</div>
-</div>
-<a id="a0ebb67ba3e6cf92464c51fa85c64d2d5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ebb67ba3e6cf92464c51fa85c64d2d5">&#9670;&nbsp;</a></span>drop_children()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void drop_children </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Recursively drop all children of a heap object. </p>
-<dl class="section note"><dt>Note</dt><dd>assumes <em>v</em> is a valid <em>heap_ptr</em>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00164">164</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

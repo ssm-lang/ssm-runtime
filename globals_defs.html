@@ -122,35 +122,35 @@ $(document).ready(function(){initNavTree('globals_defs.html',''); initResizable(
 <li>SSM_ACT_QUEUE_SIZE
 : <a class="el" href="ssm-scheduler_8c.html#a25ce0218229260d51bbeb62864dc90d0">ssm-scheduler.c</a>
 </li>
+<li>ssm_adt_field
+: <a class="el" href="group__adt.html#ga1db3e00247a1f1a15dd1aff6dbcb5be6">ssm.h</a>
+</li>
+<li>ssm_adt_size
+: <a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm-internal.h</a>
+</li>
 <li>SSM_ASSERT
 : <a class="el" href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">ssm-internal.h</a>
 </li>
-<li>SSM_BUILTIN
-: <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">ssm.h</a>
-</li>
-<li>SSM_BUILTIN_SIZE
-: <a class="el" href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">ssm.h</a>
-</li>
-<li>ssm_compatible
-: <a class="el" href="group__mem.html#ga850c1ade6e8bf58d67d5283bb71807a7">ssm.h</a>
-</li>
 <li>ssm_deref
-: <a class="el" href="group__mem.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">ssm.h</a>
+: <a class="el" href="group__sv.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">ssm.h</a>
 </li>
 <li>ssm_drop
 : <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">ssm.h</a>
 </li>
+<li>ssm_drop_unsafe
+: <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e">ssm.h</a>
+</li>
 <li>ssm_dup
 : <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">ssm.h</a>
+</li>
+<li>ssm_dup_unsafe
+: <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm.h</a>
 </li>
 <li>SSM_EVENT_QUEUE_SIZE
 : <a class="el" href="ssm-scheduler_8c.html#a212bc77e666ea29840c6201cc5d606d6">ssm-scheduler.c</a>
 </li>
 <li>SSM_HOUR
 : <a class="el" href="group__time.html#gaa197d42e5baeef09b2106f2b07fe6878">ssm.h</a>
-</li>
-<li>ssm_initialize_builtin
-: <a class="el" href="group__mem.html#ga16ee86b0f039572f6b2f16328f4ddd5f">ssm-internal.h</a>
 </li>
 <li>ssm_marshal
 : <a class="el" href="group__mem.html#ga8036e301aaee6fbac00bd2cdaa0dea8c">ssm.h</a>
@@ -182,32 +182,17 @@ $(document).ready(function(){initNavTree('globals_defs.html',''); initResizable(
 <li>SSM_MINUTE
 : <a class="el" href="group__time.html#gaac175bedf4cfeb48775f5eeeb90b9d62">ssm.h</a>
 </li>
-<li>ssm_mm_is
-: <a class="el" href="group__mem.html#ga05eb2a4b7d108a6559c125f80231942a">ssm.h</a>
-</li>
-<li>ssm_mm_is_builtin
-: <a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff">ssm.h</a>
-</li>
 <li>SSM_NANOSECOND
 : <a class="el" href="group__time.html#ga72dc193a581421c30fd63abe6b628bdd">ssm.h</a>
 </li>
 <li>SSM_NEVER
 : <a class="el" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f">ssm.h</a>
 </li>
-<li>SSM_OBJ_SIZE
-: <a class="el" href="group__mem.html#ga68af9f88d06fe2f9d528e2d45b878301">ssm.h</a>
-</li>
-<li>ssm_obj_t
-: <a class="el" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm.h</a>
-</li>
 <li>ssm_on_heap
 : <a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm.h</a>
 </li>
 <li>SSM_QUEUE_HEAD
 : <a class="el" href="ssm-scheduler_8c.html#aebf47b5a148097c1cb9d146071828637">ssm-scheduler.c</a>
-</li>
-<li>ssm_reuse
-: <a class="el" href="group__mem.html#ga7c340d276921a0cb89399fbf2b16e6ca">ssm.h</a>
 </li>
 <li>SSM_ROOT_DEPTH
 : <a class="el" href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">ssm.h</a>
@@ -218,32 +203,23 @@ $(document).ready(function(){initNavTree('globals_defs.html',''); initResizable(
 <li>SSM_SECOND
 : <a class="el" href="group__time.html#gabb9966b40b15940a870b290963bde8fe">ssm.h</a>
 </li>
-<li>SSM_SIZEOF
-: <a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">ssm.h</a>
-</li>
 <li>SSM_STATIC
 : <a class="el" href="ssm-scheduler_8c.html#a3fc88d105940c7a361804adfd99445d5">ssm-scheduler.c</a>
 </li>
 <li>SSM_STATIC_INLINE
 : <a class="el" href="ssm-scheduler_8c.html#aa2e3be49c5b417c4b7e79ce0faae5f18">ssm-scheduler.c</a>
 </li>
-<li>ssm_sv_init
-: <a class="el" href="group__sv.html#gab42eb8d8c778443a8085557153b40902">ssm.h</a>
-</li>
 <li>ssm_tag
-: <a class="el" href="group__mem.html#ga833cf6f8807efd844e504e23d9e7630b">ssm.h</a>
+: <a class="el" href="group__adt.html#ga833cf6f8807efd844e504e23d9e7630b">ssm.h</a>
 </li>
 <li>SSM_THROW
 : <a class="el" href="group__error.html#ga6ca5ca738e3da4343dbe0721aabea13e">ssm.h</a>
 </li>
-<li>ssm_to_obj
-: <a class="el" href="group__mem.html#ga14d7eb77dcc539a53e6e6037d96519ba">ssm.h</a>
+<li>ssm_time_read
+: <a class="el" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">ssm.h</a>
 </li>
 <li>ssm_to_sv
-: <a class="el" href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm.h</a>
-</li>
-<li>ssm_to_time
-: <a class="el" href="group__mem.html#ga510b9a1db11111afb05a371b1443fddb">ssm.h</a>
+: <a class="el" href="group__sv.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm.h</a>
 </li>
 <li>ssm_unmarshal
 : <a class="el" href="group__mem.html#ga68caa3f774f25fa58037cdd157fb9f7d">ssm.h</a>

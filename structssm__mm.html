@@ -95,30 +95,70 @@ $(document).ready(function(){initNavTree('structssm__mm.html',''); initResizable
 </div><!--header-->
 <div class="contents">
 
-<p>The metadata accompanying any heap-allocated object.  
+<p>The metadata "header" accompanying any heap-allocated object.  
  <a href="structssm__mm.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ssm_8h_source.html">ssm.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
+<tr class="memitem:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html#a8d212098cbfe18fbd9bec648cc0eebb7">ref_count</a></td></tr>
+<tr class="memdesc:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of references to this object.  <a href="structssm__mm.html#a8d212098cbfe18fbd9bec648cc0eebb7">More...</a><br /></td></tr>
+<tr class="separator:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9aca84b04dfc09a4eeae08b3b3266eb6"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html#a9aca84b04dfc09a4eeae08b3b3266eb6">kind</a></td></tr>
+<tr class="memdesc:a9aca84b04dfc09a4eeae08b3b3266eb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> of object this is.  <a href="structssm__mm.html#a9aca84b04dfc09a4eeae08b3b3266eb6">More...</a><br /></td></tr>
+<tr class="separator:a9aca84b04dfc09a4eeae08b3b3266eb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a22b4bc1b68ad5db3213f12c8676a2369"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html#a22b4bc1b68ad5db3213f12c8676a2369">val_count</a></td></tr>
 <tr class="memdesc:a22b4bc1b68ad5db3213f12c8676a2369"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values in payload.  <a href="structssm__mm.html#a22b4bc1b68ad5db3213f12c8676a2369">More...</a><br /></td></tr>
 <tr class="separator:a22b4bc1b68ad5db3213f12c8676a2369"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a50ffde9be79dd080d9e8effe3ee52d66"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html#a50ffde9be79dd080d9e8effe3ee52d66">tag</a></td></tr>
 <tr class="memdesc:a50ffde9be79dd080d9e8effe3ee52d66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Which variant is inhabited by this object.  <a href="structssm__mm.html#a50ffde9be79dd080d9e8effe3ee52d66">More...</a><br /></td></tr>
 <tr class="separator:a50ffde9be79dd080d9e8effe3ee52d66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html#a8d212098cbfe18fbd9bec648cc0eebb7">ref_count</a></td></tr>
-<tr class="memdesc:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of references to this object.  <a href="structssm__mm.html#a8d212098cbfe18fbd9bec648cc0eebb7">More...</a><br /></td></tr>
-<tr class="separator:a8d212098cbfe18fbd9bec648cc0eebb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The metadata accompanying any heap-allocated object. </p>
-<p>Should be embedded in heap-allocated objects as the first field (at memory offset 0).</p>
-<p>When <em>val_count</em> is 0, <em>tag</em> is to be interpreted as an <a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a>. </p>
+<div class="textblock"><p>The metadata "header" accompanying any heap-allocated object. </p>
+<p>This header should be embedded in heap-allocated objects as the first field (at memory offset 0).</p>
+<p>The <em>kind</em> field is used to indicate what <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> an object is, and thus what its size and memory layout are.</p>
+<dl class="section note"><dt>Note</dt><dd>The interpretation and usage of the <em>ref_count</em> and <em>tag</em> fields may depend on the value of <em>kind</em>. For instance, some object kinds don't use one or both of those fields, while others may use them together as a single 16-bit field. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00111">111</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00117">117</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
+<a id="a8d212098cbfe18fbd9bec648cc0eebb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d212098cbfe18fbd9bec648cc0eebb7">&#9670;&nbsp;</a></span>ref_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ref_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The number of references to this object. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00118">118</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="a9aca84b04dfc09a4eeae08b3b3266eb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9aca84b04dfc09a4eeae08b3b3266eb6">&#9670;&nbsp;</a></span>kind</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t kind</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> of object this is. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00119">119</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
 <a id="a22b4bc1b68ad5db3213f12c8676a2369"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a22b4bc1b68ad5db3213f12c8676a2369">&#9670;&nbsp;</a></span>val_count</h2>
 
@@ -133,7 +173,7 @@ Data Fields</h2></td></tr>
 
 <p>Number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values in payload. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00112">112</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00120">120</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -151,25 +191,7 @@ Data Fields</h2></td></tr>
 
 <p>Which variant is inhabited by this object. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00113">113</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="a8d212098cbfe18fbd9bec648cc0eebb7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8d212098cbfe18fbd9bec648cc0eebb7">&#9670;&nbsp;</a></span>ref_count</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint8_t ref_count</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The number of references to this object. </p>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00114">114</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00121">121</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

@@ -103,8 +103,15 @@ $(document).ready(function(){initNavTree('group__mem.html',''); initResizable();
 <a href="#details">More...</a></p>
 <a name="details" id="details"></a><h2 class="groupheader">Discussion</h2>
 <p>Values are always word-sized, and may point to heap-allocated, reference-counted <em>objects</em>; heap memory is allocated from a set of size-indexed memory pools. </p>
-<p>For simplicity and flexibility, all values in SSM runtime are word-sized, represented using <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. When the size of a value exceeds what can be represented by a word, the value is a pointer to a heap-allocated <em>object</em>. In particular, they point to a memory management metadata header, <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a>, which contains enough information to surmise the reference count and extant of that object. The object may be a basic tuple of other <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values, indicated by the <em>val_count</em> field, or it may be a builtin, when the <em>val_count</em> field is <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98" title="Magic val_count value indicating a heap object is a builtin.">SSM_BUILTIN</a>.</p>
-<p>The SSM runtime uses reference counted memory management, based on the <a href="https://www.microsoft.com/en-us/research/publication/perceus-garbage-free-reference-counting-with-reuse/">Perceus algorithm</a>. It exposes memory management primitives <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb" title="Allocate a new heap object to store word-size values.">ssm_new()</a>, <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a>, <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a>, and <a class="el" href="group__mem.html#ga7c340d276921a0cb89399fbf2b16e6ca" title="Try to reuse a potentially heap-allocated value.">ssm_reuse()</a>.</p>
+<p>For simplicity and flexibility, all values in SSM runtime are word-sized, represented using <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. When the size of a value exceeds what can be represented by a word, the value is a pointer to a heap-allocated <em>object</em>. In particular, they point to a memory management metadata header, <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a>.</p>
+<p>The SSM runtime uses reference counting to manage the lifetime of heap objects. The reference count is also maintained in the <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a> header. When a reference is duplicated, use <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> to increment its reference count. When a reference is dropped, use <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> decrement its reference and free if necessary. These macros first check whether the given <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> is heap-allocated before attempting to dereference the heap pointer; to skip this check (for example, if a value is known to be a heap object at compile time), use <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f" title="Duplicate a heap reference, incrementing its ref count.">ssm_dup_unsafe()</a> and <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a>. When the reference count of an object reaches zero, it is cleaned up and freed using <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a>, which drop any references held by the soon-to-be-freed object.</p>
+<p>The <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a> header's <em>kind</em> field indicates what <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> the object is. This determines its memory layout in the heap, in particular where the object might hold references (pointers) to other heap objects. This information is used by <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a> to figure out which values (if any) to <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a>.</p>
+<p>Heap objects are allocated for each <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> using functions with prefix <em>ssm_new_:</em> </p>
+<ul>
+<li><a class="el" href="group__adt.html#ga12f0353d3348de5943ea702d81659eaf" title="Allocate a new ADT object on the heap.">ssm_new_adt()</a></li>
+<li><a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13" title="Allocate a ssm_time on the heap.">ssm_new_time()</a></li>
+<li><a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc" title="Allocate an ssm_sv on the heap.">ssm_new_sv()</a></li>
+</ul>
 <p>The SSM runtime comes with its own platform-agnostic allocator, parameterized by handlers set using <a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231" title="Initializes the underlying allocator system.">ssm_mem_init()</a>. It allocates small pieces of memory in <em>blocks</em>, within designated <em>memory pools</em>. Each memory pool consists of zero or more fixed-size <em>memory pages</em>, and are requested from the platform/OS on-demand via the <a class="el" href="ssm-mem_8c.html#a40385bc630b530cbe8cadeff2008421a" title="Page allocation handler, set by ssm_mem_init().">alloc_page()</a> handler. Meanwhile, allocations for larger ranges of memory are deferred to the <a class="el" href="ssm-mem_8c.html#afe84928b968b035c36a85decd645d13f" title="Large memory allocation handler, set by ssm_mem_init().">alloc_mem()</a> and <a class="el" href="ssm-mem_8c.html#ac9e094b32b7178847b7c17a01070f5ea" title="Large memory release handler, set by ssm_mem_init().">free_mem()</a> handlers.</p>
 <p>The allocator's memory pools may be configured using the <a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef" title="Block size of the smallest memory pool.">SSM_MEM_POOL_MIN</a>, <a class="el" href="group__mem.html#ga1ef7f3f854e79719bd5bb8e8f3694a23" title="Factor between each successive memory pool size, in base 2.">SSM_MEM_POOL_FACTOR_BASE2</a>, <a class="el" href="group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790" title="Number of memory pools.">SSM_MEM_POOL_COUNT</a>, and <a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388" title="The size of a memory page; must be greater than SSM_MEM_POOL_MAX.">SSM_MEM_PAGE_SIZE</a> preprocessor constants. The default values produce 4 memory pools, of sizes 16B, 64B, 256B, and 1024B, and a memory page size of 4096B. </p>
 <table class="memberdecls">
@@ -114,14 +121,11 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SSM values are either "packed" values or heap-allocated.  <a href="unionssm__value__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mm.html">ssm_mm</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The metadata accompanying any heap-allocated object.  <a href="structssm__mm.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">The metadata "header" accompanying any heap-allocated object.  <a href="structssm__mm.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga16ee86b0f039572f6b2f16328f4ddd5f">ssm_initialize_builtin</a>(mm,  b)</td></tr>
-<tr class="memdesc:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the mm header of a builtin type.  <a href="group__mem.html#ga16ee86b0f039572f6b2f16328f4ddd5f">More...</a><br /></td></tr>
-<tr class="separator:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5514bce5af584559d51b5f75344205ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">SSM_MEM_POOL_MIN</a>&#160;&#160;&#160;16</td></tr>
 <tr class="memdesc:ga5514bce5af584559d51b5f75344205ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block size of the smallest memory pool.  <a href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">More...</a><br /></td></tr>
 <tr class="separator:ga5514bce5af584559d51b5f75344205ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -149,53 +153,18 @@ Macros</h2></td></tr>
 <tr class="memitem:gab4385ed8c6c55bb272f6048a721d533e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v)&#160;&#160;&#160;(((v).packed_val &amp; 0x1) == 0)</td></tr>
 <tr class="memdesc:gab4385ed8c6c55bb272f6048a721d533e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a value is on the heap (i.e., is an object).  <a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">More...</a><br /></td></tr>
 <tr class="separator:gab4385ed8c6c55bb272f6048a721d533e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac56d13a01d8b0c58de97c3a9d38c5e98"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a>&#160;&#160;&#160;0</td></tr>
-<tr class="memdesc:gac56d13a01d8b0c58de97c3a9d38c5e98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Magic <em>val_count</em> value indicating a heap object is a builtin.  <a href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">More...</a><br /></td></tr>
-<tr class="separator:gac56d13a01d8b0c58de97c3a9d38c5e98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga21268cd79302aa5bfb72da2f53866da9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(val_count)</td></tr>
-<tr class="memdesc:ga21268cd79302aa5bfb72da2f53866da9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The struct type of a heap object of the given size.  <a href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">More...</a><br /></td></tr>
-<tr class="separator:ga21268cd79302aa5bfb72da2f53866da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf37f24336c851c6ea10b1b3a9f49a1ff"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff">ssm_mm_is_builtin</a>(mp)&#160;&#160;&#160;((mp)-&gt;val_count == <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a>)</td></tr>
-<tr class="memdesc:gaf37f24336c851c6ea10b1b3a9f49a1ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether an mm header is embedded in a builtin-type object.  <a href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff">More...</a><br /></td></tr>
-<tr class="separator:gaf37f24336c851c6ea10b1b3a9f49a1ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga05eb2a4b7d108a6559c125f80231942a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga05eb2a4b7d108a6559c125f80231942a">ssm_mm_is</a>(bt,  mp)&#160;&#160;&#160;(<a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff">ssm_mm_is_builtin</a>(mp) &amp;&amp; (mp)-&gt;tag == (bt))</td></tr>
-<tr class="memdesc:ga05eb2a4b7d108a6559c125f80231942a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether an mm header is embedded in a particular builtin-type object.  <a href="group__mem.html#ga05eb2a4b7d108a6559c125f80231942a">More...</a><br /></td></tr>
-<tr class="separator:ga05eb2a4b7d108a6559c125f80231942a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7547f6ee6f90b5a8a21f9cb9c7db6fbe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">SSM_BUILTIN_SIZE</a>(b)</td></tr>
-<tr class="memdesc:ga7547f6ee6f90b5a8a21f9cb9c7db6fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lookup the size of a builtin.  <a href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">More...</a><br /></td></tr>
-<tr class="separator:ga7547f6ee6f90b5a8a21f9cb9c7db6fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga68af9f88d06fe2f9d528e2d45b878301"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga68af9f88d06fe2f9d528e2d45b878301">SSM_OBJ_SIZE</a>(val_count)</td></tr>
-<tr class="memdesc:ga68af9f88d06fe2f9d528e2d45b878301"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a heap object.  <a href="group__mem.html#ga68af9f88d06fe2f9d528e2d45b878301">More...</a><br /></td></tr>
-<tr class="separator:ga68af9f88d06fe2f9d528e2d45b878301"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae9f11018c270d35a4d70e3061356c3bb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">SSM_SIZEOF</a>(val_count,  tag)&#160;&#160;&#160;(val_count == <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a> ? <a class="el" href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">SSM_BUILTIN_SIZE</a>(tag) : <a class="el" href="group__mem.html#ga68af9f88d06fe2f9d528e2d45b878301">SSM_OBJ_SIZE</a>(val_count))</td></tr>
-<tr class="memdesc:gae9f11018c270d35a4d70e3061356c3bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of a heap object with the given <em>val_count</em> and <em>tag</em>.  <a href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">More...</a><br /></td></tr>
-<tr class="separator:gae9f11018c270d35a4d70e3061356c3bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga9f7765026c74350e37df334c9e59bb12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">ssm_dup</a>(v)</td></tr>
 <tr class="memdesc:ga9f7765026c74350e37df334c9e59bb12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a possible heap reference, incrementing its ref count.  <a href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">More...</a><br /></td></tr>
 <tr class="separator:ga9f7765026c74350e37df334c9e59bb12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabaf350ad4a1577dee5e31e6efd851054"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">ssm_drop</a>(v)</td></tr>
 <tr class="memdesc:gabaf350ad4a1577dee5e31e6efd851054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop a reference to a possible heap item, and free it if necessary.  <a href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">More...</a><br /></td></tr>
 <tr class="separator:gabaf350ad4a1577dee5e31e6efd851054"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga850c1ade6e8bf58d67d5283bb71807a7"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga850c1ade6e8bf58d67d5283bb71807a7">ssm_compatible</a>(v,  vc,  tg)&#160;&#160;&#160;(<a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">SSM_SIZEOF</a>(v.heap_ptr-&gt;val_count, v.heap_ptr-&gt;tag) == <a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">SSM_SIZEOF</a>(vc, tg))</td></tr>
-<tr class="separator:ga850c1ade6e8bf58d67d5283bb71807a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga7c340d276921a0cb89399fbf2b16e6ca"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga7c340d276921a0cb89399fbf2b16e6ca">ssm_reuse</a>(v,  vc,  tg)</td></tr>
-<tr class="memdesc:ga7c340d276921a0cb89399fbf2b16e6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to reuse a potentially heap-allocated value.  <a href="group__mem.html#ga7c340d276921a0cb89399fbf2b16e6ca">More...</a><br /></td></tr>
-<tr class="separator:ga7c340d276921a0cb89399fbf2b16e6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga833cf6f8807efd844e504e23d9e7630b"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga833cf6f8807efd844e504e23d9e7630b">ssm_tag</a>(v)&#160;&#160;&#160;(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) ? (v).heap_ptr-&gt;tag : <a class="el" href="group__mem.html#ga68caa3f774f25fa58037cdd157fb9f7d">ssm_unmarshal</a>(v))</td></tr>
-<tr class="memdesc:ga833cf6f8807efd844e504e23d9e7630b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the tag of an SSM heap object.  <a href="group__mem.html#ga833cf6f8807efd844e504e23d9e7630b">More...</a><br /></td></tr>
-<tr class="separator:ga833cf6f8807efd844e504e23d9e7630b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga14d7eb77dcc539a53e6e6037d96519ba"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga14d7eb77dcc539a53e6e6037d96519ba">ssm_to_obj</a>(v)&#160;&#160;&#160;(&amp;*<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(1), mm)-&gt;payload)</td></tr>
-<tr class="memdesc:ga14d7eb77dcc539a53e6e6037d96519ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the heap object payload pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__mem.html#ga14d7eb77dcc539a53e6e6037d96519ba">More...</a><br /></td></tr>
-<tr class="separator:ga14d7eb77dcc539a53e6e6037d96519ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga510b9a1db11111afb05a371b1443fddb"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga510b9a1db11111afb05a371b1443fddb">ssm_to_time</a>(v)&#160;&#160;&#160;(&amp;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>, mm)-&gt;time)</td></tr>
-<tr class="memdesc:ga510b9a1db11111afb05a371b1443fddb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the heap-allocated time pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__mem.html#ga510b9a1db11111afb05a371b1443fddb">More...</a><br /></td></tr>
-<tr class="separator:ga510b9a1db11111afb05a371b1443fddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga4f64d15b72fdd6f8f3085929a492582a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td></tr>
-<tr class="memdesc:ga4f64d15b72fdd6f8f3085929a492582a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the scheduled variable payload pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">More...</a><br /></td></tr>
-<tr class="separator:ga4f64d15b72fdd6f8f3085929a492582a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">ssm_deref</a>(v)&#160;&#160;&#160;(<a class="el" href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)-&gt;value)</td></tr>
-<tr class="memdesc:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the value of a scheduled variable.  <a href="group__mem.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">More...</a><br /></td></tr>
-<tr class="separator:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gab5dad0cd40fb4260de450e2226d26a8f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm_dup_unsafe</a>(v)</td></tr>
+<tr class="memdesc:gab5dad0cd40fb4260de450e2226d26a8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a heap reference, incrementing its ref count.  <a href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">More...</a><br /></td></tr>
+<tr class="separator:gab5dad0cd40fb4260de450e2226d26a8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga51acf919e4a7bd5b795aa8f302d8605e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e">ssm_drop_unsafe</a>(v)</td></tr>
+<tr class="memdesc:ga51acf919e4a7bd5b795aa8f302d8605e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop a reference to a heap item, and free it if necessary.  <a href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e">More...</a><br /></td></tr>
+<tr class="separator:ga51acf919e4a7bd5b795aa8f302d8605e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -205,29 +174,21 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:gad70079c8a7d346762adc7422cb01a879"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879">ssm_builtin</a> { <a class="el" href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a9fb37543541a2579712e719a8e81169c">SSM_TIME_T</a> = 1, 
-<a class="el" href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a23b38cf60e5d89597363cf4a0dcab026">SSM_SV_T</a>
+<tr class="memitem:ga0f26e675a76a28f76a4d31787be19250"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">ssm_kind</a> { <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6">SSM_ADT_K</a> = 0, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc">SSM_TIME_K</a>, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>
  }</td></tr>
-<tr class="memdesc:gad70079c8a7d346762adc7422cb01a879"><td class="mdescLeft">&#160;</td><td class="mdescRight">Built-in types that are stored in the heap.  <a href="group__mem.html#gad70079c8a7d346762adc7422cb01a879">More...</a><br /></td></tr>
-<tr class="separator:gad70079c8a7d346762adc7422cb01a879"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memdesc:ga0f26e675a76a28f76a4d31787be19250"><td class="mdescLeft">&#160;</td><td class="mdescRight">The different kinds of heap objects, enumerated.  <a href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">More...</a><br /></td></tr>
+<tr class="separator:ga0f26e675a76a28f76a4d31787be19250"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:gafe56b79f41cfe1522669c35cbc423231"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">ssm_mem_init</a> (void *(*alloc_page_handler)(void), void *(*alloc_mem_handler)(size_t), void(*free_mem_handler)(void *, size_t))</td></tr>
 <tr class="memdesc:gafe56b79f41cfe1522669c35cbc423231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the underlying allocator system.  <a href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">More...</a><br /></td></tr>
 <tr class="separator:gafe56b79f41cfe1522669c35cbc423231"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga623bdf0832a98667526418e0f80228fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm_new</a> (uint8_t val_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga623bdf0832a98667526418e0f80228fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new heap object to store word-size values.  <a href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">More...</a><br /></td></tr>
-<tr class="separator:ga623bdf0832a98667526418e0f80228fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">ssm_dup_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
-<tr class="memdesc:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a heap reference, incrementing its ref count.  <a href="group__mem.html#gaf608ae68abfdec1c64e6901d8ef24ccc">More...</a><br /></td></tr>
-<tr class="separator:gaf608ae68abfdec1c64e6901d8ef24ccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">ssm_drop_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
-<tr class="memdesc:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop a reference to a heap item, and free it if necessary.  <a href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c">More...</a><br /></td></tr>
-<tr class="separator:gaafd4a3d839b3e08512f55427a06c3c4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5da14d487972b170b5a3155c96d1a128"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm_reuse_unsafe</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v, uint8_t val_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga5da14d487972b170b5a3155c96d1a128"><td class="mdescLeft">&#160;</td><td class="mdescRight">Try to reuse a heap-allocated value.  <a href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">More...</a><br /></td></tr>
-<tr class="separator:ga5da14d487972b170b5a3155c96d1a128"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
+<tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
+<tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f">ssm_mem_alloc</a> (size_t size)</td></tr>
 <tr class="memdesc:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a contiguous range of memory.  <a href="group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f">More...</a><br /></td></tr>
 <tr class="separator:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -239,51 +200,6 @@ Functions</h2></td></tr>
 <tr class="separator:ga3087c5edfa451e28309ea0cb234ad02e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ga16ee86b0f039572f6b2f16328f4ddd5f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga16ee86b0f039572f6b2f16328f4ddd5f">&#9670;&nbsp;</a></span>ssm_initialize_builtin</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_initialize_builtin</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">mm, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                         \</div>
-<div class="line">    mm-&gt;val_count = <a class="code" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a>;                                               \</div>
-<div class="line">    mm-&gt;tag = b;                                                               \</div>
-<div class="line">    mm-&gt;ref_count = 1;                                                         \</div>
-<div class="line">  } <span class="keywordflow">while</span> (0)</div>
-</div><!-- fragment -->
-<p>Initialize the mm header of a builtin type. </p>
-<dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mm</td><td>pointer to the mm header. </td></tr>
-    <tr><td class="paramname">b</td><td>an <a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a> indicating the type. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00132">132</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
-
-</div>
-</div>
 <a id="ga5514bce5af584559d51b5f75344205ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga5514bce5af584559d51b5f75344205ef">&#9670;&nbsp;</a></span>SSM_MEM_POOL_MIN</h2>
 
@@ -300,7 +216,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than the word size, i.e., the size of <a class="el" href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24" title="Values are 32-bits, the largest supported machine word size.">ssm_word_t</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00169">169</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00174">174</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -320,7 +236,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00183">183</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00188">188</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -340,7 +256,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00197">197</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00202">202</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -370,7 +286,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the memory pool at position <em>pool</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00211">211</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00216">216</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -389,7 +305,7 @@ Functions</h2></td></tr>
 <p>The size of the largest memory pool. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00218">218</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00223">223</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -408,7 +324,7 @@ Functions</h2></td></tr>
 <p>The size of a memory page; must be greater than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a>. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00225">225</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00230">230</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -437,7 +353,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a packed <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00122">122</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00129">129</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -466,7 +382,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the raw 31-bit integral value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00130">130</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00137">137</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -495,236 +411,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>non-zero if on heap, zero otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00137">137</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="gac56d13a01d8b0c58de97c3a9d38c5e98"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac56d13a01d8b0c58de97c3a9d38c5e98">&#9670;&nbsp;</a></span>SSM_BUILTIN</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SSM_BUILTIN&#160;&#160;&#160;0</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Magic <em>val_count</em> value indicating a heap object is a builtin. </p>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00416">416</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga21268cd79302aa5bfb72da2f53866da9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga21268cd79302aa5bfb72da2f53866da9">&#9670;&nbsp;</a></span>ssm_obj_t</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_obj_t</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">val_count</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keyword">struct </span>{                                                                     \</div>
-<div class="line">    struct <a class="code" href="structssm__mm.html">ssm_mm</a> mm;                                                          \</div>
-<div class="line">    ssm_value_t payload[val_count];                                            \</div>
-<div class="line">  }</div>
-</div><!-- fragment -->
-<p>The struct type of a heap object of the given size. </p>
-<p>This is primarily useful for measuing object size and for casting.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val_count</td><td>the number of values in the heap object. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a struct definition of an object with <em>val_count</em> values. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00437">437</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="gaf37f24336c851c6ea10b1b3a9f49a1ff"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf37f24336c851c6ea10b1b3a9f49a1ff">&#9670;&nbsp;</a></span>ssm_mm_is_builtin</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_mm_is_builtin</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">mp</td><td>)</td>
-          <td>&#160;&#160;&#160;((mp)-&gt;val_count == <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Whether an mm header is embedded in a builtin-type object. </p>
-<p>It makes no sense to allocate zero-size objects, so when <em>val_count</em> is zero, it indicates that it is a builtin object.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">mp</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a>. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>non-zero if it is builtin, zero otherwise. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00451">451</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga05eb2a4b7d108a6559c125f80231942a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga05eb2a4b7d108a6559c125f80231942a">&#9670;&nbsp;</a></span>ssm_mm_is</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_mm_is</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">bt, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">mp&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(<a class="el" href="group__mem.html#gaf37f24336c851c6ea10b1b3a9f49a1ff">ssm_mm_is_builtin</a>(mp) &amp;&amp; (mp)-&gt;tag == (bt))</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Whether an mm header is embedded in a particular builtin-type object. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">bt</td><td><a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a> type enumeration. </td></tr>
-    <tr><td class="paramname">mp</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>non-zero if it <em>mm</em> is of type <em>bt</em>, zero otherwise.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00461">461</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga7547f6ee6f90b5a8a21f9cb9c7db6fbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">&#9670;&nbsp;</a></span>SSM_BUILTIN_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SSM_BUILTIN_SIZE</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">b</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  ((<span class="keywordtype">size_t</span>[]){                                                                 \</div>
-<div class="line">      [<a class="code" href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a9fb37543541a2579712e719a8e81169c">SSM_TIME_T</a>] = <span class="keyword">sizeof</span>(<span class="keyword">struct </span><a class="code" href="structssm__time.html">ssm_time</a>),                                  \</div>
-<div class="line">      [<a class="code" href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a23b38cf60e5d89597363cf4a0dcab026">SSM_SV_T</a>] = <span class="keyword">sizeof</span>(<a class="code" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>),                                           \</div>
-<div class="line">  }[b])</div>
-</div><!-- fragment -->
-<p>Lookup the size of a builtin. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">b</td><td>an <a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a> indicating the type. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of a builtin of type <em>b</em>, in bytes. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00468">468</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga68af9f88d06fe2f9d528e2d45b878301"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga68af9f88d06fe2f9d528e2d45b878301">&#9670;&nbsp;</a></span>SSM_OBJ_SIZE</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SSM_OBJ_SIZE</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">val_count</td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  (<span class="keyword">sizeof</span>(<a class="code" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(1)) +                                                      \</div>
-<div class="line">   (val_count - 1) * (<span class="keyword">sizeof</span>(<a class="code" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(2)) - <span class="keyword">sizeof</span>(<a class="code" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(1))))</div>
-</div><!-- fragment -->
-<p>Compute the size of a heap object. </p>
-<p>This macro is designed to be robust against struct padding inserted by the compiler.</p>
-<dl class="section note"><dt>Note</dt><dd>this does not compute the right size for values of <em>val_count</em> less than 1.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val_count</td><td>the number of values in a heap-allocated object. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of the object, in bytes. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00485">485</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="gae9f11018c270d35a4d70e3061356c3bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae9f11018c270d35a4d70e3061356c3bb">&#9670;&nbsp;</a></span>SSM_SIZEOF</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define SSM_SIZEOF</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">val_count, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">tag&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(val_count == <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a> ? <a class="el" href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe">SSM_BUILTIN_SIZE</a>(tag) : <a class="el" href="group__mem.html#ga68af9f88d06fe2f9d528e2d45b878301">SSM_OBJ_SIZE</a>(val_count))</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Size of a heap object with the given <em>val_count</em> and <em>tag</em>. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val_count</td><td>the <em>val_count</em> field of an <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a>. </td></tr>
-    <tr><td class="paramname">tag</td><td>the <em>val_count</em> field of an <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a>. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the size of a heap object with these fields. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00495">495</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00144">144</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -747,15 +434,15 @@ Functions</h2></td></tr>
 <div class="line">  ssm_dup_unsafe(v)</div>
 </div><!-- fragment -->
 <p>Duplicate a possible heap reference, incrementing its ref count. </p>
-<p>If the caller knows <em>v</em> is definitely on the heap, call <a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> to eliminate the heap check (and omit call if it is definitely not on the heap).</p>
+<p>If the caller knows <em>v</em> is definitely on the heap, call <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> to eliminate the heap check (and omit call if it is definitely not on the heap).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a> header of the heap item. </td></tr>
+    <tr><td class="paramname">v</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a> header of the heap item. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00523">523</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00154">154</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -779,7 +466,7 @@ Functions</h2></td></tr>
 </div><!-- fragment -->
 <p>Drop a reference to a possible heap item, and free it if necessary. </p>
 <p>If <em>v</em> is freed, all references held by the heap item itself will also be be dropped.</p>
-<p>If the caller knows that <em>v</em> is definitely a heap item, call <a class="el" href="group__mem.html#gaafd4a3d839b3e08512f55427a06c3c4c" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> to eliminate the heap check (and omit call if it is definitely not on the heap).</p>
+<p>If the caller knows that <em>v</em> is definitely a heap item, call <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> to eliminate the heap check (and omit call if it is definitely not on the heap).</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> to be dropped. </td></tr>
@@ -787,247 +474,73 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00538">538</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00169">169</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
-<a id="ga850c1ade6e8bf58d67d5283bb71807a7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga850c1ade6e8bf58d67d5283bb71807a7">&#9670;&nbsp;</a></span>ssm_compatible</h2>
+<a id="gab5dad0cd40fb4260de450e2226d26a8f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gab5dad0cd40fb4260de450e2226d26a8f">&#9670;&nbsp;</a></span>ssm_dup_unsafe</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ssm_compatible</td>
+          <td class="memname">#define ssm_dup_unsafe</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">v, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramname">v</td><td>)</td>
           <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">vc, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">tg&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td>&#160;&#160;&#160;(<a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">SSM_SIZEOF</a>(v.heap_ptr-&gt;val_count, v.heap_ptr-&gt;tag) == <a class="el" href="group__mem.html#gae9f11018c270d35a4d70e3061356c3bb">SSM_SIZEOF</a>(vc, tg))</td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00542">542</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga7c340d276921a0cb89399fbf2b16e6ca"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7c340d276921a0cb89399fbf2b16e6ca">&#9670;&nbsp;</a></span>ssm_reuse</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_reuse</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">vc, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">tg&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  (<a class="code" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) &amp;&amp; <a class="code" href="group__mem.html#ga850c1ade6e8bf58d67d5283bb71807a7">ssm_compatible</a>(v, vc, tg) ? <a class="code" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm_reuse_unsafe</a>(v, vc, tg)   \</div>
-<div class="line">                                               : <a class="code" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm_new</a>(vc, tg))</div>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
+<div class="line">    ++(v).heap_ptr-&gt;ref_count;                                                 \</div>
+<div class="line">  while (0)</div>
 </div><!-- fragment -->
-<p>Try to reuse a potentially heap-allocated value. </p>
-<p>Performs a runtime check to ensure that <em>v</em> actually points to a heap item of sufficient size.</p>
-<p>Calls <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb" title="Allocate a new heap object to store word-size values.">ssm_new()</a> to allocate an entirely new heap item if <em>v</em> cannot be reused.</p>
-<p>If the caller is sure that <em>v</em> can definitely be reused to allocate a heap object with <em>vc</em> and <em>tg</em>, call <a class="el" href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128" title="Try to reuse a heap-allocated value.">ssm_reuse_unsafe()</a> directly.</p>
+<p>Duplicate a heap reference, incrementing its ref count. </p>
+<p>Called by <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer, i.e., <code><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e" title="Whether a value is on the heap (i.e., is an object).">ssm_on_heap(v)</a></code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>the value to try to reuse. </td></tr>
-    <tr><td class="paramname">vc</td><td>the number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values to be stored in the object payload. </td></tr>
-    <tr><td class="paramname">tg</td><td>the tag to initialize the <em>mm</em> header with. </td></tr>
+    <tr><td class="paramname">v</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a> header of the heap item. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>value pointing to the newly allocated object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00562">562</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00181">181</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
-<a id="ga833cf6f8807efd844e504e23d9e7630b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga833cf6f8807efd844e504e23d9e7630b">&#9670;&nbsp;</a></span>ssm_tag</h2>
+<a id="ga51acf919e4a7bd5b795aa8f302d8605e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga51acf919e4a7bd5b795aa8f302d8605e">&#9670;&nbsp;</a></span>ssm_drop_unsafe</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ssm_tag</td>
+          <td class="memname">#define ssm_drop_unsafe</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) ? (v).heap_ptr-&gt;tag : <a class="el" href="group__mem.html#ga68caa3f774f25fa58037cdd157fb9f7d">ssm_unmarshal</a>(v))</td>
+          <td></td>
         </tr>
       </table>
 </div><div class="memdoc">
-
-<p>Retrieve the tag of an SSM heap object. </p>
-<p>Behavior is implementation defined for built-in types.</p>
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">if</span> (--(v).heap_ptr-&gt;ref_count == 0)                                          \</div>
+<div class="line">  ssm_drop_final(v)</div>
+</div><!-- fragment -->
+<p>Drop a reference to a heap item, and free it if necessary. </p>
+<p>If <em>v</em> is freed, <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a> will be called to drop all heap objects <em>v</em> refers to.</p>
+<p>Called by <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a>.</p>
+<dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer, i.e., <code><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e" title="Whether a value is on the heap (i.e., is an object).">ssm_on_heap(v)</a></code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> whose tag is being retrieved. </td></tr>
+    <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> to be dropped. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the tag of <em>v</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00613">613</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga14d7eb77dcc539a53e6e6037d96519ba"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga14d7eb77dcc539a53e6e6037d96519ba">&#9670;&nbsp;</a></span>ssm_to_obj</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_to_obj</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(&amp;*<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a>(1), mm)-&gt;payload)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Access the heap object payload pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </p>
-<p>Provided for convenience.</p>
-<dl class="section note"><dt>Note</dt><dd>The behavior of using this macro on an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that does not point to a scheduled variable is undefined.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>pointer to the beginning of the value payload in the heap. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00625">625</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga510b9a1db11111afb05a371b1443fddb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga510b9a1db11111afb05a371b1443fddb">&#9670;&nbsp;</a></span>ssm_to_time</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_to_time</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(&amp;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>, mm)-&gt;time)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Access the heap-allocated time pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </p>
-<p>Provided for convenience.</p>
-<dl class="section note"><dt>Note</dt><dd>The behavior of using this macro on an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that does not point to a scheduled variable is undefined.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>pointer to the <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a> in the heap. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00637">637</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga4f64d15b72fdd6f8f3085929a492582a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4f64d15b72fdd6f8f3085929a492582a">&#9670;&nbsp;</a></span>ssm_to_sv</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_to_sv</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Access the scheduled variable payload pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </p>
-<p>Provided for convenience.</p>
-<dl class="section note"><dt>Note</dt><dd>The behavior of using this macro on an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that does not point to a scheduled variable is undefined.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>pointer to the <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779" title="A scheduled variable that supported scheduled updates with triggers.">ssm_sv_t</a> in the heap. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00649">649</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga181194fb2c309b5ebbed3be4f8a2ad4c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga181194fb2c309b5ebbed3be4f8a2ad4c">&#9670;&nbsp;</a></span>ssm_deref</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_deref</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="group__mem.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)-&gt;value)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Obtain the value of a scheduled variable. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that points to a scheduled variable. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the value that <em>v</em> points to. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00656">656</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00197">197</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -1051,28 +564,30 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
-<a id="gad70079c8a7d346762adc7422cb01a879"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gad70079c8a7d346762adc7422cb01a879">&#9670;&nbsp;</a></span>ssm_builtin</h2>
+<a id="ga0f26e675a76a28f76a4d31787be19250"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga0f26e675a76a28f76a4d31787be19250">&#9670;&nbsp;</a></span>ssm_kind</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879">ssm_builtin</a></td>
+          <td class="memname">enum <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">ssm_kind</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Built-in types that are stored in the heap. </p>
-<p>Type enumerated here are chosen because they cannot be easily or efficiently expressed as a product of words. For instance, 64-bit timestamps cannot be directly stored in the payload of a regular heap object, where even-numbered timestamps may be misinterpreted as pointers. </p>
+<p>The different kinds of heap objects, enumerated. </p>
+<p>Types enumerated here that are not ADTs are chosen because they cannot be easily or efficiently expressed as a product of words. For instance, 64-bit timestamps cannot be directly stored in the payload of a regular heap object, where even-numbered timestamps may be misinterpreted as pointers. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="ggad70079c8a7d346762adc7422cb01a879a9fb37543541a2579712e719a8e81169c"></a>SSM_TIME_T&#160;</td><td class="fielddoc"><p>64-bit timestamps, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a> </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6"></a>SSM_ADT_K&#160;</td><td class="fielddoc"><p>ADT object, e.g., <a class="el" href="structssm__adt1.html" title="The struct template of a heap-allocated ADT object.">ssm_adt1</a>. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="ggad70079c8a7d346762adc7422cb01a879a23b38cf60e5d89597363cf4a0dcab026"></a>SSM_SV_T&#160;</td><td class="fielddoc"><p>Scheduled variables, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779" title="A scheduled variable that supported scheduled updates with triggers.">ssm_sv_t</a>. </p>
+<tr><td class="fieldname"><a id="gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc"></a>SSM_TIME_K&#160;</td><td class="fielddoc"><p>64-bit timestamps, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a> </p>
+</td></tr>
+<tr><td class="fieldname"><a id="gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85"></a>SSM_SV_K&#160;</td><td class="fielddoc"><p>Scheduled variables, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv_t</a>. </p>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00425">425</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00138">138</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -1126,57 +641,14 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga623bdf0832a98667526418e0f80228fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga623bdf0832a98667526418e0f80228fb">&#9670;&nbsp;</a></span>ssm_new()</h2>
+<a id="gac773e49a0378b73d49552e242a1a7971"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac773e49a0378b73d49552e242a1a7971">&#9670;&nbsp;</a></span>ssm_drop_final()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>val_count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>tag</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Allocate a new heap object to store word-size values. </p>
-<p>When <em>val_count</em> is equal to <a class="el" href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98" title="Magic val_count value indicating a heap object is a builtin.">SSM_BUILTIN</a>, <em>tag</em> is interpreted as an <a class="el" href="group__mem.html#gad70079c8a7d346762adc7422cb01a879" title="Built-in types that are stored in the heap.">ssm_builtin</a> enumeration, and a memory block of that size is allocated.</p>
-<p>The <em>mm</em> header in the returned object is initialized, but the <em>data</em> payload is not.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">val_count</td><td>the number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values to be stored in the object payload. </td></tr>
-    <tr><td class="paramname">tag</td><td>the tag to initialize the <em>mm</em> header with. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>value pointing to the newly allocated object.</dd></dl>
-<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__mem.html#ga7547f6ee6f90b5a8a21f9cb9c7db6fbe" title="Lookup the size of a builtin.">SSM_BUILTIN_SIZE()</a>. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00180">180</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
-
-</div>
-</div>
-<a id="gaf608ae68abfdec1c64e6901d8ef24ccc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaf608ae68abfdec1c64e6901d8ef24ccc">&#9670;&nbsp;</a></span>ssm_dup_unsafe()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ssm_dup_unsafe </td>
+          <td class="memname">void ssm_drop_final </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
           <td class="paramname"><em>v</em></td><td>)</td>
@@ -1185,98 +657,18 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Duplicate a heap reference, incrementing its ref count. </p>
-<p>Called by <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a>.</p>
+<p>Finalize and free a heap object. </p>
+<p>Drops all heap objects <em>v</em> refers to, and perform any additional finalization as required by the <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> of <em>v</em>.</p>
+<p>Called by <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer, i.e., <code><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e" title="Whether a value is on the heap (i.e., is an object).">ssm_on_heap(v)</a></code>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>pointer to the <a class="el" href="structssm__mm.html" title="The metadata accompanying any heap-allocated object.">ssm_mm</a> header of the heap item. </td></tr>
+    <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> to be finalized and freed. </td></tr>
   </table>
   </dd>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00188">188</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
-
-</div>
-</div>
-<a id="gaafd4a3d839b3e08512f55427a06c3c4c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaafd4a3d839b3e08512f55427a06c3c4c">&#9670;&nbsp;</a></span>ssm_drop_unsafe()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void ssm_drop_unsafe </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
-          <td class="paramname"><em>v</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Drop a reference to a heap item, and free it if necessary. </p>
-<p>If <em>v</em> is freed, all references held by the heap item itself will also be be dropped.</p>
-<p>Called by <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a>.</p>
-<dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer, i.e., <code><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e" title="Whether a value is on the heap (i.e., is an object).">ssm_on_heap(v)</a></code>.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> to be dropped. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00190">190</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
-
-</div>
-</div>
-<a id="ga5da14d487972b170b5a3155c96d1a128"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5da14d487972b170b5a3155c96d1a128">&#9670;&nbsp;</a></span>ssm_reuse_unsafe()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_reuse_unsafe </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
-          <td class="paramname"><em>v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>val_count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>tag</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Try to reuse a heap-allocated value. </p>
-<p>Calls <a class="el" href="group__mem.html#ga623bdf0832a98667526418e0f80228fb" title="Allocate a new heap object to store word-size values.">ssm_new()</a> to allocate an entirely new heap item if <em>v</em> cannot be reused.</p>
-<p>Called by <a class="el" href="group__mem.html#ga7c340d276921a0cb89399fbf2b16e6ca" title="Try to reuse a potentially heap-allocated value.">ssm_reuse()</a>.</p>
-<dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer to an object of sufficient size.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">v</td><td>the value to try to reuse. </td></tr>
-    <tr><td class="paramname">val_count</td><td>the number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values to be stored in the object payload. </td></tr>
-    <tr><td class="paramname">tag</td><td>the tag to initialize the <em>mm</em> header with. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>value pointing to the newly allocated object. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00198">198</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -1392,17 +784,7 @@ Functions</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__sv_html_ga3ff20b6ba9aa056f1cf64051c20dd779"><div class="ttname"><a href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a></div><div class="ttdeci">struct ssm_sv ssm_sv_t</div><div class="ttdoc">A scheduled variable that supported scheduled updates with triggers.</div></div>
-<div class="ttc" id="astructssm__time_html"><div class="ttname"><a href="structssm__time.html">ssm_time</a></div><div class="ttdoc">Heap-allocated time values.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00153">ssm.h:153</a></div></div>
-<div class="ttc" id="agroup__mem_html_ggad70079c8a7d346762adc7422cb01a879a9fb37543541a2579712e719a8e81169c"><div class="ttname"><a href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a9fb37543541a2579712e719a8e81169c">SSM_TIME_T</a></div><div class="ttdeci">@ SSM_TIME_T</div><div class="ttdoc">64-bit timestamps, ssm_time_t</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00426">ssm.h:426</a></div></div>
-<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The metadata accompanying any heap-allocated object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00111">ssm.h:111</a></div></div>
-<div class="ttc" id="agroup__mem_html_gac56d13a01d8b0c58de97c3a9d38c5e98"><div class="ttname"><a href="group__mem.html#gac56d13a01d8b0c58de97c3a9d38c5e98">SSM_BUILTIN</a></div><div class="ttdeci">#define SSM_BUILTIN</div><div class="ttdoc">Magic val_count value indicating a heap object is a builtin.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00416">ssm.h:416</a></div></div>
-<div class="ttc" id="agroup__mem_html_ga5da14d487972b170b5a3155c96d1a128"><div class="ttname"><a href="group__mem.html#ga5da14d487972b170b5a3155c96d1a128">ssm_reuse_unsafe</a></div><div class="ttdeci">ssm_value_t ssm_reuse_unsafe(ssm_value_t v, uint8_t val_count, uint8_t tag)</div><div class="ttdoc">Try to reuse a heap-allocated value.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00198">ssm-mem.c:198</a></div></div>
-<div class="ttc" id="agroup__mem_html_ga21268cd79302aa5bfb72da2f53866da9"><div class="ttname"><a href="group__mem.html#ga21268cd79302aa5bfb72da2f53866da9">ssm_obj_t</a></div><div class="ttdeci">#define ssm_obj_t(val_count)</div><div class="ttdoc">The struct type of a heap object of the given size.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00437">ssm.h:437</a></div></div>
-<div class="ttc" id="agroup__mem_html_ggad70079c8a7d346762adc7422cb01a879a23b38cf60e5d89597363cf4a0dcab026"><div class="ttname"><a href="group__mem.html#ggad70079c8a7d346762adc7422cb01a879a23b38cf60e5d89597363cf4a0dcab026">SSM_SV_T</a></div><div class="ttdeci">@ SSM_SV_T</div><div class="ttdoc">Scheduled variables, ssm_sv_t.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00427">ssm.h:427</a></div></div>
-<div class="ttc" id="agroup__mem_html_ga850c1ade6e8bf58d67d5283bb71807a7"><div class="ttname"><a href="group__mem.html#ga850c1ade6e8bf58d67d5283bb71807a7">ssm_compatible</a></div><div class="ttdeci">#define ssm_compatible(v, vc, tg)</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00542">ssm.h:542</a></div></div>
-<div class="ttc" id="agroup__mem_html_ga623bdf0832a98667526418e0f80228fb"><div class="ttname"><a href="group__mem.html#ga623bdf0832a98667526418e0f80228fb">ssm_new</a></div><div class="ttdeci">ssm_value_t ssm_new(uint8_t val_count, uint8_t tag)</div><div class="ttdoc">Allocate a new heap object to store word-size values.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00180">ssm-mem.c:180</a></div></div>
-<div class="ttc" id="agroup__mem_html_gab4385ed8c6c55bb272f6048a721d533e"><div class="ttname"><a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a></div><div class="ttdeci">#define ssm_on_heap(v)</div><div class="ttdoc">Whether a value is on the heap (i.e., is an object).</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00137">ssm.h:137</a></div></div>
+<div class="ttc" id="agroup__mem_html_gab4385ed8c6c55bb272f6048a721d533e"><div class="ttname"><a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a></div><div class="ttdeci">#define ssm_on_heap(v)</div><div class="ttdoc">Whether a value is on the heap (i.e., is an object).</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00144">ssm.h:144</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

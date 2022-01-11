@@ -90,6 +90,7 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">ssm-internal.h File Reference</div>  </div>
@@ -134,9 +135,9 @@ Macros</h2></td></tr>
 <tr class="memitem:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">SSM_ASSERT</a>(cond)</td></tr>
 <tr class="memdesc:ga3d0f3851fe9b66a8c421974262799fd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throw an internal error.  <a href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">More...</a><br /></td></tr>
 <tr class="separator:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga16ee86b0f039572f6b2f16328f4ddd5f">ssm_initialize_builtin</a>(mm,  b)</td></tr>
-<tr class="memdesc:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialize the mm header of a builtin type.  <a href="group__mem.html#ga16ee86b0f039572f6b2f16328f4ddd5f">More...</a><br /></td></tr>
-<tr class="separator:ga16ee86b0f039572f6b2f16328f4ddd5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm_adt_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__adt1.html">ssm_adt1</a>) + sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1))</td></tr>
+<tr class="memdesc:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a heap-allocated ADT.  <a href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">More...</a><br /></td></tr>
+<tr class="separator:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5514bce5af584559d51b5f75344205ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">SSM_MEM_POOL_MIN</a>&#160;&#160;&#160;16</td></tr>
 <tr class="memdesc:ga5514bce5af584559d51b5f75344205ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block size of the smallest memory pool.  <a href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">More...</a><br /></td></tr>
 <tr class="separator:ga5514bce5af584559d51b5f75344205ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,6 +156,15 @@ Macros</h2></td></tr>
 <tr class="memitem:gab5a6226f024f81622a5ce90dcd9b7388"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388">SSM_MEM_PAGE_SIZE</a>&#160;&#160;&#160;<a class="el" href="group__mem.html#ga9fe24b7e82f37df88331c2acef65ed2c">SSM_MEM_POOL_SIZE</a>(<a class="el" href="group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790">SSM_MEM_POOL_COUNT</a>)</td></tr>
 <tr class="memdesc:gab5a6226f024f81622a5ce90dcd9b7388"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of a memory page; must be greater than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a>.  <a href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388">More...</a><br /></td></tr>
 <tr class="separator:gab5a6226f024f81622a5ce90dcd9b7388"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:ga0f26e675a76a28f76a4d31787be19250"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">ssm_kind</a> { <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6">SSM_ADT_K</a> = 0, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc">SSM_TIME_K</a>, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>
+ }</td></tr>
+<tr class="memdesc:ga0f26e675a76a28f76a4d31787be19250"><td class="mdescLeft">&#160;</td><td class="mdescRight">The different kinds of heap objects, enumerated.  <a href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">More...</a><br /></td></tr>
+<tr class="separator:ga0f26e675a76a28f76a4d31787be19250"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>

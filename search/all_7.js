@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['last_5fupdated_35',['last_updated',['../structssm__sv.html#a8789bb37d54b70b671b6286befaf711e',1,'ssm_sv']]],
-  ['later_5ftime_36',['later_time',['../structssm__sv.html#a2527ff359c176c26db2570b0216ba9da',1,'ssm_sv']]],
-  ['later_5fvalue_37',['later_value',['../structssm__sv.html#aec86c4639acbe2997a5599560ff6b034',1,'ssm_sv']]]
+  ['kind_38',['kind',['../structssm__mm.html#a9aca84b04dfc09a4eeae08b3b3266eb6',1,'ssm_mm']]]
 ];
