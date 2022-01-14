@@ -466,19 +466,40 @@ ssm_value_t ssm_new_sv(ssm_value_t val);
  *  Updates the value of @a var in the current instant, and wakes up all
  *  sensitive processes at a lower priority than the calling routine.
  *
- *  Does not overwrite a scheduled assignment.
+ *  ssm_assign() will ssm_drop() the previous value of @a var and ssm_dup() the
+ *  new @a value. If the caller already knows whether @a var and @a value reside
+ *  on the heap, they may call ssm_assign_unsafe() to forego the ssm_drop() and
+ *  ssm_dup() calls, but will be responsible for reference counting themselves
+ *  (i.e., calling ssm_dup_unsafe() and ssm_drop_unsafe() for heap objects).
+ *
+ *  @note Does not overwrite a scheduled assignment.
+ *  @note The behavior of this macro when @a var does not point to a scheduled
+ *        variable is undefined.
  *
  *  @param var    pointer to the scheduled variable.
  *  @param prio   priority of the calling routine.
  *  @param value  the value to be assigned to @a var.
  */
-void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value);
+#define ssm_assign(var, prio, value)                                           \
+  do {                                                                         \
+    ssm_dup(value);                                                            \
+    ssm_drop(ssm_deref(var));                                                  \
+    ssm_assign_unsafe(ssm_to_sv(var), prio, value);                            \
+  } while (0)
 
 /** @brief Delayed assignment to a scheduled variable.
  *
  *  Schedules a delayed assignment to @a var at a later time.
  *
- *  Overwrites any previously scheduled update.
+ *  ssm_later() will ssm_dup() the scheduled @a value. If the caller already
+ *  knows whether @a value resides on the heap, they may call ssm_later_unsafe()
+ *  to forego the ssm_dup(), but will be responsible for reference counting
+ *  themselves (i.e., calling ssm_dup_unsafe() for heap objects).
+ *
+ *  Overwrites any previously scheduled update, if any.
+ *
+ *  @note The behavior of this macro when @a var does not point to a scheduled
+ *        variable is undefined.
  *
  *  @param var    pointer to the scheduled variable.
  *  @param later  the time when the update should take place.
@@ -487,7 +508,41 @@ void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value);
  *  @throws SSM_INVALID_TIME          @a later is greater than ssm_now().
  *  @throws SSM_EXHAUSTED_EVENT_QUEUE event queue ran out of space.
  */
-void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value);
+#define ssm_later(var, later, value)                                           \
+  do {                                                                         \
+    ssm_dup(value);                                                            \
+    ssm_later_unsafe(ssm_to_sv(var), later, value);                            \
+  } while (0)
+
+/** @brief ssm_assign() without automatic reference counting.
+ *
+ *  @note Does not overwrite a scheduled assignment.
+ *
+ *  @param var    pointer to the scheduled variable.
+ *  @param prio   priority of the calling routine.
+ *  @param value  the value to be assigned to @a var.
+ *
+ *  @sa ssm_assign().
+ */
+void ssm_assign_unsafe(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value);
+
+/** @brief ssm_later() without automatic reference counting.
+ *
+ *  Overwrites any previously scheduled update, if ssm_laterr
+ *
+ *  @note ssm_drop() <em>will</em> be called on the previous @a later_value,
+ *        so the caller is not responsible for checking that.
+ *
+ *  @param var    pointer to the scheduled variable.
+ *  @param later  the time when the update should take place.
+ *  @param value  the value to be assigned to @a var.
+ *
+ *  @throws SSM_INVALID_TIME          @a later is greater than ssm_now().
+ *  @throws SSM_EXHAUSTED_EVENT_QUEUE event queue ran out of space.
+ *
+ *  @sa ssm_later().
+ */
+void ssm_later_unsafe(ssm_sv_t *var, ssm_time_t later, ssm_value_t value);
 
 /** @brief Sensitize a variable to a trigger.
  *
