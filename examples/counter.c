@@ -110,15 +110,13 @@ void step_clock(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_later(ssm_to_sv(cont->clk), ssm_now() + (2 * SSM_SECOND),
-                ssm_marshal(1));
+      ssm_later(cont->clk, ssm_now() + (2 * SSM_SECOND), ssm_marshal(1));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 1;
       return;
     case 1:
       ssm_desensitize(&cont->trigger1);
-      ssm_later(ssm_to_sv(cont->clk), ssm_now() + (2 * SSM_SECOND),
-                ssm_marshal(0));
+      ssm_later(cont->clk, ssm_now() + (2 * SSM_SECOND), ssm_marshal(0));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 2;
       return;
@@ -157,7 +155,7 @@ void step_dff1(struct ssm_act *act) {
   case 0:
     for (;;) {
       if (ssm_unmarshal(ssm_deref(cont->clk)))
-        ssm_assign(ssm_to_sv(cont->q1), act->priority, ssm_deref(cont->d1));
+        ssm_assign(cont->q1, act->priority, ssm_deref(cont->d1));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 1;
       return;
@@ -198,7 +196,7 @@ void step_dff2(struct ssm_act *act) {
   case 0:
     for (;;) {
       if ((int)ssm_unmarshal(ssm_deref(cont->clk)))
-        ssm_assign(ssm_to_sv(cont->q2), act->priority, ssm_deref(cont->d2));
+        ssm_assign(cont->q2, act->priority, ssm_deref(cont->d2));
       ssm_sensitize(ssm_to_sv(cont->clk), &cont->trigger1);
       act->pc = 1;
       return;
@@ -230,7 +228,7 @@ void step_incr(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_assign(ssm_to_sv(cont->d2), act->priority,
+      ssm_assign(cont->d2, act->priority,
                  ssm_marshal(ssm_unmarshal(ssm_deref(cont->q2)) + 1));
       ssm_sensitize(ssm_to_sv(cont->q2), &cont->trigger1);
       act->pc = 1;
@@ -268,7 +266,7 @@ void step_adder(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_assign(ssm_to_sv(cont->d1), act->priority,
+      ssm_assign(cont->d1, act->priority,
                  ssm_marshal(ssm_unmarshal(ssm_deref(cont->q1)) +
                              ssm_unmarshal(ssm_deref(cont->d2))));
       ssm_sensitize(ssm_to_sv(cont->q2), &cont->trigger1);

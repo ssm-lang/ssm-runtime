@@ -37,7 +37,7 @@ void step_hello(ssm_act_t *act) {
   case 0:
 
 #define print_yield(p, c)                                                      \
-  ssm_later(ssm_to_sv(cont->stdout), ssm_now() + 10, ssm_marshal(c));          \
+  ssm_later(cont->stdout, ssm_now() + 10, ssm_marshal(c));                     \
   ssm_sensitize(ssm_to_sv(cont->stdout), &cont->trigger1);                     \
   act->pc = p;                                                                 \
   return;                                                                      \

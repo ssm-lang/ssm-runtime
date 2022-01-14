@@ -62,8 +62,8 @@ void step_second_clock(struct ssm_act *act) {
   case 0:
     cont->timer = ssm_new_sv(EVENT_VALUE);
     for (;;) {
-      ssm_assign(ssm_to_sv(cont->second_event), act->priority, EVENT_VALUE);
-      ssm_later(ssm_to_sv(cont->timer), ssm_now() + SSM_SECOND, EVENT_VALUE);
+      ssm_assign(cont->second_event, act->priority, EVENT_VALUE);
+      ssm_later(cont->timer, ssm_now() + SSM_SECOND, EVENT_VALUE);
       cont->trigger1.act = act;
       ssm_sensitize(ssm_to_sv(cont->timer), &cont->trigger1);
       act->pc = 1;
@@ -103,7 +103,7 @@ void step_report_seconds(struct ssm_act *act) {
       return;
     case 1:
       ssm_desensitize(&cont->trigger1);
-      ssm_assign(ssm_to_sv(cont->seconds), act->priority,
+      ssm_assign(cont->seconds, act->priority,
                  ssm_marshal(ssm_unmarshal(ssm_deref(cont->seconds)) + 1));
 
       printf("%d\n", (int)ssm_unmarshal(ssm_deref(cont->seconds)));

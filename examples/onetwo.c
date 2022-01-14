@@ -59,7 +59,7 @@ void step_one(struct ssm_act *act) {
     return;
   case 1:
     ssm_desensitize(&cont->trigger1);
-    ssm_assign(ssm_to_sv(cont->a), act->priority,
+    ssm_assign(cont->a, act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) + 1));
   }
   ssm_drop(cont->a);
@@ -88,7 +88,7 @@ void step_two(struct ssm_act *act) {
     return;
   case 1:
     ssm_desensitize(&cont->trigger1);
-    ssm_assign(ssm_to_sv(cont->a), act->priority,
+    ssm_assign(cont->a, act->priority,
                ssm_marshal(ssm_unmarshal(ssm_deref(cont->a)) * 2));
   }
   ssm_drop(cont->a);
@@ -111,7 +111,7 @@ void step_main(struct ssm_act *act) {
   case 0:
     cont->a = ssm_new_sv(ssm_marshal(0));
 
-    ssm_later(ssm_to_sv(cont->a), ssm_now() + 100, ssm_marshal(10));
+    ssm_later(cont->a, ssm_now() + 100, ssm_marshal(10));
     {
       ssm_depth_t new_depth = act->depth - 1; // 2 children
       ssm_priority_t new_priority = act->priority;
