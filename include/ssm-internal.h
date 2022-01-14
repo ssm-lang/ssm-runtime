@@ -373,7 +373,7 @@ struct ssm_input {
 };
 
 #ifndef SSM_INPUT_RB_SIZE
-#define SSM_INPUT_RB_SIZE 1024
+#define SSM_INPUT_RB_SIZE 32
 #endif
 
 extern struct ssm_input ssm_input_rb[SSM_INPUT_RB_SIZE];
@@ -381,8 +381,8 @@ extern struct ssm_input ssm_input_rb[SSM_INPUT_RB_SIZE];
 #define ssm_input_idx(i) ((i) % SSM_INPUT_RB_SIZE)
 #define ssm_input_get(i) (&ssm_input_rb[ssm_input_idx(i)])
 
-#define ssm_input_read_ready(r, w) (ssm_input_idx(r) != ssm_input_idx(w))
-#define ssm_input_write_ready(r, w) (ssm_input_idx(r) != ssm_input_idx(w + 1))
+#define ssm_input_read_ready(r, w)  (ssm_input_idx(r) != ssm_input_idx(w))
+#define ssm_input_write_ready(r, w) (ssm_input_read_ready(r, w + 1))
 
 /** @brief Consume #ssm_input_packet, to prepare to ssm_tick().
  *
