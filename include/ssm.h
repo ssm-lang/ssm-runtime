@@ -275,7 +275,7 @@ ssm_value_t ssm_new_time(ssm_time_t time);
  *  @param v  the #ssm_value_t
  *  @returns  the #ssm_time_t in the heap.
  */
-#define ssm_time_read(v) (container_of((v).heap_ptr, ssm_time_t, mm)->time)
+#define ssm_time_read(v) (container_of((v).heap_ptr, struct ssm_time, mm)->time)
 
 /** @} */
 
