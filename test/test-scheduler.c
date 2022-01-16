@@ -287,9 +287,9 @@ void trigger_basic() {
 
   step0ran = step1ran = false;
 
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[2]);
+  ssm_sensitize(variables[0], &triggers[0]);
+  ssm_sensitize(variables[0], &triggers[1]);
+  ssm_sensitize(variables[0], &triggers[2]);
 
   ssm_later(variables[0], 1, DUMMY_VALUE);
 
@@ -354,8 +354,8 @@ void trigger_basic() {
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_later(variables[0], 6, DUMMY_VALUE);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
+  ssm_sensitize(variables[0], &triggers[1]);
+  ssm_sensitize(variables[0], &triggers[0]);
 
   step0ran = step1ran = false;
   ssm_tick();
@@ -380,7 +380,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
+  ssm_sensitize(variables[0], &triggers[0]);
 
   for (ssm_trigger_t *trig = ssm_to_sv(variables[0])->triggers; trig;
        trig = trig->next)

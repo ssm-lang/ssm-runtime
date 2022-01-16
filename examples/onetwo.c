@@ -54,7 +54,7 @@ void step_one(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:
-    ssm_sensitize(ssm_to_sv(cont->a), &cont->trigger1);
+    ssm_sensitize(cont->a, &cont->trigger1);
     act->pc = 1;
     return;
   case 1:
@@ -83,7 +83,7 @@ void step_two(struct ssm_act *act) {
   act_two_t *cont = container_of(act, act_two_t, act);
   switch (act->pc) {
   case 0:
-    ssm_sensitize(ssm_to_sv(cont->a), &cont->trigger1);
+    ssm_sensitize(cont->a, &cont->trigger1);
     act->pc = 1;
     return;
   case 1:

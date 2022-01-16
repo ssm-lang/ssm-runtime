@@ -58,7 +58,7 @@ void step_mywait(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     cont->trigger1.act = act;
-    ssm_sensitize(ssm_to_sv(cont->r), &cont->trigger1);
+    ssm_sensitize(cont->r, &cont->trigger1);
     act->pc = 1;
     return;
   case 1:
