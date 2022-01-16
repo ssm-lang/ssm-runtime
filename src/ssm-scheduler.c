@@ -298,67 +298,68 @@ void ssm_activate(ssm_act_t *act) {
   act_queue_percolate_up(hole, act);
 }
 
-void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value) {
-  var->value = value;
+void ssm_sv_assign_unsafe(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t val) {
+  var->value = val;
   var->last_updated = now;
   for (ssm_trigger_t *trig = var->triggers; trig; trig = trig->next)
     if (trig->act->priority > prio)
       ssm_activate(trig->act);
 }
 
-void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value) {
-  if (later < now)
+void ssm_sv_later_unsafe(ssm_sv_t *var, ssm_time_t when, ssm_value_t val) {
+  if (when < now)
     // later must be in the future
     SSM_THROW(SSM_INVALID_TIME);
 
-  var->later_value = value;
-
   if (var->later_time == SSM_NEVER) {
-    // Variable does not have a pending event: add it to the queue
-    q_idx_t hole = ++event_queue_len;
+    // Variable does not have a pending event
+    var->later_time = when;
 
+    // Add it to the queue
+    q_idx_t hole = ++event_queue_len;
     if (event_queue_len > SSM_EVENT_QUEUE_SIZE)
       SSM_THROW(SSM_EXHAUSTED_EVENT_QUEUE);
-
-    var->later_time = later;
     event_queue_percolate_up(hole, var);
 
   } else {
-    // Variable has a pending event: reposition the event in the queue
-    // as appropriate
+    // Variable has a pending event
+    var->later_time = when;
+
+    // Drop the old pending value
+    ssm_drop(var->later_value);
+
+    // Reposition the event in the queue as appropriate
     q_idx_t hole = find_queued_event(var);
-
-    var->later_time = later;
-
-    if (hole == SSM_QUEUE_HEAD || event_queue[hole >> 1]->later_time < later)
+    if (hole == SSM_QUEUE_HEAD || event_queue[hole >> 1]->later_time < when)
       event_queue_percolate_down(hole, var);
     else
       event_queue_percolate_up(hole, var);
   }
+  var->later_value = val;
 }
 
-void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trigger) {
+void ssm_sv_sensitize(ssm_sv_t *var, ssm_trigger_t *trig) {
   // Point us to the first element
-  trigger->next = var->triggers;
+  trig->next = var->triggers;
 
   if (var->triggers)
     // Make first element point to us
-    var->triggers->prev_ptr = &trigger->next;
+    var->triggers->prev_ptr = &trig->next;
 
   // Insert us at the beginning
-  var->triggers = trigger;
+  var->triggers = trig;
 
   // Our previous is the variable
-  trigger->prev_ptr = &var->triggers;
+  trig->prev_ptr = &var->triggers;
 }
 
-void ssm_desensitize(ssm_trigger_t *trigger) {
+void ssm_sv_desensitize(ssm_trigger_t *trig) {
   // Tell predecessor to skip us
-  *trigger->prev_ptr = trigger->next;
+  *trig->prev_ptr = trig->next;
 
-  if (trigger->next)
+  if (trig->next)
     // Tell successor its predecessor is our predecessor
-    trigger->next->prev_ptr = trigger->prev_ptr;
+    trig->next->prev_ptr = trig->prev_ptr;
 }
 
 void ssm_unschedule(ssm_sv_t *var) {
@@ -404,6 +405,7 @@ void ssm_update(ssm_sv_t *sv) {
   if (now != sv->later_time)
     SSM_THROW(SSM_NOT_READY);
 
+  ssm_drop(sv->value);
   sv->value = sv->later_value;
   sv->last_updated = now;
   sv->later_time = SSM_NEVER;

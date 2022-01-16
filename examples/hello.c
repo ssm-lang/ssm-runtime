@@ -37,8 +37,8 @@ void step_hello(ssm_act_t *act) {
   case 0:
 
 #define print_yield(p, c)                                                      \
-  ssm_later(ssm_to_sv(cont->stdout), ssm_now() + 10, ssm_marshal(c));          \
-  ssm_sensitize(ssm_to_sv(cont->stdout), &cont->trigger1);                     \
+  ssm_later(cont->stdout, ssm_now() + 10, ssm_marshal(c));                     \
+  ssm_sensitize(cont->stdout, &cont->trigger1);                     \
   act->pc = p;                                                                 \
   return;                                                                      \
   case p:                                                                      \
@@ -80,7 +80,7 @@ void step_print(ssm_act_t *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_sensitize(ssm_to_sv(cont->stdout), &cont->trigger1);
+      ssm_sensitize(cont->stdout, &cont->trigger1);
       act->pc = 1;
       return;
     case 1:
