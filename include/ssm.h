@@ -443,10 +443,10 @@ ssm_value_t ssm_new_sv(ssm_value_t val);
  *  @note The behavior of using this macro on an #ssm_value_t that does not
  *        point to a scheduled variable is undefined.
  *
- *  @param v  the #ssm_value_t
- *  @returns  pointer to the #ssm_sv_t
+ *  @param val  the #ssm_value_t
+ *  @returns    pointer to the #ssm_sv_t
  */
-#define ssm_to_sv(v) container_of((v).heap_ptr, ssm_sv_t, mm)
+#define ssm_to_sv(val) container_of((val).heap_ptr, ssm_sv_t, mm)
 
 /** @brief Read the value of a scheduled variable.
  *
@@ -456,38 +456,114 @@ ssm_value_t ssm_new_sv(ssm_value_t val);
  *        undefined. To assign to a scheduled variable, use ssm_assign() or
  *        ssm_later().
  *
- *  @param v  #ssm_value_t that points to a scheduled variable.
- *  @returns  the value that @a v points to.
+ *  @param val  #ssm_value_t that points to a scheduled variable.
+ *  @returns    the value that @a val points to.
  */
-#define ssm_deref(v) (ssm_to_sv(v)->value)
+#define ssm_deref(val) (ssm_to_sv(val)->value)
 
 /** @brief Instantaneous assignment to a scheduled variable.
  *
  *  Updates the value of @a var in the current instant, and wakes up all
  *  sensitive processes at a lower priority than the calling routine.
  *
- *  Does not overwrite a scheduled assignment.
+ *  ssm_assign() will ssm_drop() the previous value of @a var and ssm_dup() the
+ *  new @a val. If the caller already knows whether @a var and @a val reside on
+ *  the heap, they may call ssm_assign_unsafe() to forego the ssm_drop() and
+ *  ssm_dup() calls, but will be responsible for reference counting themselves
+ *  (i.e., calling ssm_dup_unsafe() and ssm_drop_unsafe() for heap objects).
  *
- *  @param var    pointer to the scheduled variable.
- *  @param prio   priority of the calling routine.
- *  @param value  the value to be assigned to @a var.
+ *  @note Does not overwrite a scheduled assignment.
+ *  @note The behavior of this macro when @a var does not point to a scheduled
+ *        variable is undefined.
+ *
+ *  @param var  pointer to the scheduled variable.
+ *  @param prio priority of the calling routine.
+ *  @param val  the value to be assigned to @a var.
  */
-void ssm_assign(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t value);
+#define ssm_assign(var, prio, val)                                             \
+  do {                                                                         \
+    ssm_dup(val);                                                              \
+    ssm_drop(ssm_deref(var));                                                  \
+    ssm_sv_assign_unsafe(ssm_to_sv(var), prio, val);                           \
+  } while (0)
 
 /** @brief Delayed assignment to a scheduled variable.
  *
  *  Schedules a delayed assignment to @a var at a later time.
  *
- *  Overwrites any previously scheduled update.
+ *  ssm_later() will ssm_dup() the scheduled @a val. If the caller already
+ *  knows whether @a val resides on the heap, they may call ssm_later_unsafe()
+ *  to forego the ssm_dup(), but will be responsible for reference counting
+ *  themselves (i.e., calling ssm_dup_unsafe() for heap objects).
  *
- *  @param var    pointer to the scheduled variable.
- *  @param later  the time when the update should take place.
- *  @param value  the value to be assigned to @a var.
+ *  Overwrites any previously scheduled update, if any.
+ *
+ *  @note The behavior of this macro when @a var does not point to a scheduled
+ *        variable is undefined.
+ *
+ *  @param var  pointer to the scheduled variable.
+ *  @param when the time when the update should take place.
+ *  @param val  the value to be assigned to @a var.
  *
  *  @throws SSM_INVALID_TIME          @a later is greater than ssm_now().
  *  @throws SSM_EXHAUSTED_EVENT_QUEUE event queue ran out of space.
  */
-void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value);
+#define ssm_later(var, when, val)                                              \
+  do {                                                                         \
+    ssm_dup(val);                                                              \
+    ssm_sv_later_unsafe(ssm_to_sv(var), when, val);                            \
+  } while (0)
+
+/** @brief ssm_assign() without automatic reference counting.
+ *
+ *  @note Does not overwrite a scheduled assignment.
+ *
+ *  @param var  pointer to the scheduled variable.
+ *  @param prio priority of the calling routine.
+ *  @param val  the value to be assigned to @a var.
+ *
+ *  @sa ssm_assign().
+ */
+void ssm_sv_assign_unsafe(ssm_sv_t *var, ssm_priority_t prio, ssm_value_t val);
+
+/** @brief ssm_later() without automatic reference counting.
+ *
+ *  Overwrites any previously scheduled update, if ssm_laterr
+ *
+ *  @note ssm_drop() <em>will</em> be called on the previous @a later_value,
+ *        so the caller is not responsible for checking that.
+ *
+ *  @param var  pointer to the scheduled variable.
+ *  @param when the time when the update should take place.
+ *  @param val  the value to be assigned to @a var.
+ *
+ *  @throws SSM_INVALID_TIME          @a later is greater than ssm_now().
+ *  @throws SSM_EXHAUSTED_EVENT_QUEUE event queue ran out of space.
+ *
+ *  @sa ssm_later().
+ */
+void ssm_sv_later_unsafe(ssm_sv_t *var, ssm_time_t when, ssm_value_t val);
+
+/** @brief Sensitize a trigger to a scheduled variable.
+ *
+ *  Macro provided for convenience.
+ *
+ *  @sa ssm_sv_sensitize().
+ *
+ *  @param var  #ssm_value_t pointing to a scheduled variable.
+ *  @param trig  trigger to be registered on @a var.
+ */
+#define ssm_sensitize(var, trig) ssm_sv_sensitize(ssm_to_sv(var), trig)
+
+/** @brief Desensitize a trigger.
+ *
+ *  Macro provided for convenience.
+ *
+ *  @sa ssm_sv_desensitize().
+ *
+ *  @param trig  the trigger.
+ */
+#define ssm_desensitize(trig) ssm_sv_desensitize(trig)
 
 /** @brief Sensitize a variable to a trigger.
  *
@@ -499,7 +575,7 @@ void ssm_later(ssm_sv_t *var, ssm_time_t later, ssm_value_t value);
  *  @param var  pointer to the scheduled variable.
  *  @param trig trigger to be registered on @a var.
  */
-void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trig);
+void ssm_sv_sensitize(ssm_sv_t *var, ssm_trigger_t *trig);
 
 /** @brief Desensitize a variable from a trigger.
  *
@@ -509,7 +585,7 @@ void ssm_sensitize(ssm_sv_t *var, ssm_trigger_t *trig);
  *
  *  @param trig the trigger.
  */
-void ssm_desensitize(ssm_trigger_t *trig);
+void ssm_sv_desensitize(ssm_trigger_t *trig);
 
 /** @} */
 
