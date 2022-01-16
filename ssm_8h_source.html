@@ -369,7 +369,7 @@ $(document).ready(function(){initNavTree('ssm_8h_source.html',''); initResizable
 <div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;<span class="comment"> *  @param v  the #ssm_value_t</span></div>
 <div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;<span class="comment"> *  @returns  the #ssm_time_t in the heap.</span></div>
 <div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;<span class="comment"> */</span></div>
-<div class="line"><a name="l00278"></a><span class="lineno"><a class="line" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">  278</a></span>&#160;<span class="preprocessor">#define ssm_time_read(v) (container_of((v).heap_ptr, ssm_time_t, mm)-&gt;time)</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno"><a class="line" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">  278</a></span>&#160;<span class="preprocessor">#define ssm_time_read(v) (container_of((v).heap_ptr, struct ssm_time, mm)-&gt;time)</span></div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">/** @} */</span></div>
 <div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment"></span> </div>

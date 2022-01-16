@@ -134,7 +134,7 @@ Macros</h2></td></tr>
 <tr class="memitem:gaa197d42e5baeef09b2106f2b07fe6878"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gaa197d42e5baeef09b2106f2b07fe6878">SSM_HOUR</a>&#160;&#160;&#160;(<a class="el" href="group__time.html#gaac175bedf4cfeb48775f5eeeb90b9d62">SSM_MINUTE</a> * 60L)</td></tr>
 <tr class="memdesc:gaa197d42e5baeef09b2106f2b07fe6878"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ticks per hour.  <a href="group__time.html#gaa197d42e5baeef09b2106f2b07fe6878">More...</a><br /></td></tr>
 <tr class="separator:gaa197d42e5baeef09b2106f2b07fe6878"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">ssm_time_read</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>, mm)-&gt;time)</td></tr>
+<tr class="memitem:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">ssm_time_read</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__time.html">ssm_time</a>, mm)-&gt;time)</td></tr>
 <tr class="memdesc:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the heap-allocated time pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">More...</a><br /></td></tr>
 <tr class="separator:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -301,7 +301,7 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>, mm)-&gt;time)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__time.html">ssm_time</a>, mm)-&gt;time)</td>
         </tr>
       </table>
 </div><div class="memdoc">
