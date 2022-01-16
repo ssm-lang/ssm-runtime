@@ -114,12 +114,24 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ga4f64d15b72fdd6f8f3085929a492582a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td></tr>
-<tr class="memdesc:ga4f64d15b72fdd6f8f3085929a492582a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve <a class="el" href="structssm__sv.html" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv</a> pointer pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__sv.html#ga4f64d15b72fdd6f8f3085929a492582a">More...</a><br /></td></tr>
-<tr class="separator:ga4f64d15b72fdd6f8f3085929a492582a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">ssm_deref</a>(v)&#160;&#160;&#160;(<a class="el" href="group__sv.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)-&gt;value)</td></tr>
-<tr class="memdesc:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the value of a scheduled variable.  <a href="group__sv.html#ga181194fb2c309b5ebbed3be4f8a2ad4c">More...</a><br /></td></tr>
-<tr class="separator:ga181194fb2c309b5ebbed3be4f8a2ad4c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga65af173a5550c494e2a615f6b6c94e28"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(val)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((val).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td></tr>
+<tr class="memdesc:ga65af173a5550c494e2a615f6b6c94e28"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve <a class="el" href="structssm__sv.html" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv</a> pointer pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">More...</a><br /></td></tr>
+<tr class="separator:ga65af173a5550c494e2a615f6b6c94e28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gaf28a5c2401bffda3729dc388da2838a6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gaf28a5c2401bffda3729dc388da2838a6">ssm_deref</a>(val)&#160;&#160;&#160;(<a class="el" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(val)-&gt;value)</td></tr>
+<tr class="memdesc:gaf28a5c2401bffda3729dc388da2838a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the value of a scheduled variable.  <a href="group__sv.html#gaf28a5c2401bffda3729dc388da2838a6">More...</a><br /></td></tr>
+<tr class="separator:gaf28a5c2401bffda3729dc388da2838a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad2813acae8332a57decdbd7bf8d37ec9"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9">ssm_assign</a>(var,  prio,  val)</td></tr>
+<tr class="memdesc:gad2813acae8332a57decdbd7bf8d37ec9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantaneous assignment to a scheduled variable.  <a href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9">More...</a><br /></td></tr>
+<tr class="separator:gad2813acae8332a57decdbd7bf8d37ec9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga46f3f3ac1efff267c6d7441faa81fb54"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54">ssm_later</a>(var,  when,  val)</td></tr>
+<tr class="memdesc:ga46f3f3ac1efff267c6d7441faa81fb54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delayed assignment to a scheduled variable.  <a href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54">More...</a><br /></td></tr>
+<tr class="separator:ga46f3f3ac1efff267c6d7441faa81fb54"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga647ceb064c57973f714a4235c5705597"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga647ceb064c57973f714a4235c5705597">ssm_sensitize</a>(var,  trig)&#160;&#160;&#160;<a class="el" href="group__sv.html#gad21febd43005134a377d8ed1f75e67ca">ssm_sv_sensitize</a>(<a class="el" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(var), trig)</td></tr>
+<tr class="memdesc:ga647ceb064c57973f714a4235c5705597"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sensitize a trigger to a scheduled variable.  <a href="group__sv.html#ga647ceb064c57973f714a4235c5705597">More...</a><br /></td></tr>
+<tr class="separator:ga647ceb064c57973f714a4235c5705597"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac6ecbdc4ea932e5ebe08c303c8e6a4b1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gac6ecbdc4ea932e5ebe08c303c8e6a4b1">ssm_desensitize</a>(trig)&#160;&#160;&#160;<a class="el" href="group__sv.html#ga30f8b17198ed817ab7e124a8da4e4725">ssm_sv_desensitize</a>(trig)</td></tr>
+<tr class="memdesc:gac6ecbdc4ea932e5ebe08c303c8e6a4b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Desensitize a trigger.  <a href="group__sv.html#gac6ecbdc4ea932e5ebe08c303c8e6a4b1">More...</a><br /></td></tr>
+<tr class="separator:gac6ecbdc4ea932e5ebe08c303c8e6a4b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -138,22 +150,22 @@ Functions</h2></td></tr>
 <tr class="memitem:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">ssm_new_sv</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
 <tr class="memdesc:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an <a class="el" href="structssm__sv.html" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv</a> on the heap.  <a href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">More...</a><br /></td></tr>
 <tr class="separator:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gac7071d416ab1beecab8acf1b0bf09825"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825">ssm_assign</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> prio, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> value)</td></tr>
-<tr class="memdesc:gac7071d416ab1beecab8acf1b0bf09825"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantaneous assignment to a scheduled variable.  <a href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825">More...</a><br /></td></tr>
-<tr class="separator:gac7071d416ab1beecab8acf1b0bf09825"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gaec47ada342876e79b21c53151001c888"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gaec47ada342876e79b21c53151001c888">ssm_later</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> later, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> value)</td></tr>
-<tr class="memdesc:gaec47ada342876e79b21c53151001c888"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delayed assignment to a scheduled variable.  <a href="group__sv.html#gaec47ada342876e79b21c53151001c888">More...</a><br /></td></tr>
-<tr class="separator:gaec47ada342876e79b21c53151001c888"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga5aa7b2c2566032f8a4e646bcb010ecd1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">ssm_sensitize</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *trig)</td></tr>
-<tr class="memdesc:ga5aa7b2c2566032f8a4e646bcb010ecd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sensitize a variable to a trigger.  <a href="group__sv.html#ga5aa7b2c2566032f8a4e646bcb010ecd1">More...</a><br /></td></tr>
-<tr class="separator:ga5aa7b2c2566032f8a4e646bcb010ecd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga415fa87c32772f0cced29b552845c85b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">ssm_desensitize</a> (<a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *trig)</td></tr>
-<tr class="memdesc:ga415fa87c32772f0cced29b552845c85b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Desensitize a variable from a trigger.  <a href="group__sv.html#ga415fa87c32772f0cced29b552845c85b">More...</a><br /></td></tr>
-<tr class="separator:ga415fa87c32772f0cced29b552845c85b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae375396db801571915176a1619bba97b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gae375396db801571915176a1619bba97b">ssm_sv_assign_unsafe</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> prio, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
+<tr class="memdesc:gae375396db801571915176a1619bba97b"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a> without automatic reference counting.  <a href="group__sv.html#gae375396db801571915176a1619bba97b">More...</a><br /></td></tr>
+<tr class="separator:gae375396db801571915176a1619bba97b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga63ba55eb9c5c6ae995890ffc010b1015"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga63ba55eb9c5c6ae995890ffc010b1015">ssm_sv_later_unsafe</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> when, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
+<tr class="memdesc:ga63ba55eb9c5c6ae995890ffc010b1015"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a> without automatic reference counting.  <a href="group__sv.html#ga63ba55eb9c5c6ae995890ffc010b1015">More...</a><br /></td></tr>
+<tr class="separator:ga63ba55eb9c5c6ae995890ffc010b1015"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad21febd43005134a377d8ed1f75e67ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#gad21febd43005134a377d8ed1f75e67ca">ssm_sv_sensitize</a> (<a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *var, <a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *trig)</td></tr>
+<tr class="memdesc:gad21febd43005134a377d8ed1f75e67ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sensitize a variable to a trigger.  <a href="group__sv.html#gad21febd43005134a377d8ed1f75e67ca">More...</a><br /></td></tr>
+<tr class="separator:gad21febd43005134a377d8ed1f75e67ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga30f8b17198ed817ab7e124a8da4e4725"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga30f8b17198ed817ab7e124a8da4e4725">ssm_sv_desensitize</a> (<a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *trig)</td></tr>
+<tr class="memdesc:ga30f8b17198ed817ab7e124a8da4e4725"><td class="mdescLeft">&#160;</td><td class="mdescRight">Desensitize a variable from a trigger.  <a href="group__sv.html#ga30f8b17198ed817ab7e124a8da4e4725">More...</a><br /></td></tr>
+<tr class="separator:ga30f8b17198ed817ab7e124a8da4e4725"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
-<a id="ga4f64d15b72fdd6f8f3085929a492582a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga4f64d15b72fdd6f8f3085929a492582a">&#9670;&nbsp;</a></span>ssm_to_sv</h2>
+<a id="ga65af173a5550c494e2a615f6b6c94e28"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga65af173a5550c494e2a615f6b6c94e28">&#9670;&nbsp;</a></span>ssm_to_sv</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -162,8 +174,8 @@ Functions</h2></td></tr>
           <td class="memname">#define ssm_to_sv</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td>
+          <td class="paramname">val</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((val).heap_ptr, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a>, mm)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -172,7 +184,7 @@ Functions</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>The behavior of using this macro on an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that does not point to a scheduled variable is undefined.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> </td></tr>
+    <tr><td class="paramname">val</td><td>the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -182,8 +194,8 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="ga181194fb2c309b5ebbed3be4f8a2ad4c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga181194fb2c309b5ebbed3be4f8a2ad4c">&#9670;&nbsp;</a></span>ssm_deref</h2>
+<a id="gaf28a5c2401bffda3729dc388da2838a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gaf28a5c2401bffda3729dc388da2838a6">&#9670;&nbsp;</a></span>ssm_deref</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -192,8 +204,8 @@ Functions</h2></td></tr>
           <td class="memname">#define ssm_deref</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;(<a class="el" href="group__sv.html#ga4f64d15b72fdd6f8f3085929a492582a">ssm_to_sv</a>(v)-&gt;value)</td>
+          <td class="paramname">val</td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(val)-&gt;value)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -201,16 +213,204 @@ Functions</h2></td></tr>
 <p>Read the value of a scheduled variable. </p>
 <dl class="section note"><dt>Note</dt><dd>The behavior of using this macro on an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that does not point to a scheduled variable is undefined. </dd>
 <dd>
-The behavior of using the result of this macro as an l-value is undefined. To assign to a scheduled variable, use <a class="el" href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a> or <a class="el" href="group__sv.html#gaec47ada342876e79b21c53151001c888" title="Delayed assignment to a scheduled variable.">ssm_later()</a>.</dd></dl>
+The behavior of using the result of this macro as an l-value is undefined. To assign to a scheduled variable, use <a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a> or <a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">v</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that points to a scheduled variable. </td></tr>
+    <tr><td class="paramname">val</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> that points to a scheduled variable. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the value that <em>v</em> points to. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the value that <em>val</em> points to. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00462">462</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="gad2813acae8332a57decdbd7bf8d37ec9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad2813acae8332a57decdbd7bf8d37ec9">&#9670;&nbsp;</a></span>ssm_assign</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_assign</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">var, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">prio, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">val&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                         \</div>
+<div class="line">    ssm_dup(val);                                                              \</div>
+<div class="line">    ssm_drop(<a class="code" href="group__sv.html#gaf28a5c2401bffda3729dc388da2838a6">ssm_deref</a>(var));                                                  \</div>
+<div class="line">    ssm_sv_assign_unsafe(<a class="code" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(var), prio, val);                           \</div>
+<div class="line">  } <span class="keywordflow">while</span> (0)</div>
+</div><!-- fragment -->
+<p>Instantaneous assignment to a scheduled variable. </p>
+<p>Updates the value of <em>var</em> in the current instant, and wakes up all sensitive processes at a lower priority than the calling routine.</p>
+<p><a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a> will <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> the previous value of <em>var</em> and <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> the new <em>val</em>. If the caller already knows whether <em>var</em> and <em>val</em> reside on the heap, they may call ssm_assign_unsafe() to forego the <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> and <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> calls, but will be responsible for reference counting themselves (i.e., calling <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f" title="Duplicate a heap reference, incrementing its ref count.">ssm_dup_unsafe()</a> and <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> for heap objects).</p>
+<dl class="section note"><dt>Note</dt><dd>Does not overwrite a scheduled assignment. </dd>
+<dd>
+The behavior of this macro when <em>var</em> does not point to a scheduled variable is undefined.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">var</td><td>pointer to the scheduled variable. </td></tr>
+    <tr><td class="paramname">prio</td><td>priority of the calling routine. </td></tr>
+    <tr><td class="paramname">val</td><td>the value to be assigned to <em>var</em>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00483">483</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="ga46f3f3ac1efff267c6d7441faa81fb54"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga46f3f3ac1efff267c6d7441faa81fb54">&#9670;&nbsp;</a></span>ssm_later</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_later</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">var, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">when, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">val&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> {                                                                         \</div>
+<div class="line">    ssm_dup(val);                                                              \</div>
+<div class="line">    ssm_sv_later_unsafe(<a class="code" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(var), when, val);                            \</div>
+<div class="line">  } <span class="keywordflow">while</span> (0)</div>
+</div><!-- fragment -->
+<p>Delayed assignment to a scheduled variable. </p>
+<p>Schedules a delayed assignment to <em>var</em> at a later time.</p>
+<p><a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a> will <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> the scheduled <em>val</em>. If the caller already knows whether <em>val</em> resides on the heap, they may call ssm_later_unsafe() to forego the <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a>, but will be responsible for reference counting themselves (i.e., calling <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f" title="Duplicate a heap reference, incrementing its ref count.">ssm_dup_unsafe()</a> for heap objects).</p>
+<p>Overwrites any previously scheduled update, if any.</p>
+<dl class="section note"><dt>Note</dt><dd>The behavior of this macro when <em>var</em> does not point to a scheduled variable is undefined.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">var</td><td>pointer to the scheduled variable. </td></tr>
+    <tr><td class="paramname">when</td><td>the time when the update should take place. </td></tr>
+    <tr><td class="paramname">val</td><td>the value to be assigned to <em>var</em>.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="exception"><dt>Exceptions</dt><dd>
+  <table class="exception">
+    <tr><td class="paramname">SSM_INVALID_TIME</td><td><em>later</em> is greater than <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff" title="The current model time.">ssm_now()</a>. </td></tr>
+    <tr><td class="paramname">SSM_EXHAUSTED_EVENT_QUEUE</td><td>event queue ran out of space. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00511">511</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="ga647ceb064c57973f714a4235c5705597"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga647ceb064c57973f714a4235c5705597">&#9670;&nbsp;</a></span>ssm_sensitize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_sensitize</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">var, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">trig&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="group__sv.html#gad21febd43005134a377d8ed1f75e67ca">ssm_sv_sensitize</a>(<a class="el" href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a>(var), trig)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sensitize a trigger to a scheduled variable. </p>
+<p>Macro provided for convenience.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__sv.html#gad21febd43005134a377d8ed1f75e67ca" title="Sensitize a variable to a trigger.">ssm_sv_sensitize()</a>.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">var</td><td><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> pointing to a scheduled variable. </td></tr>
+    <tr><td class="paramname">trig</td><td>trigger to be registered on <em>var</em>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00556">556</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="gac6ecbdc4ea932e5ebe08c303c8e6a4b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac6ecbdc4ea932e5ebe08c303c8e6a4b1">&#9670;&nbsp;</a></span>ssm_desensitize</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_desensitize</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">trig</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="group__sv.html#ga30f8b17198ed817ab7e124a8da4e4725">ssm_sv_desensitize</a>(trig)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Desensitize a trigger. </p>
+<p>Macro provided for convenience.</p>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__sv.html#ga30f8b17198ed817ab7e124a8da4e4725" title="Desensitize a variable from a trigger.">ssm_sv_desensitize()</a>.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">trig</td><td>the trigger. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00566">566</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -229,7 +429,7 @@ The behavior of using the result of this macro as an l-value is undefined. To as
 
 <p>A scheduled variable that supports scheduled updates with triggers. </p>
 <p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. These should be always allocated on the heap using <a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc" title="Allocate an ssm_sv on the heap.">ssm_new_sv()</a>.</p>
-<p>Routines may directly assign to them in the current instant (<a class="el" href="group__sv.html#gac7071d416ab1beecab8acf1b0bf09825" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>), or schedule a delayed assignment to them (<a class="el" href="group__sv.html#gaec47ada342876e79b21c53151001c888" title="Delayed assignment to a scheduled variable.">ssm_later()</a>). The <em>last_updated</em> time is recorded in each case, sensitive routines, i.e., <em>triggers</em>, are woken up.</p>
+<p>Routines may directly assign to them in the current instant (<a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>), or schedule a delayed assignment to them (<a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a>). The <em>last_updated</em> time is recorded in each case, sensitive routines, i.e., <em>triggers</em>, are woken up.</p>
 <p>At most one delayed assignment may be scheduled at a time, but a single update may wake any number of sensitive routines.</p>
 <dl class="section invariant"><dt>Invariant</dt><dd><em>later_time</em> != <a class="el" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f" title="Time indicating something will never happen.">SSM_NEVER</a> iff this variable in the event queue. </dd>
 <dd>
@@ -272,7 +472,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00403">403</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00404">404</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
@@ -303,7 +503,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00364">364</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00365">365</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
@@ -339,14 +539,14 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
 
 </div>
 </div>
-<a id="gac7071d416ab1beecab8acf1b0bf09825"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gac7071d416ab1beecab8acf1b0bf09825">&#9670;&nbsp;</a></span>ssm_assign()</h2>
+<a id="gae375396db801571915176a1619bba97b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae375396db801571915176a1619bba97b">&#9670;&nbsp;</a></span>ssm_sv_assign_unsafe()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ssm_assign </td>
+          <td class="memname">void ssm_sv_assign_unsafe </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *&#160;</td>
           <td class="paramname"><em>var</em>, </td>
@@ -361,7 +561,7 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -371,30 +571,30 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Instantaneous assignment to a scheduled variable. </p>
-<p>Updates the value of <em>var</em> in the current instant, and wakes up all sensitive processes at a lower priority than the calling routine.</p>
-<p>Does not overwrite a scheduled assignment.</p>
+<p><a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a> without automatic reference counting. </p>
+<dl class="section note"><dt>Note</dt><dd>Does not overwrite a scheduled assignment.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">var</td><td>pointer to the scheduled variable. </td></tr>
     <tr><td class="paramname">prio</td><td>priority of the calling routine. </td></tr>
-    <tr><td class="paramname">value</td><td>the value to be assigned to <em>var</em>. </td></tr>
+    <tr><td class="paramname">val</td><td>the value to be assigned to <em>var</em>.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00301">301</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
-<a id="gaec47ada342876e79b21c53151001c888"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gaec47ada342876e79b21c53151001c888">&#9670;&nbsp;</a></span>ssm_later()</h2>
+<a id="ga63ba55eb9c5c6ae995890ffc010b1015"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga63ba55eb9c5c6ae995890ffc010b1015">&#9670;&nbsp;</a></span>ssm_sv_later_unsafe()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ssm_later </td>
+          <td class="memname">void ssm_sv_later_unsafe </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *&#160;</td>
           <td class="paramname"><em>var</em>, </td>
@@ -403,13 +603,13 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td>
-          <td class="paramname"><em>later</em>, </td>
+          <td class="paramname"><em>when</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td>
-          <td class="paramname"><em>value</em>&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -419,37 +619,38 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p>Delayed assignment to a scheduled variable. </p>
-<p>Schedules a delayed assignment to <em>var</em> at a later time.</p>
-<p>Overwrites any previously scheduled update.</p>
+<p><a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a> without automatic reference counting. </p>
+<p>Overwrites any previously scheduled update, if ssm_laterr</p>
+<dl class="section note"><dt>Note</dt><dd><a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> <em>will</em> be called on the previous <em>later_value</em>, so the caller is not responsible for checking that.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">var</td><td>pointer to the scheduled variable. </td></tr>
-    <tr><td class="paramname">later</td><td>the time when the update should take place. </td></tr>
-    <tr><td class="paramname">value</td><td>the value to be assigned to <em>var</em>.</td></tr>
+    <tr><td class="paramname">when</td><td>the time when the update should take place. </td></tr>
+    <tr><td class="paramname">val</td><td>the value to be assigned to <em>var</em>.</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="exception"><dt>Exceptions</dt><dd>
   <table class="exception">
     <tr><td class="paramname">SSM_INVALID_TIME</td><td><em>later</em> is greater than <a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff" title="The current model time.">ssm_now()</a>. </td></tr>
-    <tr><td class="paramname">SSM_EXHAUSTED_EVENT_QUEUE</td><td>event queue ran out of space. </td></tr>
+    <tr><td class="paramname">SSM_EXHAUSTED_EVENT_QUEUE</td><td>event queue ran out of space.</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a>. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00309">309</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
-<a id="ga5aa7b2c2566032f8a4e646bcb010ecd1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga5aa7b2c2566032f8a4e646bcb010ecd1">&#9670;&nbsp;</a></span>ssm_sensitize()</h2>
+<a id="gad21febd43005134a377d8ed1f75e67ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad21febd43005134a377d8ed1f75e67ca">&#9670;&nbsp;</a></span>ssm_sv_sensitize()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ssm_sensitize </td>
+          <td class="memname">void ssm_sv_sensitize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779">ssm_sv_t</a> *&#160;</td>
           <td class="paramname"><em>var</em>, </td>
@@ -479,18 +680,18 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00340">340</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00341">341</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
-<a id="ga415fa87c32772f0cced29b552845c85b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga415fa87c32772f0cced29b552845c85b">&#9670;&nbsp;</a></span>ssm_desensitize()</h2>
+<a id="ga30f8b17198ed817ab7e124a8da4e4725"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga30f8b17198ed817ab7e124a8da4e4725">&#9670;&nbsp;</a></span>ssm_sv_desensitize()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void ssm_desensitize </td>
+          <td class="memname">void ssm_sv_desensitize </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e">ssm_trigger_t</a> *&#160;</td>
           <td class="paramname"><em>trig</em></td><td>)</td>
@@ -509,12 +710,14 @@ The <em>later_value</em> field is left uninitialized.</dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00355">355</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-scheduler_8c_source.html#l00356">356</a> of file <a class="el" href="ssm-scheduler_8c_source.html">ssm-scheduler.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="agroup__sv_html_gaf28a5c2401bffda3729dc388da2838a6"><div class="ttname"><a href="group__sv.html#gaf28a5c2401bffda3729dc388da2838a6">ssm_deref</a></div><div class="ttdeci">#define ssm_deref(val)</div><div class="ttdoc">Read the value of a scheduled variable.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00462">ssm.h:462</a></div></div>
+<div class="ttc" id="agroup__sv_html_ga65af173a5550c494e2a615f6b6c94e28"><div class="ttname"><a href="group__sv.html#ga65af173a5550c494e2a615f6b6c94e28">ssm_to_sv</a></div><div class="ttdeci">#define ssm_to_sv(val)</div><div class="ttdoc">Retrieve ssm_sv pointer pointed to by an ssm_value_t.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00449">ssm.h:449</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
