@@ -185,6 +185,42 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
   return (ssm_value_t){.heap_ptr = mm};
 }
 
+ssm_value_t ssm_new_closure(ssm_func_t f) {
+	struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(0));
+	struct ssm_closure *closure = container_of(mm, struct ssm_closure, mm);
+	mm->ref_count = 1;
+	mm->kind = SSM_CLOSURE_K;
+	mm->val_count = 0;
+	mm->tag = 0; // what do here
+	closure->f = f;
+	return (ssm_value_t){.heap_ptr = mm};
+}
+
+ssm_value_t ssm_closure_apply(ssm_value_t closure_val, ssm_value_t arg) {
+	struct ssm_closure *closure = container_of(closure_val.heap_ptr, struct ssm_closure, mm);
+	ssm_dup(closure_val); // do i dup the args too?
+	struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(closure_val.heap_ptr->val_count + 1));
+	struct ssm_closure *applied_closure = container_of(mm, struct ssm_closure, mm);
+	mm->ref_count = 1;
+	mm->kind = SSM_CLOSURE_K;
+	mm->val_count = closure_val.heap_ptr->val_count + 1;
+	mm->tag = 0;
+	applied_closure->f = closure->f;
+	for (size_t i = 0; i < closure->mm.val_count; i++)
+		applied_closure->argv[i] = closure->argv[i];
+	applied_closure->argv[mm->val_count - 1] = arg;
+	return (ssm_value_t){.heap_ptr = mm};
+}
+
+ssm_act_t ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
+			       ssm_act_t *parent, ssm_priority_t prio,
+			       ssm_depth_t depth, ssm_value_t *ret) {
+	ssm_value_t val = ssm_closure_apply(closure, arg);
+	struct ssm_closure *fully_applied_closure = container_of(val.heap_ptr, struct ssm_closure, mm);
+
+	return fully_applied_closure->f(parent, prio, depth, fully_applied_closure->argv, ret);
+}
+
 void ssm_drop_final(ssm_value_t v) {
   size_t size = 0;
   switch (v.heap_ptr->kind) {
@@ -202,6 +238,11 @@ void ssm_drop_final(ssm_value_t v) {
     ssm_drop(ssm_to_sv(v)->value);
     if (ssm_to_sv(v)->later_time != SSM_NEVER)
       ssm_drop(ssm_to_sv(v)->later_value);
+    break;
+  case SSM_CLOSURE_K:
+    size = ssm_closure_size(v.heap_ptr->val_count);
+    for (size_t i = 0; i < v.heap_ptr->val_count; i++)
+      ssm_drop(ssm_closure_arg(v, i));
     break;
   }
   ssm_mem_free(v.heap_ptr, size);

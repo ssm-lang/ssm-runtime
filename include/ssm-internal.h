@@ -123,6 +123,9 @@ void ssm_tick(void);
  */
 #define ssm_adt_size(vc) (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc) - 1))
 
+
+#define ssm_closure_size(vc) (sizeof(struct ssm_closure) + (vc ? sizeof(ssm_value_t) * ((vc) - 1) : 0))
+
 /**
  * @addtogroup mem
  * @{
@@ -139,6 +142,7 @@ enum ssm_kind {
   SSM_ADT_K = 0,  /**< ADT object, e.g., #ssm_adt1 */
   SSM_TIME_K,     /**< 64-bit timestamps, #ssm_time_t */
   SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
+  SSM_CLOSURE_K,  /**< Closure object, #ssm_closure */
 };
 
 /** @brief Initializes the underlying allocator system.
