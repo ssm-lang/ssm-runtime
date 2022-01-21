@@ -191,28 +191,28 @@ ssm_value_t ssm_new_closure(ssm_func_t f) {
 	mm->ref_count = 1;
 	mm->kind = SSM_CLOSURE_K;
 	mm->val_count = 0;
-	mm->tag = 0; // what do here
 	closure->f = f;
 	return (ssm_value_t){.heap_ptr = mm};
 }
 
 ssm_value_t ssm_closure_apply(ssm_value_t closure_val, ssm_value_t arg) {
+	// use macros to access fields, dont allow direct access to closure
 	struct ssm_closure *closure = container_of(closure_val.heap_ptr, struct ssm_closure, mm);
-	ssm_dup(closure_val); // do i dup the args too?
+	// declare local var count instead of long expr
 	struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(closure_val.heap_ptr->val_count + 1));
 	struct ssm_closure *applied_closure = container_of(mm, struct ssm_closure, mm);
 	mm->ref_count = 1;
 	mm->kind = SSM_CLOSURE_K;
 	mm->val_count = closure_val.heap_ptr->val_count + 1;
-	mm->tag = 0;
 	applied_closure->f = closure->f;
 	for (size_t i = 0; i < closure->mm.val_count; i++)
 		applied_closure->argv[i] = closure->argv[i];
+	// args need to be dupd
 	applied_closure->argv[mm->val_count - 1] = arg;
 	return (ssm_value_t){.heap_ptr = mm};
 }
 
-ssm_act_t ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
+ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
 			       ssm_act_t *parent, ssm_priority_t prio,
 			       ssm_depth_t depth, ssm_value_t *ret) {
 	ssm_value_t val = ssm_closure_apply(closure, arg);

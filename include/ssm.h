@@ -666,11 +666,11 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag);
 
 /** HANS TODO: closure docs **/
 
-typedef ssm_act_t (*ssm_func_t)(ssm_act_t *parent, ssm_priority_t prio,
+typedef ssm_act_t *(*ssm_func_t)(ssm_act_t *parent, ssm_priority_t prio,
                                 ssm_depth_t depth, ssm_value_t *argv,
                                 ssm_value_t *ret);
 
-struct ssm_closure {
+struct ssm_closure { // ssm_closure1
   struct ssm_mm mm;
   ssm_func_t f;
   ssm_value_t argv[1];
@@ -682,7 +682,7 @@ ssm_value_t ssm_new_closure(ssm_func_t f);
   (&*container_of((v).heap_ptr, struct ssm_closure, mm)->argv)[i]
 
 ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg);
-ssm_act_t ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
+ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
 			       ssm_act_t *parent, ssm_priority_t prio,
 			       ssm_depth_t depth, ssm_value_t *ret);
 
