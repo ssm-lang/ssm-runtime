@@ -186,39 +186,39 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
 }
 
 ssm_value_t ssm_new_closure(ssm_func_t f) {
-	struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(0));
-	struct ssm_closure *closure = container_of(mm, struct ssm_closure, mm);
-	mm->ref_count = 1;
-	mm->kind = SSM_CLOSURE_K;
-	mm->val_count = 0;
-	closure->f = f;
-	return (ssm_value_t){.heap_ptr = mm};
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(0));
+  struct ssm_closure *closure = container_of(mm, struct ssm_closure, mm);
+  mm->ref_count = 1;
+  mm->kind = SSM_CLOSURE_K;
+  mm->val_count = 0;
+  closure->f = f;
+  return (ssm_value_t){.heap_ptr = mm};
 }
 
-ssm_value_t ssm_closure_apply(ssm_value_t closure_val, ssm_value_t arg) {
-	// use macros to access fields, dont allow direct access to closure
-	struct ssm_closure *closure = container_of(closure_val.heap_ptr, struct ssm_closure, mm);
-	// declare local var count instead of long expr
-	struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(closure_val.heap_ptr->val_count + 1));
-	struct ssm_closure *applied_closure = container_of(mm, struct ssm_closure, mm);
-	mm->ref_count = 1;
-	mm->kind = SSM_CLOSURE_K;
-	mm->val_count = closure_val.heap_ptr->val_count + 1;
-	applied_closure->f = closure->f;
-	for (size_t i = 0; i < closure->mm.val_count; i++)
-		applied_closure->argv[i] = closure->argv[i];
-	// args need to be dupd
-	applied_closure->argv[mm->val_count - 1] = arg;
-	return (ssm_value_t){.heap_ptr = mm};
+ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg) {
+  uint8_t val_count = ssm_closure_val_count(closure);
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(val_count + 1));
+  struct ssm_closure *applied_closure = container_of(mm, struct ssm_closure, mm);
+  mm->ref_count = 1;
+  mm->kind = SSM_CLOSURE_K;
+  mm->val_count = val_count + 1;
+  applied_closure->f = ssm_closure_func(closure);
+  for (size_t i = 0; i < val_count; i++) {
+    ssm_value_t arg_i = ssm_closure_arg(closure, i);
+    ssm_dup(arg_i);
+    applied_closure->argv[i] = arg_i;
+  }
+  applied_closure->argv[val_count] = arg;
+  ssm_dup(arg);
+  return (ssm_value_t){.heap_ptr = mm};
 }
 
 ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
-			       ssm_act_t *parent, ssm_priority_t prio,
-			       ssm_depth_t depth, ssm_value_t *ret) {
-	ssm_value_t val = ssm_closure_apply(closure, arg);
-	struct ssm_closure *fully_applied_closure = container_of(val.heap_ptr, struct ssm_closure, mm);
-
-	return fully_applied_closure->f(parent, prio, depth, fully_applied_closure->argv, ret);
+                              ssm_act_t *parent, ssm_priority_t prio,
+                              ssm_depth_t depth, ssm_value_t *ret) {
+  ssm_value_t val = ssm_closure_apply(closure, arg);
+  // TODO: Don't I have to drop val since this is the last reference to it?
+  return ssm_closure_func(val)(parent, prio, depth, ssm_closure_argv(val), ret);
 }
 
 void ssm_drop_final(ssm_value_t v) {
