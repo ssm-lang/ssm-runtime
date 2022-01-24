@@ -229,6 +229,9 @@ void step_main(struct ssm_act *act) {
     act->pc = 3;
     return;
   case 3:
+    ssm_drop(cont->init);
+    ssm_drop(cont->offset);
+    ssm_drop(cont->inc_func);
     break;
   }
   ssm_leave(&cont->act, sizeof(*cont));
