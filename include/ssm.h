@@ -670,7 +670,7 @@ typedef ssm_act_t *(*ssm_func_t)(ssm_act_t *parent, ssm_priority_t prio,
                                 ssm_depth_t depth, ssm_value_t *argv,
                                 ssm_value_t *ret);
 
-struct ssm_closure { // ssm_closure1
+struct ssm_closure1 {
   struct ssm_mm mm;
   ssm_func_t f;
   ssm_value_t argv[1];
@@ -679,16 +679,16 @@ struct ssm_closure { // ssm_closure1
 ssm_value_t ssm_new_closure(ssm_func_t f);
 
 #define ssm_closure_arg(v, i)	\
-  (&*container_of((v).heap_ptr, struct ssm_closure, mm)->argv)[i]
+  (&*container_of((v).heap_ptr, struct ssm_closure1, mm)->argv)[i]
 
 #define ssm_closure_argv(v)	\
-  container_of((v).heap_ptr, struct ssm_closure, mm)->argv
+  container_of((v).heap_ptr, struct ssm_closure1, mm)->argv
 
 #define ssm_closure_func(v)	\
-  container_of((v).heap_ptr, struct ssm_closure, mm)->f
+  container_of((v).heap_ptr, struct ssm_closure1, mm)->f
 
 #define ssm_closure_val_count(v)	\
-  container_of((v).heap_ptr, struct ssm_closure, mm)->mm.val_count
+  container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.val_count
 
 ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg);
 ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
