@@ -187,7 +187,7 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
 
 ssm_value_t ssm_new_closure(ssm_func_t f) {
   struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(0));
-  struct ssm_closure *closure = container_of(mm, struct ssm_closure, mm);
+  struct ssm_closure1 *closure = container_of(mm, struct ssm_closure1, mm);
   mm->ref_count = 1;
   mm->kind = SSM_CLOSURE_K;
   mm->val_count = 0;
@@ -198,7 +198,7 @@ ssm_value_t ssm_new_closure(ssm_func_t f) {
 ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg) {
   uint8_t val_count = ssm_closure_val_count(closure);
   struct ssm_mm *mm = ssm_mem_alloc(ssm_closure_size(val_count + 1));
-  struct ssm_closure *applied_closure = container_of(mm, struct ssm_closure, mm);
+  struct ssm_closure1 *applied_closure = container_of(mm, struct ssm_closure1, mm);
   mm->ref_count = 1;
   mm->kind = SSM_CLOSURE_K;
   mm->val_count = val_count + 1;
