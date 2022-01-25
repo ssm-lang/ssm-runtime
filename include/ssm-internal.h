@@ -143,7 +143,7 @@ enum ssm_kind {
   SSM_ADT_K = 0,  /**< ADT object, e.g., #ssm_adt1 */
   SSM_TIME_K,     /**< 64-bit timestamps, #ssm_time_t */
   SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K,  /**< Closure object, #ssm_closure */
+  SSM_CLOSURE_K,  /**< Closure object, #ssm_closure1 */
 };
 
 /** @brief Initializes the underlying allocator system.
