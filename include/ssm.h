@@ -678,11 +678,11 @@ struct ssm_closure1 {
 
 ssm_value_t ssm_new_closure(ssm_func_t f);
 
-#define ssm_closure_arg(v, i)	\
-  (&*container_of((v).heap_ptr, struct ssm_closure1, mm)->argv)[i]
-
 #define ssm_closure_argv(v)	\
-  container_of((v).heap_ptr, struct ssm_closure1, mm)->argv
+  (&*container_of((v).heap_ptr, struct ssm_closure1, mm)->argv)
+
+#define ssm_closure_arg(v, i)   \
+  ssm_closure_argv(v)[i]
 
 #define ssm_closure_func(v)	\
   container_of((v).heap_ptr, struct ssm_closure1, mm)->f
