@@ -684,10 +684,10 @@ ssm_value_t ssm_new_closure(ssm_func_t f);
 #define ssm_closure_arg(v, i)                                                  \
   ssm_closure_argv(v)[i]
 
-#define ssm_closure_func(v)	                                                   \
+#define ssm_closure_func(v)                                                    \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->f
 
-#define ssm_closure_val_count(v)	                                             \
+#define ssm_closure_val_count(v)                                               \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.val_count
 
 ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg);
