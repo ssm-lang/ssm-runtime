@@ -124,7 +124,8 @@ void ssm_tick(void);
 #define ssm_adt_size(vc) (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc) - 1))
 
 
-#define ssm_closure_size(vc) (sizeof(struct ssm_closure1) + (vc ? sizeof(ssm_value_t) * ((vc) - 1) : -sizeof(ssm_value_t)))
+#define ssm_closure_size(vc)                                                   \
+  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc) - 1)))
 
 /**
  * @addtogroup mem
