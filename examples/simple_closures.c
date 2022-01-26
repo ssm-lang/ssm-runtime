@@ -42,7 +42,6 @@ void step_f(ssm_act_t *act) {
 
 typedef struct {
   ssm_act_t act;
-  ssm_value_t f_closure;
   ssm_value_t g_closure;
   ssm_value_t __tmp0;
   ssm_value_t __tmp1;
@@ -63,9 +62,10 @@ void step_main(struct ssm_act *act) {
   act_main_t *cont = container_of(act, act_main_t, act);
 
   switch (act->pc) {
-  case 0:
-    cont->f_closure = ssm_new_closure(&enter_f);
-    cont->g_closure = ssm_closure_apply(cont->f_closure, ssm_marshal(1));
+  case 0:;
+    ssm_value_t f_closure = ssm_new_closure(&enter_f);
+    cont->g_closure = ssm_closure_apply(f_closure, ssm_marshal(1));
+    ssm_drop(f_closure);
     ssm_activate(ssm_closure_reduce(cont->g_closure, ssm_marshal(2), act,
                                     act->priority, act->depth, &cont->__tmp0));
     act->pc = 1;
@@ -77,7 +77,6 @@ void step_main(struct ssm_act *act) {
     return;
   case 2:;
     printf("%d\n", ssm_unmarshal(cont->__tmp0) + ssm_unmarshal(cont->__tmp1));
-    ssm_drop(cont->f_closure);
     ssm_drop(cont->g_closure);
     ssm_drop(cont->__tmp0);
     ssm_drop(cont->__tmp1);
