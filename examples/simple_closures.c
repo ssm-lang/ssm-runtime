@@ -42,7 +42,11 @@ void step_f(ssm_act_t *act) {
 
 typedef struct {
   ssm_act_t act;
+  ssm_value_t f_closure;
   ssm_value_t g_closure;
+  ssm_value_t t1;
+  ssm_value_t t2;
+  ssm_value_t t3;
   ssm_value_t __tmp0;
   ssm_value_t __tmp1;
 } act_main_t;
@@ -63,21 +67,35 @@ void step_main(struct ssm_act *act) {
 
   switch (act->pc) {
   case 0:;
-    ssm_value_t f_closure = ssm_new_closure(&enter_f);
-    cont->g_closure = ssm_closure_apply(f_closure, ssm_marshal(1));
-    ssm_drop(f_closure);
-    ssm_activate(ssm_closure_reduce(cont->g_closure, ssm_marshal(2), act,
+    cont->f_closure = ssm_new_closure(&enter_f);
+    cont->t1 = ssm_new_time(1);
+    cont->t2 = ssm_new_time(2);
+
+    /* ssm_dup(cont->t1); */
+    cont->g_closure = ssm_closure_apply(cont->f_closure, cont->t1);
+    ssm_drop(cont->f_closure);
+    /* ssm_drop(cont->t1); */
+
+    ssm_dup(cont->t1); // dup all of g closure args
+    /* ssm_dup(cont->t2); */
+    ssm_activate(ssm_closure_reduce(cont->g_closure, cont->t2, act,
                                     act->priority, act->depth, &cont->__tmp0));
+    /* ssm_drop(cont->t2); */
     act->pc = 1;
     return;
   case 1:;
-    ssm_activate(ssm_closure_reduce(cont->g_closure, ssm_marshal(3), act,
+    cont->t3 = ssm_new_time(3);
+    ssm_dup(cont->t1); // dup all of g closure args
+    /* ssm_dup(cont->t3); */
+    // move activate call to closure_reduce)
+    ssm_activate(ssm_closure_reduce(cont->g_closure, cont->t3, act,
                                     act->priority, act->depth, &cont->__tmp1));
+    ssm_drop(cont->g_closure);
+    /* ssm_drop(cont->t3); */
     act->pc = 2;
     return;
   case 2:;
     printf("%d\n", ssm_unmarshal(cont->__tmp0) + ssm_unmarshal(cont->__tmp1));
-    ssm_drop(cont->g_closure);
     ssm_drop(cont->__tmp0);
     ssm_drop(cont->__tmp1);
     break;
