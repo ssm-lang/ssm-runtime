@@ -190,8 +190,6 @@ typedef struct {
   ssm_value_t list;
   ssm_value_t list_;
   ssm_value_t inc_func;
-  ssm_value_t init;
-  ssm_value_t offset;
 } act_main_t;
 
 ssm_stepf_t step_main;
@@ -217,9 +215,9 @@ void step_main(struct ssm_act *act) {
     act->pc = 1;
     return;
   case 1:;
-    cont->init= ssm_new_closure(&enter_inc_offset);
-    cont->offset = ssm_marshal(69);
-    cont->inc_func = ssm_closure_apply(cont->init, cont->offset);
+    ssm_value_t init = ssm_new_closure(&enter_inc_offset);
+    cont->inc_func = ssm_closure_apply(init, ssm_marshal(69));
+    ssm_drop(init);
     ssm_activate(enter_map_inc(act, act->priority, act->depth, cont->list, cont->inc_func,
                                &cont->list_));
     act->pc = 2;
@@ -229,8 +227,6 @@ void step_main(struct ssm_act *act) {
     act->pc = 3;
     return;
   case 3:
-    ssm_drop(cont->init);
-    ssm_drop(cont->offset);
     ssm_drop(cont->inc_func);
     break;
   }
