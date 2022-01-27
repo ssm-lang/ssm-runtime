@@ -204,9 +204,8 @@ void ssm_drop_final(ssm_value_t v) {
       ssm_drop(ssm_to_sv(v)->later_value);
     break;
   case SSM_CLOSURE_K:
-    size = ssm_closure_size(v.heap_ptr->val_count);
-    for (size_t i = 0; i < v.heap_ptr->val_count; i++)
-      ssm_drop(ssm_closure_arg(v, i));
+    size = ssm_closure_size(v.heap_ptr->tag);
+    ssm_closure_drop_args(v);
     break;
   }
   ssm_mem_free(v.heap_ptr, size);

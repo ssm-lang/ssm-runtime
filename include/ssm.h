@@ -167,8 +167,10 @@ struct ssm_mm {
  *  @param v  #ssm_value_t to be dropped.
  */
 #define ssm_drop(v)                                                            \
-  if (ssm_on_heap(v))                                                          \
-  ssm_drop_unsafe(v)
+  if (ssm_on_heap(v)) {                                                        \
+    printf("Dropping " #v "\n");                                               \
+    ssm_drop_unsafe(v);                                                        \
+  }
 
 /** @brief Duplicate a heap reference, incrementing its ref count.
  *
@@ -663,12 +665,11 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag);
 
 /** @} */
 
-
 /** HANS TODO: closure docs **/
 
 typedef ssm_act_t *(*ssm_func_t)(ssm_act_t *parent, ssm_priority_t prio,
-                                ssm_depth_t depth, ssm_value_t *argv,
-                                ssm_value_t *ret);
+                                 ssm_depth_t depth, ssm_value_t *argv,
+                                 ssm_value_t *ret);
 
 struct ssm_closure1 {
   struct ssm_mm mm;
@@ -676,25 +677,57 @@ struct ssm_closure1 {
   ssm_value_t argv[1];
 };
 
-ssm_value_t ssm_new_closure(ssm_func_t f);
-
 #define ssm_closure_argv(v)                                                    \
   (&*container_of((v).heap_ptr, struct ssm_closure1, mm)->argv)
 
-#define ssm_closure_arg(v, i)                                                  \
-  ssm_closure_argv(v)[i]
+#define ssm_closure_arg(v, i) ssm_closure_argv(v)[i]
 
 #define ssm_closure_func(v)                                                    \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->f
 
-#define ssm_closure_val_count(v)                                               \
+#define ssm_closure_arg_count(v)                                               \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.val_count
 
-ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg);
-ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
-			       ssm_act_t *parent, ssm_priority_t prio,
-			       ssm_depth_t depth, ssm_value_t *ret);
+#define ssm_closure_arg_cap(v)                                                 \
+  container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.tag
 
+ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap);
+void ssm_closure_dup_args(ssm_value_t closure);
+void ssm_closure_drop_args(ssm_value_t closure);
+ssm_value_t ssm_closure_clone_unsafe(ssm_value_t old_closure);
+
+#define ssm_closure_clone(closure)                                             \
+  do {                                                                         \
+    if ((closure).heap_ptr->ref_count > 1) {                                   \
+      ssm_closure_dup_args(closure);                                           \
+      ssm_value_t new_closure = ssm_closure_clone_unsafe(closure);             \
+      (closure).heap_ptr->ref_count--;                                         \
+      (closure) = new_closure;                                                 \
+    }                                                                          \
+  } while (0)
+
+#define ssm_closure_apply_unsafe(closure, arg)                                 \
+  do {                                                                         \
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = (arg);          \
+    ssm_closure_arg_count(closure)++;                                          \
+  } while (0)
+
+#define ssm_closure_apply(closure, arg)                                        \
+  do {                                                                         \
+    ssm_dup(arg);                                                              \
+    ssm_closure_apply_unsafe(closure, arg);                                    \
+  } while (0)
+
+#define ssm_closure_activate(closure, ...)                                     \
+  do {                                                                         \
+    for (size_t i = 0; i < ssm_closure_arg_cap(closure); i++)                  \
+      ssm_dup(ssm_closure_arg(closure, i));                                    \
+    ssm_closure_activate_unsafe(closure, __VA_ARGS__);                         \
+  } while (0)
+
+#define ssm_closure_activate_unsafe(closure, parent, prio, depth, ret)         \
+  ssm_activate(ssm_closure_func(closure)(parent, prio, depth,                  \
+                                         ssm_closure_argv(closure), ret))
 
 /**
  * @addtogroup mem
