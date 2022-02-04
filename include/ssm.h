@@ -143,6 +143,15 @@ struct ssm_mm {
  */
 #define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
 
+/** @brief Whether a value is shared, i.e., unsafe to modify.
+ *
+ *  The opposite of "shared" is "unique," as in C++'s "unique_ptr."
+ *
+ *  @param v  pointer to the #ssm_value_t.
+ *  @returns  non-zero if shared, zero otherwise.
+ */
+#define ssm_is_shared(v) !(ssm_on_heap(v) && ((v).heap_ptr->ref_count == 1))
+
 /** @brief Duplicate a possible heap reference, incrementing its ref count.
  *
  *  If the caller knows @a v is definitely on the heap, call ssm_drop_unsafe()
@@ -151,9 +160,7 @@ struct ssm_mm {
  *
  *  @param v  pointer to the #ssm_mm header of the heap item.
  */
-#define ssm_dup(v)                                                             \
-  if (ssm_on_heap(v))                                                          \
-  ssm_dup_unsafe(v)
+#define ssm_dup(v) (ssm_on_heap(v) ? ssm_dup_unsafe(v) : (v))
 
 /** @brief Drop a reference to a possible heap item, and free it if necessary.
  *
@@ -167,8 +174,10 @@ struct ssm_mm {
  *  @param v  #ssm_value_t to be dropped.
  */
 #define ssm_drop(v)                                                            \
-  if (ssm_on_heap(v))                                                          \
-  ssm_drop_unsafe(v)
+  do                                                                           \
+    if (ssm_on_heap(v))                                                        \
+      ssm_drop_unsafe(v);                                                      \
+  while (0)
 
 /** @brief Duplicate a heap reference, incrementing its ref count.
  *
@@ -178,10 +187,7 @@ struct ssm_mm {
  *
  *  @param v  pointer to the #ssm_mm header of the heap item.
  */
-#define ssm_dup_unsafe(v)                                                      \
-  do                                                                           \
-    ++(v).heap_ptr->ref_count;                                                 \
-  while (0)
+#define ssm_dup_unsafe(v) ((++(v).heap_ptr->ref_count, (v)))
 
 /** @brief Drop a reference to a heap item, and free it if necessary.
  *
@@ -193,10 +199,13 @@ struct ssm_mm {
  *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
  *
  *  @param v  #ssm_value_t to be dropped.
+ *  @returns  0 on success.
  */
 #define ssm_drop_unsafe(v)                                                     \
-  if (--(v).heap_ptr->ref_count == 0)                                          \
-  ssm_drop_final(v)
+  do                                                                           \
+    if (--(v).heap_ptr->ref_count == 0)                                        \
+      ssm_drop_final(v);                                                       \
+  while (0)
 
 /** @brief Finalize and free a heap object.
  *
@@ -663,38 +672,184 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag);
 
 /** @} */
 
+/**
+ * @addtogroup closure
+ * @{
+ */
 
-/** HANS TODO: closure docs **/
-
+/** @brief The type signature for all SSM enter functions.
+ *
+ *  This type standardizes the "calling convention" of SSM functions, so that
+ *  they can be stored in generic closures and treated uniformly.
+ *
+ *  @param parent the activation record of the caller.
+ *  @param prio   the priority of the callee.
+ *  @param depth  the depth of the callee.
+ *  @param argv   an array of #ssm_value_t arguments given to the callee.
+ *  @param ret    the return value address that the callee should write to.
+ *  @returns      an allocated activation record for the callee.
+ */
 typedef ssm_act_t *(*ssm_func_t)(ssm_act_t *parent, ssm_priority_t prio,
-                                ssm_depth_t depth, ssm_value_t *argv,
-                                ssm_value_t *ret);
+                                 ssm_depth_t depth, ssm_value_t *argv,
+                                 ssm_value_t *ret);
 
+/** @brief The struct template of a heap-allocated closure object.
+ *
+ *  This struct is meant to be used as a template for performing other
+ *  closure-related pointer arithmetic; no instance of this should ever be
+ *  declared. See elaborated discussion about this pattern for #ssm_adt1.
+ *
+ *  A closure should always be allocated with enough space in @a argv to
+ *  accommodate <em>all</em> arguments expected by the enter function @a f,
+ *  so faciliate efficient in-place usage.
+ *
+ *  The current number of arguments owned by the closure is tracked by the
+ *  memory management header's @a val_count field; the reference counts of the
+ *  @a argv fields within this range need to be decremented when the enclosing
+ *  closure is freed. The total number of arguments accommodated by the closure
+ *  is tracked by the @a tag field; this also determines the size of the closure
+ *  object.
+ */
 struct ssm_closure1 {
-  struct ssm_mm mm;
-  ssm_func_t f;
-  ssm_value_t argv[1];
+  struct ssm_mm mm;    /**< Memory management header. */
+  ssm_func_t f;        /**< Enter function pointer. */
+  ssm_value_t argv[1]; /**< An array of arguments. */
 };
 
-ssm_value_t ssm_new_closure(ssm_func_t f);
-
+/** @brief Retrieve the argument array of a closure. */
 #define ssm_closure_argv(v)                                                    \
   (&*container_of((v).heap_ptr, struct ssm_closure1, mm)->argv)
 
-#define ssm_closure_arg(v, i)                                                  \
-  ssm_closure_argv(v)[i]
+/** @brief Obtain the ith argument of a closure. */
+#define ssm_closure_arg(v, i) ssm_closure_argv(v)[i]
 
+/** @brief Obtain the enter function pointer of a closure. */
 #define ssm_closure_func(v)                                                    \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->f
 
-#define ssm_closure_val_count(v)                                               \
+/** @brief Obtain the number of argument values owned by a closure. */
+#define ssm_closure_arg_count(v)                                               \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.val_count
 
-ssm_value_t ssm_closure_apply(ssm_value_t closure, ssm_value_t arg);
-ssm_act_t *ssm_closure_reduce(ssm_value_t closure, ssm_value_t arg,
-			       ssm_act_t *parent, ssm_priority_t prio,
-			       ssm_depth_t depth, ssm_value_t *ret);
+/** @brief Obtain the number of argument values accommodated by a closure. */
+#define ssm_closure_arg_cap(v)                                                 \
+  container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.tag
 
+/** @brief Allocate a closure on the heap.
+ *
+ *  @param f        the enter function pointer of the closure.
+ *  @param arg_cap  the number of arguments the closure should accommodate.
+ *  @returns        a value pointing to the heap-allocated closure.
+ */
+ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap);
+
+/** @brief ssm_dup() all the arguments of a closure. */
+void ssm_closure_dup_args(ssm_value_t closure);
+
+/** @brief ssm_drop() all the arguments of a closure. */
+void ssm_closure_drop_args(ssm_value_t closure);
+
+/** @brief Write a value to the next available slot in a closure's @a argv.
+ *
+ *  Note that ssm_dup() is not called on @a arg, nor is the @a arg_count of the
+ *  closure incremented.
+ */
+#define ssm_closure_store_arg_unsafe(closure, arg)                             \
+  do                                                                           \
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
+  while (0)
+
+/** @brief Add a value to a closure's @a argv, and advance @a arg_count.
+ *
+ *  Note that ssm_dup() is not called on @a arg.
+ */
+#define ssm_closure_push_arg_unsafe(closure, arg)                              \
+  do {                                                                         \
+    ssm_closure_store_arg_unsafe(closure, arg);                                \
+    ssm_closure_arg_count(closure)++;                                          \
+  } while (0)
+
+/** @brief Partially apply a function to an argument, without memory management.
+ *
+ *  This function strictly follows functional semantics: it leaves @a closure
+ *  unmodified, and returns a copy of @a closure with the additional @a arg
+ *  argument. ssm_dup() is called on all arguments of @a closure.
+ *
+ *  Yet this function is unsafe in the sense that it does not ssm_dup() @a arg.
+ *  For the memory-safe version, see ssm_closure_apply().
+ *
+ *  It is the responsibility of the caller to ensure that @a closure has enough
+ *  capacity to accommodate @a arg. The result of calling this when it no longer
+ *  has capacity is undefined.
+ *
+ *  @param closure  value pointing to a heap-allocated closure.
+ *  @param arg      argument to be applied to @a closure.
+ *  @returns        a clone of @a closure with @a arg applied to it.
+ */
+ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg);
+
+/** @brief Partially apply a function to an argument.
+ *
+ *  This function strictly follows functional semantics: it leaves @a closure
+ *  unmodified, and returns a copy of @a closure with the additional @a arg
+ *  argument. ssm_dup() is called on all arguments of @a closure, as well as the
+ *  new argument @a arg.
+ *
+ *  It is the responsibility of the caller to ensure that @a closure has enough
+ *  capacity to accommodate @a arg. The result of calling this when it no longer
+ *  has capacity is undefined.
+ *
+ *  @param closure  value pointing to a heap-allocated closure.
+ *  @param arg      argument to be applied to @a closure.
+ *  @returns        a clone of @a closure with @a arg applied to it.
+ */
+#define ssm_closure_apply(closure, arg)                                        \
+  ssm_closure_apply_unsafe(closure, ssm_dup(arg))
+
+/** @brief Invoke a closure's enter function and activate the new process.
+ *
+ *  Note that @a closure does not have to have its @a arg_count set to capacity,
+ *  as long as all slots in @a argv are written to. This means that this macro
+ *  is safe to invoke after an argument is added with
+ *  ssm_closure_store_arg_unsafe(), without needing to increment @a arg_count.
+ *
+ *  This macro is unsafe in that it does not perform any memory management for
+ *  the closure, e.g., calling ssm_dup() on its arguments.
+ *
+ *  @param closure  value pointing to a heap-allocated closure.
+ *  @param parent   the activation record of the caller.
+ *  @param prio     the priority of the callee.
+ *  @param depth    the depth of the callee.
+ *  @param ret      the return value address that the callee should write to.
+ */
+#define ssm_closure_activate_unsafe(closure, parent, prio, depth, ret)         \
+  do {                                                                         \
+    ssm_activate(ssm_closure_func(closure)(parent, prio, depth,                \
+                                           ssm_closure_argv(closure), ret));   \
+  } while (0)
+
+/** @brief Apply a closure to its final argument, and activate the process.
+ *
+ *  This macro assumes that @a closure has all but one argument aleady applied.
+ *  It will call ssm_dup() on all values in @a argv, since they will be passed
+ *  to the newly created process.
+ *
+ *  @param closure  value pointing to a heap-allocated closure.
+ *  @param arg      final argument applied to @a closure.
+ *  @param parent   the activation record of the caller.
+ *  @param prio     the priority of the callee.
+ *  @param depth    the depth of the callee.
+ *  @param ret      the return value address that the callee should write to.
+ */
+#define ssm_closure_reduce(closure, arg, parent, prio, depth, ret)             \
+  do {                                                                         \
+    ssm_closure_dup_args(closure);                                             \
+    ssm_dup(arg);                                                              \
+    ssm_closure_store_arg_unsafe(closure, arg);                                \
+    ssm_closure_activate_unsafe(closure, parent, prio, depth, ret);            \
+  } while (0)
+
+/** @} */
 
 /**
  * @addtogroup mem
