@@ -116,7 +116,7 @@ void step_map_inc(ssm_act_t *act) {
     ssm_drop(cont->l);
 
     ssm_dup(__i);
-    ssm_activate(ssm_closure_reduce(cont->inc, __i, act, act->priority, act->depth, &cont->__tmp0));
+    ssm_closure_reduce(cont->inc, __i, act, act->priority, act->depth, &cont->__tmp0);
     cont->__tmp2 = __l;
     act->pc = 1;
     return;
@@ -215,7 +215,7 @@ void step_main(struct ssm_act *act) {
     act->pc = 1;
     return;
   case 1:;
-    ssm_value_t init = ssm_new_closure(&enter_inc_offset);
+    ssm_value_t init = ssm_new_closure(&enter_inc_offset, 2);
     cont->inc_func = ssm_closure_apply(init, ssm_marshal(69));
     ssm_drop(init);
     ssm_activate(enter_map_inc(act, act->priority, act->depth, cont->list, cont->inc_func,
