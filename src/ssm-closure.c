@@ -29,6 +29,11 @@ void ssm_closure_dup_args(ssm_value_t closure) {
     ssm_dup(ssm_closure_arg(closure, i));
 }
 
+void ssm_closure_dup_argv(ssm_value_t closure) {
+  for (size_t i = 0; i < ssm_closure_arg_cap(closure); i++)
+    ssm_dup(ssm_closure_arg(closure, i));
+}
+
 void ssm_closure_drop_args(ssm_value_t closure) {
   for (size_t i = 0; i < ssm_closure_arg_count(closure); i++)
     ssm_drop(ssm_closure_arg(closure, i));
@@ -40,10 +45,10 @@ ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg) {
 
   for (size_t i = 0; i < ssm_closure_arg_count(closure); i++) {
     ssm_dup(ssm_closure_arg(closure, i));
-    ssm_closure_store_arg_unsafe(new_closure, ssm_closure_arg(closure, i));
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;
   }
 
-  ssm_closure_store_arg_unsafe(new_closure, arg);
+  ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;
 
   return new_closure;
 }

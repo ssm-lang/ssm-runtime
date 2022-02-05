@@ -743,21 +743,14 @@ struct ssm_closure1 {
  */
 ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap);
 
-/** @brief ssm_dup() all the arguments of a closure. */
+/** @brief ssm_dup() each owned argument in a closure. */
 void ssm_closure_dup_args(ssm_value_t closure);
+
+/** @brief ssm_dup() all values in a closure's argv. */
+void ssm_closure_dup_argv(ssm_value_t closure);
 
 /** @brief ssm_drop() all the arguments of a closure. */
 void ssm_closure_drop_args(ssm_value_t closure);
-
-/** @brief Write a value to the next available slot in a closure's @a argv.
- *
- *  Note that ssm_dup() is not called on @a arg, nor is the @a arg_count of the
- *  closure incremented.
- */
-#define ssm_closure_store_arg_unsafe(closure, arg)                             \
-  do                                                                           \
-    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
-  while (0)
 
 /** @brief Add a value to a closure's @a argv, and advance @a arg_count.
  *
@@ -765,7 +758,7 @@ void ssm_closure_drop_args(ssm_value_t closure);
  */
 #define ssm_closure_push_arg_unsafe(closure, arg)                              \
   do {                                                                         \
-    ssm_closure_store_arg_unsafe(closure, arg);                                \
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
     ssm_closure_arg_count(closure)++;                                          \
   } while (0)
 
@@ -810,8 +803,8 @@ ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg);
  *
  *  Note that @a closure does not have to have its @a arg_count set to capacity,
  *  as long as all slots in @a argv are written to. This means that this macro
- *  is safe to invoke after an argument is added with
- *  ssm_closure_store_arg_unsafe(), without needing to increment @a arg_count.
+ *  is safe to invoke immediately after an argument is added, without needing to
+ *  increment @a arg_count.
  *
  *  This macro is unsafe in that it does not perform any memory management for
  *  the closure, e.g., calling ssm_dup() on its arguments.
@@ -828,25 +821,30 @@ ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg);
                                            ssm_closure_argv(closure), ret));   \
   } while (0)
 
-/** @brief Apply a closure to its final argument, and activate the process.
+/** @brief Enter and activate a closure, incrementing the ref count on all args.
  *
- *  This macro assumes that @a closure has all but one argument aleady applied.
- *  It will call ssm_dup() on all values in @a argv, since they will be passed
- *  to the newly created process.
+ *  This macro assumes that @a closure has a fully populated @a argv (though
+ *  this does not need to be reflected in its @a arg_count). It will call
+ *  ssm_dup() on all values in @a argv, since they will be passed to the newly
+ *  created process.
  *
  *  @param closure  value pointing to a heap-allocated closure.
- *  @param arg      final argument applied to @a closure.
  *  @param parent   the activation record of the caller.
  *  @param prio     the priority of the callee.
  *  @param depth    the depth of the callee.
  *  @param ret      the return value address that the callee should write to.
  */
+#define ssm_closure_activate(closure, parent, prio, depth, ret)                \
+  do {                                                                         \
+    ssm_closure_dup_argv(closure);                                             \
+    ssm_closure_activate_unsafe(closure, parent, prio, depth, ret);            \
+  } while (0)
+
+/** @brief Apply the final argument to a closure and activate the process. */
 #define ssm_closure_reduce(closure, arg, parent, prio, depth, ret)             \
   do {                                                                         \
-    ssm_closure_dup_args(closure);                                             \
-    ssm_dup(arg);                                                              \
-    ssm_closure_store_arg_unsafe(closure, arg);                                \
-    ssm_closure_activate_unsafe(closure, parent, prio, depth, ret);            \
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
+    ssm_closure_activate(closure, parent, prio, depth, ret);                   \
   } while (0)
 
 /** @} */
