@@ -91,7 +91,7 @@ static inline size_t find_pool_size(size_t size) {
 static inline void alloc_pool(size_t p) {
   block_t *new_page = alloc_page();
   SSM_ASSERT(END_OF_FREELIST < new_page);
-
+  VALGRIND_CREATE_MEMPOOL(new_page, 0, 0);
   struct mem_pool *pool = &mem_pools[p];
   size_t last_block = BLOCKS_PER_PAGE - SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
   new_page[last_block].free_list_next = pool->free_list_head;
@@ -121,6 +121,7 @@ void *ssm_mem_alloc(size_t size) {
 #ifdef SSM_DEBUG_NO_ALLOC
   return alloc_mem(size);
 #else
+
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
     return alloc_mem(size);
@@ -131,12 +132,12 @@ void *ssm_mem_alloc(size_t size) {
     alloc_pool(p);
 
   void *buf = pool->free_list_head->block_buf;
+  VALGRIND_MEMPOOL_ALLOC(pool, buf, size);
 
   if (pool->free_list_head->free_list_next == UNINITIALIZED_FREE_BLOCK)
     pool->free_list_head += SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
   else
     pool->free_list_head = pool->free_list_head->free_list_next;
-
   return buf;
 #endif
 }
@@ -145,11 +146,13 @@ void ssm_mem_free(void *m, size_t size) {
 #ifdef SSM_DEBUG_NO_ALLOC
   free_mem(m, size);
 #else
+
   size_t pool = find_pool_size(size);
   if (pool >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
     return;
   }
+  VALGRIND_MEMPOOL_FREE(pool, m);
 
   block_t *new_head = m;
   new_head->free_list_next = mem_pools[pool].free_list_head;

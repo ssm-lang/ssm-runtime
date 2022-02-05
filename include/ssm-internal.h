@@ -232,4 +232,39 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
 
 /** @} */
 
+#ifndef NVALGRIND
+#include <valgrind/memcheck.h>
+#else
+/** @brief Registers the address pool as the anchor address for a memory pool.
+ *
+ * It also provides a size rzB, specifying how large the redzones placed around
+ * chunks allocated from the pool should be. Finally, it provides an is_zeroed
+ * argument that specifies whether the pool's chunks are zeroed (more precisely:
+ * defined) when allocated.
+ *
+ * Upon completion of this request, no chunks are associated with the pool. The
+ * request simply tells Memcheck that the pool exists, so that subsequent calls
+ * can refer to it as a pool.
+*/
+#define VALGRIND_CREATE_MEMPOOL(pool, rzB, is_zeroed) do; while(0)
+
+/** @brief Informs Memcheck that a size-byte chunk has been allocated at addr.
+ *
+ *  Associates the chunk with the specified pool.
+ *
+ *  If the pool was created with nonzero rzB redzones, Memcheck will mark the
+ *  rzB bytes before and after the chunk as NOACCESS. If the pool was created
+ *  with the is_zeroed argument set, Memcheck will mark the chunk as DEFINED,
+ *  otherwise Memcheck will mark the chunk as UNDEFINED.
+ */
+#define VALGRIND_MEMPOOL_ALLOC(pool, addr, size) do; while(0)
+
+/** @brief Informs Memcheck that the chunk at addr should no longer be considered allocated.
+ *
+ *  Memcheck will mark the chunk associated with addr as NOACCESS, and delete
+ *  its record of the chunk's existence.
+ */
+#define VALGRIND_MEMPOOL_FREE(pool, addr) do; while(0)
+#endif
+
 #endif /* _SSM_SCHED_H */
