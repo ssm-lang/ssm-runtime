@@ -39,10 +39,9 @@ void reset_all() {
   for (int i = 0; i < NUM_VARIABLES; i++)
     ssm_drop(variables[i]);
   ssm_reset();
-  for (int i = 0; i < NUM_VARIABLES; i++) {
-    variables[i] = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(variables[i], DUMMY_VALUE);
-  }
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    variables[i] = ssm_new_sv(DUMMY_VALUE);
+
   check_starts_initialized();
 }
 
@@ -50,7 +49,7 @@ void event_queue_basic() {
   reset_all();
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
   SSM_ASSERT(ssm_to_sv(variables[0])->last_updated != ssm_now());
-  ssm_later(ssm_to_sv(variables[0]), 1, DUMMY_VALUE);
+  ssm_later(variables[0], 1, DUMMY_VALUE);
   SSM_ASSERT(event_queue_len == 1);
   SSM_ASSERT(ssm_next_event_time() == 1);
   event_queue_consistency_check();
@@ -81,7 +80,7 @@ void event_queue_sort_string(const char *input, const char *expected) {
   SSM_ASSERT(event_queue_len == 0);
   ssm_value_t *var = variables;
   for (const char *cp = input; *cp; ++cp, ++var) {
-    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, DUMMY_VALUE);
+    ssm_later(*var, (ssm_time_t)*cp, DUMMY_VALUE);
     event_queue_consistency_check();
   }
 
@@ -111,7 +110,7 @@ void event_queue_reschedule_string(const char *input, const char *expected) {
   ssm_value_t *var = variables;
 
   for (const char *cp = input; *cp; ++cp, ++var) {
-    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, DUMMY_VALUE);
+    ssm_later(*var, (ssm_time_t)*cp, DUMMY_VALUE);
     event_queue_consistency_check();
   }
 
@@ -123,9 +122,9 @@ void event_queue_reschedule_string(const char *input, const char *expected) {
   for (const char *cp = input; *cp; ++cp, ++var) {
     if (*cp != ' ') {
       if (*cp > 'Z')
-        ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp + 'A' - 'a', DUMMY_VALUE);
+        ssm_later(*var, (ssm_time_t)*cp + 'A' - 'a', DUMMY_VALUE);
       else
-        ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp + 'a' - 'A', DUMMY_VALUE);
+        ssm_later(*var, (ssm_time_t)*cp + 'a' - 'A', DUMMY_VALUE);
     }
     event_queue_consistency_check();
   }
@@ -150,7 +149,7 @@ void event_queue_unschedule_string(const char *input, int n,
   reset_all();
   ssm_value_t *var = variables;
   for (const char *cp = input; *cp; ++cp, ++var) {
-    ssm_later(ssm_to_sv(*var), (ssm_time_t)*cp, DUMMY_VALUE);
+    ssm_later(*var, (ssm_time_t)*cp, DUMMY_VALUE);
     event_queue_consistency_check();
   }
 
@@ -288,11 +287,11 @@ void trigger_basic() {
 
   step0ran = step1ran = false;
 
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[2]);
+  ssm_sensitize(variables[0], &triggers[0]);
+  ssm_sensitize(variables[0], &triggers[1]);
+  ssm_sensitize(variables[0], &triggers[2]);
 
-  ssm_later(ssm_to_sv(variables[0]), 1, DUMMY_VALUE);
+  ssm_later(variables[0], 1, DUMMY_VALUE);
 
   ssm_tick();
   printf("\n");
@@ -303,7 +302,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_later(ssm_to_sv(variables[0]), 2, DUMMY_VALUE);
+  ssm_later(variables[0], 2, DUMMY_VALUE);
 
   step0ran = step1ran = false;
   ssm_tick();
@@ -315,7 +314,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_later(ssm_to_sv(variables[0]), 3, DUMMY_VALUE);
+  ssm_later(variables[0], 3, DUMMY_VALUE);
   ssm_desensitize(&triggers[1]);
 
   step0ran = step1ran = false;
@@ -328,7 +327,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_later(ssm_to_sv(variables[0]), 4, DUMMY_VALUE);
+  ssm_later(variables[0], 4, DUMMY_VALUE);
   ssm_desensitize(&triggers[0]);
 
   step0ran = step1ran = false;
@@ -341,7 +340,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_later(ssm_to_sv(variables[0]), 5, DUMMY_VALUE);
+  ssm_later(variables[0], 5, DUMMY_VALUE);
   ssm_desensitize(&triggers[2]);
 
   step0ran = step1ran = false;
@@ -354,9 +353,9 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_later(ssm_to_sv(variables[0]), 6, DUMMY_VALUE);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[1]);
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
+  ssm_later(variables[0], 6, DUMMY_VALUE);
+  ssm_sensitize(variables[0], &triggers[1]);
+  ssm_sensitize(variables[0], &triggers[0]);
 
   step0ran = step1ran = false;
   ssm_tick();
@@ -369,7 +368,7 @@ void trigger_basic() {
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
   ssm_desensitize(&triggers[0]);
-  ssm_later(ssm_to_sv(variables[0]), 7, DUMMY_VALUE);
+  ssm_later(variables[0], 7, DUMMY_VALUE);
 
   step0ran = step1ran = false;
   ssm_tick();
@@ -381,7 +380,7 @@ void trigger_basic() {
 
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
 
-  ssm_sensitize(ssm_to_sv(variables[0]), &triggers[0]);
+  ssm_sensitize(variables[0], &triggers[0]);
 
   for (ssm_trigger_t *trig = ssm_to_sv(variables[0])->triggers; trig;
        trig = trig->next)
@@ -438,10 +437,8 @@ static void free_mem(void *mem, size_t size) { free(mem); }
 int main(void) {
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
 
-  for (int i = 0; i < NUM_VARIABLES; i++) {
-    variables[i] = ssm_new(SSM_BUILTIN, SSM_SV_T);
-    ssm_sv_init(variables[i], DUMMY_VALUE);
-  }
+  for (int i = 0; i < NUM_VARIABLES; i++)
+    variables[i] = ssm_new_sv(DUMMY_VALUE);
 
   for (int i = 0; i < NUM_ACTS; i++)
     acts[i] = (ssm_act_t){

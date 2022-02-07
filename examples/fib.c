@@ -58,7 +58,7 @@ void step_mywait(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     cont->trigger1.act = act;
-    ssm_sensitize(ssm_to_sv(cont->r), &cont->trigger1);
+    ssm_sensitize(cont->r, &cont->trigger1);
     act->pc = 1;
     return;
   case 1:
@@ -99,7 +99,7 @@ void step_sum(struct ssm_act *act) {
     act->pc = 1;
     return;
   case 1:
-    ssm_later(ssm_to_sv(cont->r), ssm_now() + SSM_SECOND,
+    ssm_later(cont->r, ssm_now() + SSM_SECOND,
               ssm_marshal(ssm_unmarshal(ssm_deref(cont->r1)) +
                           ssm_unmarshal(ssm_deref(cont->r2))));
     break;
@@ -127,14 +127,11 @@ void step_fib(struct ssm_act *act) {
   switch (act->pc) {
   case 0:
     if (ssm_unmarshal(cont->n) < 2) {
-      ssm_later(ssm_to_sv(cont->r), ssm_now() + SSM_SECOND, ssm_marshal(1));
+      ssm_later(cont->r, ssm_now() + SSM_SECOND, ssm_marshal(1));
       break;
     } else {
-      cont->r1 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-      ssm_sv_init(cont->r1, ssm_marshal(0));
-
-      cont->r2 = ssm_new(SSM_BUILTIN, SSM_SV_T);
-      ssm_sv_init(cont->r2, ssm_marshal(0));
+      cont->r1 = ssm_new_sv(ssm_marshal(0));
+      cont->r2 = ssm_new_sv(ssm_marshal(0));
 
       ssm_dup(cont->r1);
       ssm_dup(cont->r2);
@@ -163,8 +160,7 @@ void step_fib(struct ssm_act *act) {
 
 ssm_u32_t result;
 void ssm_program_init(void) {
-  result = ssm_new(SSM_BUILTIN, SSM_SV_T);
-  ssm_sv_init(result, ssm_marshal(0xdeadbeef));
+  result = ssm_new_sv(ssm_marshal(0xdeadbeef));
 
   int n = ssm_init_args && ssm_init_args[0] ? atoi(ssm_init_args[0]) : 3;
   ssm_dup(result);

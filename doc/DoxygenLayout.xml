@@ -33,7 +33,8 @@
       <tab type="filelist" visible="yes" title="" intro=""/>
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
-    <tab type="examples" visible="yes" title="" intro=""/>  
+    <tab type="examples" visible="yes" title="" intro=""/>
+    <tab type="user" url="@ref contributing" title="Contributing"/>
   </navindex>
 
   <!-- Layout definition for a class page -->

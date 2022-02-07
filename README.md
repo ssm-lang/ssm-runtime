@@ -1,12 +1,26 @@
 # The Sparse Synchronous Model Runtime
 
-![tests](https://github.com/ssm-lang/ssm-runtime/actions/workflows/test.yml/badge.svg?branch=dev)
-[![doc](https://github.com/ssm-lang/ssm-runtime/actions/workflows/doc.yml/badge.svg?branch=dev)](https://ssm-lang.github.io/ssm-runtime)
-[![codecov](https://codecov.io/gh/ssm-lang/ssm-runtime/branch/dev/graph/badge.svg?token=TYCPPY7Y92)](https://codecov.io/gh/ssm-lang/ssm-runtime)
+<div>
+<a>
+  <img src="https://github.com/ssm-lang/ssm-runtime/actions/workflows/test.yml/badge.svg?branch=dev">
+</a>
+<a href="https://ssm-lang.github.io/ssm-runtime">
+  <img src="https://github.com/ssm-lang/ssm-runtime/actions/workflows/doc.yml/badge.svg?branch=dev"/>
+</a>
+<a href="https://codecov.io/gh/ssm-lang/ssm-runtime">
+  <img src="https://codecov.io/gh/ssm-lang/ssm-runtime/branch/dev/graph/badge.svg?token=TYCPPY7Y92"/>
+</a>
+</div>
 
 The Sparse Synchronous Model (SSM) is a deterministic real-time execution technique that allows explicit, precise timing control.
 
+The source code for this library is hosted on GitHub at <https://github.com/ssm-lang/ssm-runtime/tree/dev>.
+
 ## Documentation
+
+The generated documentation for this library maybe found at <https://ssm-lang.github.io/ssm-runtime>.
+
+The code documentation is organized in terms of modules, which are listed at <https://ssm-lang.github.io/ssm-runtime/modules.html>. Note that these modules do not reflect how the documented code is organized in files. Instead, they are purely logical: they group together related families of types and symbols across C translation units and public/private interfaces.
 
 The operation of this library was first described in:
 
@@ -15,8 +29,6 @@ The operation of this library was first described in:
 > In Forum on Specification and Design Languages (FDL),
 > Kiel, Germany, September 2020.
 > http://www.cs.columbia.edu/~sedwards/papers/edwards2020sparse.pdf
-
-The generated documentation for this library maybe found [here](https://ssm-lang.github.io/ssm-runtime).
 
 ## Dependencies
 
