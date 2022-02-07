@@ -128,7 +128,8 @@ int main(int argc, char *argv[]) {
   while (ssm_next_event_time() != SSM_NEVER && ssm_now() < stop_at)
     ssm_tick();
 
-  printf("%s: simulated %lu seconds\n", prog, ssm_now() / SSM_SECOND);
+  printf("%s: simulated %lu seconds\n", prog,
+         (unsigned long)ssm_now() / SSM_SECOND);
 
   ssm_program_exit();
 
