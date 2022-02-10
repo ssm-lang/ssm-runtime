@@ -70,6 +70,8 @@ rm -f build/examples.out
   run counter
   run list
   run list 2048
+  run simple-closures
+  run map-closure
 } >> build/examples.out
 
 if diff build/examples.out test/examples.out &> build/examples.diff ; then
@@ -109,6 +111,8 @@ if command -v valgrind >/dev/null ; then
     vg counter
     vg list
     vg list 2048
+    vg simple-closures
+    vg map-closure
   } >> build/examples.vg-out
   say "Examples do not have any memory errors"
 
