@@ -220,6 +220,12 @@ struct ssm_mm {
  */
 void ssm_drop_final(ssm_value_t v);
 
+/** @brief Call ssm_dup() on an array of values. */
+void ssm_dups(size_t cnt, ssm_value_t *arr);
+
+/** @brief Call ssm_drop() on an array of values. */
+void ssm_drops(size_t cnt, ssm_value_t *arr);
+
 /** @} */
 
 /**
@@ -341,6 +347,9 @@ typedef struct ssm_trigger {
   struct ssm_trigger **prev_ptr; /**< Pointer to self in previous element. */
   struct ssm_act *act;           /**< Routine triggered by this variable. */
 } ssm_trigger_t;
+
+/** @brief Whether an activation record has any children. */
+#define ssm_has_children(act) ((act)->children != 0)
 
 /** @brief Allocate and initialize a routine activation record.
  *
@@ -735,6 +744,38 @@ struct ssm_closure1 {
 #define ssm_closure_arg_cap(v)                                                 \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.tag
 
+/** @brief Add an argument to a closure.
+ *
+ *  Note that this helper increments the @a arg_count of @a closure but does not
+ *  perform memory management, i.e., does not ssm_dup() @a arg. It also does not
+ *  check whether @a closure has capacity for @a arg.
+ */
+#define ssm_closure_push(closure, arg)                                         \
+  do                                                                           \
+    ssm_closure_arg(closure, ssm_closure_arg_count(closure)++) = (arg);        \
+  while (0)
+
+/** @brief Remove an argument from a closure.
+ *
+ *  Note that this helper decrements the @a arg_count of @a closure but does not
+ *  perform memory management, i.e., does not ssm_drop() @a arg. It also does
+ *  not check whether @a closure has a non-zero number of arguments already
+ *  applied.
+ */
+#define ssm_closure_pop(closure)                                               \
+  do                                                                           \
+    ssm_closure_arg_count(closure)--;                                          \
+  while (0)
+
+/** @brief Spawn and schedule a new child process from a fully-applied closure.
+ *
+ *  Note that this helper does not perform any memory management, nor does it
+ *  ensure that @a closure has all arguments applied.
+ */
+#define ssm_closure_activate(closure, parent, prio, depth, ret)                \
+  ssm_activate(ssm_closure_func(closure)(parent, prio, depth,                  \
+                                         ssm_closure_argv(closure), ret))
+
 /** @brief Allocate a closure on the heap.
  *
  *  @param f        the enter function pointer of the closure.
@@ -743,108 +784,111 @@ struct ssm_closure1 {
  */
 ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap);
 
-/** @brief ssm_dup() each owned argument in a closure. */
-void ssm_closure_dup_args(ssm_value_t closure);
-
-/** @brief ssm_dup() all values in a closure's argv. */
-void ssm_closure_dup_argv(ssm_value_t closure);
-
-/** @brief ssm_drop() all the arguments of a closure. */
-void ssm_closure_drop_args(ssm_value_t closure);
-
-/** @brief Add a value to a closure's @a argv, and advance @a arg_count.
+/** @brief Create a copy of a closure.
  *
- *  Note that ssm_dup() is not called on @a arg.
+ *  @note Calls ssm_dup() on all previously applied arguments.
+ *
+ *  @param closure  the closure to be copied.
+ *  @returns        a value pointing to the heap-allocated closure.
  */
-#define ssm_closure_push_arg_unsafe(closure, arg)                              \
+ssm_value_t ssm_closure_clone(ssm_value_t closure);
+
+/** @brief Apply an argument to a closure.
+ *
+ *  The behavior depends on whether @a closure needs to be activated after being
+ *  applied to @a arg, i.e., whether all of its arguments have arrived.
+ *
+ *  If @a closure is activated, a child process will be scheduled, so the caller
+ *  must yield to the scheduler to allow the child process to run. The child
+ *  process will write its return value to @a ret.
+ *
+ *  If @a closure is not activated, a copy of it (via ssm_closure_clone()) with
+ *  @a arg pushed to its @a argv will be written to @a ret.
+ *
+ *  In both cases, all values in @a closure's @a argv will have ssm_dup() called
+ *  on them, since application will result in those values being shared in a new
+ *  context, either from a child process or from the cloned closure. Note that
+ *  ssm_dup() is <em>not</em> called on @a arg; to do so automatically, use
+ *  ssm_closure_apply_auto().
+ *
+ *  @param closure  the closure to be applied.
+ *  @param arg      the argument @a closure is applied to.
+ *  @param parent   the current process performing the application.
+ *  @param prio     priority of the current process.
+ *  @param depth    depth of the current process.
+ *  @param ret      pointer to the return value.
+ */
+void ssm_closure_apply(ssm_value_t closure, ssm_value_t arg, ssm_act_t *parent,
+                       ssm_priority_t prio, ssm_depth_t depth,
+                       ssm_value_t *ret);
+
+/** @brief Apply an argument to a closure that is used for the last time.
+ *
+ *  An optimized version of ssm_closure_apply(), to be used only provided:
+ *
+ *  1.  this is the last time @a closure is used by the caller.
+ *  2.  no other processes share @a closure.
+ *
+ *  This implementation should be used as the fast path when those conditions
+ *  hold; it improves upon the more general ssm_closure_apply() by using @a
+ *  closure in-place, and avoiding unnecessary ssm_dup() and ssm_drop() called.
+ *  After this is called, @a closure will not need to be dropped.
+ *
+ *  The behavior of this function is equivalent to:
+ *
+ *  ```{.c}
+ *  ssm_closure_apply(f, a, p, prio, depth, ret);
+ *  ssm_drop(f);
+ *  ```
+ *
+ *  Like ssm_closure_apply(), this function does not ssm_drop() @a arg; to do so
+ *  automatically, use ssm_closure_apply_final_auto().
+ *
+ *  @param closure  the closure to be applied.
+ *  @param arg      the argument @a closure is applied to.
+ *  @param parent   the current process performing the application.
+ *  @param prio     priority of the current process.
+ *  @param depth    depth of the current process.
+ *  @param ret      pointer to the return value.
+ */
+void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
+                             ssm_act_t *parent, ssm_priority_t prio,
+                             ssm_depth_t depth, ssm_value_t *ret);
+
+/** @brief Closure application with automatic memory management.
+ *
+ *  ssm_dup() is called on @a a before @a f is applied to it;
+ *  see ssm_closure_apply().
+ *
+ *  @param closure  the closure to be applied.
+ *  @param arg      the argument @a closure is applied to.
+ *  @param parent   the current process performing the application.
+ *  @param prio     priority of the current process.
+ *  @param depth    depth of the current process.
+ *  @param ret      pointer to the return value.
+ */
+#define ssm_closure_apply_auto(f, a, parent, prio, depth, ret)                 \
   do {                                                                         \
-    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
-    ssm_closure_arg_count(closure)++;                                          \
+    ssm_dup(a);                                                                \
+    ssm_closure_apply(f, a, parent, prio, depth, ret);                         \
   } while (0)
 
-/** @brief Partially apply a function to an argument, without memory management.
+/** @brief In-place closure application with automatic memory management.
  *
- *  This function strictly follows functional semantics: it leaves @a closure
- *  unmodified, and returns a copy of @a closure with the additional @a arg
- *  argument. ssm_dup() is called on all arguments of @a closure.
+ *  ssm_dup() is called on @a a before @a f is applied to it;
+ *  see ssm_closure_apply_final().
  *
- *  Yet this function is unsafe in the sense that it does not ssm_dup() @a arg.
- *  For the memory-safe version, see ssm_closure_apply().
- *
- *  It is the responsibility of the caller to ensure that @a closure has enough
- *  capacity to accommodate @a arg. The result of calling this when it no longer
- *  has capacity is undefined.
- *
- *  @param closure  value pointing to a heap-allocated closure.
- *  @param arg      argument to be applied to @a closure.
- *  @returns        a clone of @a closure with @a arg applied to it.
+ *  @param closure  the closure to be applied.
+ *  @param arg      the argument @a closure is applied to.
+ *  @param parent   the current process performing the application.
+ *  @param prio     priority of the current process.
+ *  @param depth    depth of the current process.
+ *  @param ret      pointer to the return value.
  */
-ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg);
-
-/** @brief Partially apply a function to an argument.
- *
- *  This function strictly follows functional semantics: it leaves @a closure
- *  unmodified, and returns a copy of @a closure with the additional @a arg
- *  argument. ssm_dup() is called on all arguments of @a closure, as well as the
- *  new argument @a arg.
- *
- *  It is the responsibility of the caller to ensure that @a closure has enough
- *  capacity to accommodate @a arg. The result of calling this when it no longer
- *  has capacity is undefined.
- *
- *  @param closure  value pointing to a heap-allocated closure.
- *  @param arg      argument to be applied to @a closure.
- *  @returns        a clone of @a closure with @a arg applied to it.
- */
-#define ssm_closure_apply(closure, arg)                                        \
-  ssm_closure_apply_unsafe(closure, ssm_dup(arg))
-
-/** @brief Invoke a closure's enter function and activate the new process.
- *
- *  Note that @a closure does not have to have its @a arg_count set to capacity,
- *  as long as all slots in @a argv are written to. This means that this macro
- *  is safe to invoke immediately after an argument is added, without needing to
- *  increment @a arg_count.
- *
- *  This macro is unsafe in that it does not perform any memory management for
- *  the closure, e.g., calling ssm_dup() on its arguments.
- *
- *  @param closure  value pointing to a heap-allocated closure.
- *  @param parent   the activation record of the caller.
- *  @param prio     the priority of the callee.
- *  @param depth    the depth of the callee.
- *  @param ret      the return value address that the callee should write to.
- */
-#define ssm_closure_activate_unsafe(closure, parent, prio, depth, ret)         \
+#define ssm_closure_apply_final_auto(f, a, parent, prio, depth, ret)           \
   do {                                                                         \
-    ssm_activate(ssm_closure_func(closure)(parent, prio, depth,                \
-                                           ssm_closure_argv(closure), ret));   \
-  } while (0)
-
-/** @brief Enter and activate a closure, incrementing the ref count on all args.
- *
- *  This macro assumes that @a closure has a fully populated @a argv (though
- *  this does not need to be reflected in its @a arg_count). It will call
- *  ssm_dup() on all values in @a argv, since they will be passed to the newly
- *  created process.
- *
- *  @param closure  value pointing to a heap-allocated closure.
- *  @param parent   the activation record of the caller.
- *  @param prio     the priority of the callee.
- *  @param depth    the depth of the callee.
- *  @param ret      the return value address that the callee should write to.
- */
-#define ssm_closure_activate(closure, parent, prio, depth, ret)                \
-  do {                                                                         \
-    ssm_closure_dup_argv(closure);                                             \
-    ssm_closure_activate_unsafe(closure, parent, prio, depth, ret);            \
-  } while (0)
-
-/** @brief Apply the final argument to a closure and activate the process. */
-#define ssm_closure_reduce(closure, arg, parent, prio, depth, ret)             \
-  do {                                                                         \
-    ssm_closure_arg(closure, ssm_closure_arg_count(closure)) = arg;            \
-    ssm_closure_activate(closure, parent, prio, depth, ret);                   \
+    ssm_dup(a);                                                                \
+    ssm_closure_apply_final(f, a, parent, prio, depth, ret);                   \
   } while (0)
 
 /** @} */
@@ -856,9 +900,9 @@ ssm_value_t ssm_closure_apply_unsafe(ssm_value_t closure, ssm_value_t arg);
 
 /** @brief Allocate a contiguous range of memory.
  *
- *  Memory will be allocated from an appropriately sized memory pool, if one is
- *  available. Guaranteed to be aligned against the smallest power of 2 greater
- *  than @a size.
+ *  Memory will be allocated from an appropriately sized memory pool, if one
+ *  is available. Guaranteed to be aligned against the smallest power of 2
+ *  greater than @a size.
  *
  *  @param size   the requested memory range size, in bytes.
  *  @returns      pointer to the first byte of the allocate memory block.

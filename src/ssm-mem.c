@@ -211,3 +211,17 @@ void ssm_drop_final(ssm_value_t v) {
   }
   ssm_mem_free(v.heap_ptr, size);
 }
+
+// These are functions rather than macros to limit code size.
+// I anticipate few valuable opportunities for the optimizer to inline
+// code, since it's quite difficult to know ahead of time how many
+// arguments are already contained in a closure.
+void ssm_dups(size_t cnt, ssm_value_t *arr) {
+  for (size_t i = 0; i < cnt; i++)
+    ssm_dup(arr[i]);
+}
+
+void ssm_drops(size_t cnt, ssm_value_t *arr) {
+  for (size_t i = 0; i < cnt; i++)
+    ssm_drop(arr[i]);
+}
