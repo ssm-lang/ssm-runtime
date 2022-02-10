@@ -867,10 +867,10 @@ void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
  *  @param depth    depth of the current process.
  *  @param ret      pointer to the return value.
  */
-#define ssm_closure_apply_auto(f, a, parent, prio, depth, ret)                 \
+#define ssm_closure_apply_auto(closure, arg, parent, prio, depth, ret)         \
   do {                                                                         \
-    ssm_dup(a);                                                                \
-    ssm_closure_apply(f, a, parent, prio, depth, ret);                         \
+    ssm_dup(arg);                                                              \
+    ssm_closure_apply(closure, arg, parent, prio, depth, ret);                 \
   } while (0)
 
 /** @brief In-place closure application with automatic memory management.
@@ -885,10 +885,10 @@ void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
  *  @param depth    depth of the current process.
  *  @param ret      pointer to the return value.
  */
-#define ssm_closure_apply_final_auto(f, a, parent, prio, depth, ret)           \
+#define ssm_closure_apply_final_auto(closure, arg, parent, prio, depth, ret)   \
   do {                                                                         \
-    ssm_dup(a);                                                                \
-    ssm_closure_apply_final(f, a, parent, prio, depth, ret);                   \
+    ssm_dup(arg);                                                              \
+    ssm_closure_apply_final(closure, arg, parent, prio, depth, ret);           \
   } while (0)
 
 /** @} */
