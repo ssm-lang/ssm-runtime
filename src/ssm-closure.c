@@ -23,6 +23,7 @@ ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap) {
 ssm_value_t ssm_closure_clone(ssm_value_t closure) {
   ssm_value_t new_closure =
       ssm_new_closure(ssm_closure_func(closure), ssm_closure_arg_cap(closure));
+  ssm_closure_arg_count(new_closure) = ssm_closure_arg_count(closure);
 
   for (size_t i = 0; i < ssm_closure_arg_count(closure); i++) {
     ssm_dup(ssm_closure_arg(closure, i));
