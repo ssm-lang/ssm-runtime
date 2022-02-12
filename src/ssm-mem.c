@@ -78,6 +78,13 @@ static inline size_t find_pool_size(size_t size) {
   return SSM_MEM_POOL_COUNT;
 }
 
+static inline block_t *find_next_block(block_t *block, size_t pool_size) {
+  if (block->free_list_next == UNINITIALIZED_FREE_BLOCK)
+    return block + pool_size / sizeof(block_t);
+  else
+    return block->free_list_next;
+}
+
 /** @brief Allocate a new block for a memory pool.
  *
  *  Calls alloc_page() to allocate a new zero-initialized page for the memory
@@ -95,7 +102,9 @@ static inline void alloc_pool(size_t p) {
   size_t last_block = BLOCKS_PER_PAGE - SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
   new_page[last_block].free_list_next = pool->free_list_head;
   pool->free_list_head = new_page;
-  VALGRIND_MAKE_MEM_NOACCESS(new_page, SSM_MEM_PAGE_SIZE);
+
+  // Mark as NOACCESS; nothing should touch this memory until it is allocated.
+  // VALGRIND_MAKE_MEM_NOACCESS(new_page, SSM_MEM_PAGE_SIZE);
 }
 
 void ssm_mem_init(void *(*alloc_page_handler)(void),
@@ -107,8 +116,21 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
 
   for (size_t p = 0; p < SSM_MEM_POOL_COUNT; p++) {
     mem_pools[p].free_list_head = END_OF_FREELIST;
-    VALGRIND_CREATE_MEMPOOL(&mem_pools[p], 0, 1);
   }
+
+  // Ask Valgrind to checkpoint the amount of memory allocated so far.
+  VALGRIND_PRINTF("Performing leak check at memory initialization.\n");
+  VALGRIND_PRINTF("(Checkpoints how much memory is allocated at init time.)\n");
+  VALGRIND_DO_QUICK_LEAK_CHECK;
+}
+
+void ssm_mem_destroy(void (*free_page_handler)(void *)) {
+
+  // Report how much memory has been leaked since the checkpoint in
+  // ssm_mem_init().
+  VALGRIND_PRINTF("About to destroy SSM allocator. Performing leak check.\n");
+  VALGRIND_PRINTF("(Ignore leaks coming from malloc() in alloc_pool().)\n");
+  VALGRIND_DO_ADDED_LEAK_CHECK;
 }
 
 void ssm_mem_prealloc(size_t size, size_t num_pages) {
@@ -135,13 +157,15 @@ void *ssm_mem_alloc(size_t size) {
 
   void *buf = pool->free_list_head->block_buf;
 
-  VALGRIND_MEMPOOL_ALLOC(pool, buf, size);
+  // Tell Valgrind that we have allocated buf as a chunk of pool.
+  //
+  // The memory range [buf..buf+size] is now considered DEFINED.
+  VALGRIND_MALLOCLIKE_BLOCK(buf, size, 0, 1);
 
-  if (pool->free_list_head->free_list_next == UNINITIALIZED_FREE_BLOCK)
-    pool->free_list_head += SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
-  else
-    pool->free_list_head = pool->free_list_head->free_list_next;
+  pool->free_list_head = find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
 
+  // Make the memory range [buf..buf+size] undefined, because the caller should
+  // not rely on allocated chunks being defined.
   VALGRIND_MAKE_MEM_UNDEFINED(buf, size);
 
   return buf;
@@ -165,7 +189,10 @@ void ssm_mem_free(void *m, size_t size) {
   new_head->free_list_next = pool->free_list_head;
   pool->free_list_head = new_head;
 
-  VALGRIND_MEMPOOL_FREE(pool, m);
+  VALGRIND_FREELIKE_BLOCK(m, 0);
+  // char *buf = m;
+  // buf[0] = 3;
+  // VALGRIND_CHECK_MEM_IS_DEFINED(m, size);
 #endif
 }
 

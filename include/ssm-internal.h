@@ -164,6 +164,9 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
                   void *(*alloc_mem_handler)(size_t),
                   void (*free_mem_handler)(void *, size_t));
 
+/* TODO: document */
+void ssm_mem_destroy(void (*free_page_handler)(void *));
+
 #ifndef SSM_MEM_POOL_MIN
 /** @brief Block size of the smallest memory pool.
  *
