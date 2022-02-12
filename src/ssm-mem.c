@@ -142,10 +142,6 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 }
 
 void *ssm_mem_alloc(size_t size) {
-#ifdef SSM_DEBUG_NO_ALLOC
-  return alloc_mem(size);
-#else
-
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
     return alloc_mem(size);
@@ -169,14 +165,9 @@ void *ssm_mem_alloc(size_t size) {
   VALGRIND_MAKE_MEM_UNDEFINED(buf, size);
 
   return buf;
-#endif
 }
 
 void ssm_mem_free(void *m, size_t size) {
-#ifdef SSM_DEBUG_NO_ALLOC
-  free_mem(m, size);
-#else
-
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
@@ -193,7 +184,6 @@ void ssm_mem_free(void *m, size_t size) {
   // char *buf = m;
   // buf[0] = 3;
   // VALGRIND_CHECK_MEM_IS_DEFINED(m, size);
-#endif
 }
 
 ssm_value_t ssm_new_time(ssm_time_t time) {
