@@ -59,6 +59,9 @@ COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
 CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -std=c99
+ifeq ($(shell command -v valgrind),)
+CFLAGS += -DNVALGRIND
+endif
 TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
 
 LD = $(MAKE_LD)

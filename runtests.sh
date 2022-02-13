@@ -94,7 +94,7 @@ else
 fi
 
 make clean
-CFLAGS=-DSSM_DEBUG_NO_ALLOC make exes tests
+make exes tests
 
 if command -v valgrind >/dev/null ; then
   rm -f build/examples.vg-out
