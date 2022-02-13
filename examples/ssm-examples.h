@@ -66,9 +66,7 @@ static void *alloc_mem(size_t size) { return malloc(size); }
 
 static void free_mem(void *mem, size_t size) { free(mem); }
 
-static void free_page(void *mem) {
-  allocated_pages--;
-}
+static void free_page(void *mem) { allocated_pages--; }
 
 static void print_help(char *prog) {
   printf("Usage: %s [OPTION]... [--] [ARG]...\n", prog);
@@ -121,6 +119,8 @@ int main(int argc, char *argv[]) {
 
   ssm_init_args = argv;
   ssm_time_t stop_at = stop_at_s == 0 ? SSM_NEVER : stop_at_s * SSM_SECOND;
+  printf("%s: simulating up to %lu seconds\n", prog,
+         (unsigned long)stop_at / SSM_SECOND);
 
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
 
