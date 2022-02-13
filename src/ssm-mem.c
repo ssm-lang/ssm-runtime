@@ -125,6 +125,11 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
 }
 
 void ssm_mem_destroy(void (*free_page_handler)(void *)) {
+  // TODO: call free_page_handler on all superblocks in each mem pool.
+  // for (size_t p = 0; p < SSM_MEM_POOL_COUNT; p++) {
+  //   if (mem_pools[p].free_list_head != END_OF_FREELIST) {
+  //   }
+  // }
 
   // Report how much memory has been leaked since the checkpoint in
   // ssm_mem_init().
