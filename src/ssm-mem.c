@@ -143,7 +143,7 @@ void ssm_mem_destroy(void (*free_page_handler)(void *)) {
   // Report how much memory has been leaked since the checkpoint in
   // ssm_mem_init().
   VALGRIND_PRINTF("About to destroy SSM allocator. Performing leak check.\n");
-  VALGRIND_PRINTF("(Ignore leaks coming from malloc() in alloc_pool().)\n");
+  VALGRIND_PRINTF("(Note that leaks from malloc() may be false positives.)\n");
   VALGRIND_PRINTF("\n");
   VALGRIND_DO_ADDED_LEAK_CHECK;
 #endif
@@ -176,7 +176,8 @@ void *ssm_mem_alloc(size_t size) {
   VALGRIND_MALLOCLIKE_BLOCK(m, size, 0, 1);
 #endif
 
-  pool->free_list_head = find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
+  pool->free_list_head =
+      find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
 
 #ifndef NVALGRIND
   // Make the memory range [m..m+size] undefined, because the caller should
