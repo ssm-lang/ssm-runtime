@@ -15,6 +15,7 @@ set -euf
 set -o pipefail
 
 BUILD_DIR=./build
+declare -a VG_FLAGS=("--leak-check=full" "--show-leak-kinds=all")
 
 scriptname="$(basename "$0")"
 
@@ -26,6 +27,7 @@ run () {
   local exe="$BUILD_DIR/$1"
   shift
   echo "$exe" "$@"
+  echo "$exe" "$@" >&2
   set +e
   "$exe" "$@" 2>&1 | sed 's/^/# /'
   local exit_code="$?"
@@ -39,9 +41,10 @@ run () {
 vg () {
   local exe="$BUILD_DIR/$1"
   shift
-  echo "$exe" "$@"
+  echo valgrind "${VG_FLAGS[@]}" "$exe" "$@"
+  echo valgrind "${VG_FLAGS[@]}" "$exe" "$@" >&2
   set +e
-  valgrind "$exe" "$@" 2>&1 | sed 's/^/# /'
+  valgrind "${VG_FLAGS[@]}" "$exe" "$@" 2>&1 | sed 's/^/# /'
   local exit_code="$?"
   set -e
   if [ "$exit_code" -ne 0 ]; then
