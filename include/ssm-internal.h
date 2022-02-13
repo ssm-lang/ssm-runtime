@@ -154,6 +154,10 @@ enum ssm_kind {
  *  alloc_mem_handler. These handlers may also assume they will not be invoked
  *  to request memory ranges of less than #SSM_MEM_POOL_MAX bytes.
  *
+ *  If the allocator is compiled with valgrind support (i.e., without defining
+ *  @a NVALGRIND), it will perform a leak-check summary, to checkpoint how much
+ *  memory has already been allocated.
+ *
  *  @platformonly
  *
  *  @param alloc_page_handler allocates pages.
@@ -165,6 +169,16 @@ void ssm_mem_init(void *(*alloc_page_handler)(void),
                   void (*free_mem_handler)(void *, size_t));
 
 /** @brief Tears down the underlying allocator system.
+ *
+ *  If the allocator is compiled with valgrind support (i.e., without defining
+ *  @a NVALGRIND), it will perform a full leak-check summary, to report how much
+ *  memory has been leaked since ssm_mem_init().
+ *
+ *  @TODO this doesn't actually call @a free_page_handler yet. It still needs to
+ *        be implemented, perhaps with the help of a superblock header to keep
+ *        track of all pages allocated for each mempool
+ *
+ *  @platformonly
  *
  *  @param free_page_handler  frees pages allocated with @a alloc_page_handler.
  */

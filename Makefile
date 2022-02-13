@@ -59,9 +59,17 @@ COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
 CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -std=c99
+
+# Check whether valgrind is available.
 ifeq ($(shell command -v valgrind),)
+# If not, we probably shouldn't try to include <valgrind/valgrind.h>,
+# which we use to instrument our memory allocator.
+# 
+# NOTE: this is just a heuristic that may not be very reliable.
+# We should probably implement better dependency management.
 CFLAGS += -DNVALGRIND
 endif
+
 TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
 
 LD = $(MAKE_LD)
