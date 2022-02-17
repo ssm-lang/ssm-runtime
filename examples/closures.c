@@ -30,8 +30,9 @@ This file shows both an unoptimized implementation of this program, and
 a selectively hand-optimized implementation designed to be instructive of the
 kinds of optimizations the SSM closure API allows.
 
-To select the optimzed implementation, define CLOSURES_OPTIMIZED (or compile
-this file with -DCLOSURES_OPTIMIZED).
+The optimized implementation is used by default. To select the unoptimized
+implementation, define CLOSURES_UNOPTIMIZED (or compile this file with
+-DCLOSURES_UNOPTIMIZED).
 */
 
 typedef struct {
@@ -66,7 +67,7 @@ void step_foo(ssm_act_t *act) {
   ssm_leave(&cont->act, sizeof(act_foo_t));
 }
 
-#ifndef CLOSURES_OPTIMIZED
+#ifdef CLOSURES_UNOPTIMIZED
 typedef struct {
   ssm_act_t act;
   ssm_value_t foo;
@@ -107,7 +108,7 @@ ssm_act_t *ssm_enter_main(struct ssm_act *parent, ssm_priority_t priority,
   return &cont->act;
 }
 
-#ifndef CLOSURES_OPTIMIZED
+#ifdef CLOSURES_UNOPTIMIZED
 
 void step_main(struct ssm_act *act) {
   act_main_t *cont = container_of(act, act_main_t, act);
