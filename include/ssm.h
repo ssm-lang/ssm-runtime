@@ -891,6 +891,11 @@ void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
     ssm_closure_apply_final(closure, arg, parent, prio, depth, ret);           \
   } while (0)
 
+/** @brief Helper to free a closure (without reference counting). */
+#define ssm_closure_free(closure)                                              \
+  ssm_mem_free((closure).heap_ptr,                                             \
+               ssm_closure_size(ssm_closure_arg_cap(closure)))
+
 /** @} */
 
 /**

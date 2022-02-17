@@ -66,8 +66,7 @@ void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
     // We don't need to call ssm_drop() on any of its arguments since those are
     // moved into the newly activated process (also why we didn't need to call
     // ssm_dup() before activating the process).
-    ssm_mem_free(closure.heap_ptr,
-                 ssm_closure_size(ssm_closure_arg_cap(closure)));
+    ssm_closure_free(closure);
   } else {
     // Just modify the closure in-place.
     ssm_closure_push(closure, arg);
