@@ -58,7 +58,7 @@ TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
-CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -std=c99
+CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT
 
 # Check whether valgrind is available.
 ifeq ($(shell command -v valgrind),)
@@ -78,6 +78,7 @@ TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
 LD = $(MAKE_LD)
 LDFLAGS = -L$(BUILD_DIR)
 TEST_LDFLAGS = $(LDFLAGS) --coverage
+LDLIBS= -lpthread
 
 AR = $(MAKE_AR)
 ARFLAGS = -cr
@@ -98,10 +99,10 @@ $(TLIB_TGT): $(TLIB_OBJ)
 	$(AR) $(ARFLAGS) $@ $+
 
 $(EXE_TGT): %: %.o $(LIB_TGT)
-	$(LD) $(LDFLAGS) -o $@ $@.o -l$(LIB_NAME)
+	$(LD) $(LDFLAGS) -o $@ $@.o -l$(LIB_NAME) $(LDLIBS)
 
 $(TEST_TGT): %: %.o $(TLIB_TGT)
-	$(LD) $(TEST_LDFLAGS) -o $@ $@.o -l$(TLIB_NAME)
+	$(LD) $(TEST_LDFLAGS) -o $@ $@.o -l$(TLIB_NAME) $(LDLIBS)
 
 vpath %.c $(SRC_DIR) $(EXE_DIR) $(TEST_DIR)
 
