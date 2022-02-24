@@ -11,6 +11,7 @@ var searchData=
   ['alloc_5fmem_8',['alloc_mem',['../ssm-mem_8c.html#afe84928b968b035c36a85decd645d13f',1,'ssm-mem.c']]],
   ['alloc_5fpage_9',['alloc_page',['../ssm-mem_8c.html#a40385bc630b530cbe8cadeff2008421a',1,'ssm-mem.c']]],
   ['alloc_5fpool_10',['alloc_pool',['../ssm-mem_8c.html#a9df693157bde17eda351ca1a94eae032',1,'ssm-mem.c']]],
-  ['act_11',['act',['../md_doc_act.html',1,'']]],
-  ['adt_12',['adt',['../md_doc_adt.html',1,'']]]
+  ['argv_11',['argv',['../structssm__closure1.html#aceb5fb6a3d1c58721131e4b0b3fe8245',1,'ssm_closure1']]],
+  ['act_12',['act',['../md_doc_act.html',1,'']]],
+  ['adt_13',['adt',['../md_doc_adt.html',1,'']]]
 ];

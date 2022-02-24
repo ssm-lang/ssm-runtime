@@ -19,6 +19,7 @@ var group__mem =
     [ "ssm_marshal", "group__mem.html#ga8036e301aaee6fbac00bd2cdaa0dea8c", null ],
     [ "ssm_unmarshal", "group__mem.html#ga68caa3f774f25fa58037cdd157fb9f7d", null ],
     [ "ssm_on_heap", "group__mem.html#gab4385ed8c6c55bb272f6048a721d533e", null ],
+    [ "ssm_is_shared", "group__mem.html#gac91722f7d8b8a233392cd4f9c8b83821", null ],
     [ "ssm_dup", "group__mem.html#ga9f7765026c74350e37df334c9e59bb12", null ],
     [ "ssm_drop", "group__mem.html#gabaf350ad4a1577dee5e31e6efd851054", null ],
     [ "ssm_dup_unsafe", "group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f", null ],
@@ -27,11 +28,14 @@ var group__mem =
     [ "ssm_kind", "group__mem.html#ga0f26e675a76a28f76a4d31787be19250", [
       [ "SSM_ADT_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6", null ],
       [ "SSM_TIME_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc", null ],
-      [ "SSM_SV_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85", null ]
+      [ "SSM_SV_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85", null ],
+      [ "SSM_CLOSURE_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e", null ]
     ] ],
     [ "ssm_mem_init", "group__mem.html#gafe56b79f41cfe1522669c35cbc423231", null ],
     [ "ssm_mem_destroy", "group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb", null ],
     [ "ssm_drop_final", "group__mem.html#gac773e49a0378b73d49552e242a1a7971", null ],
+    [ "ssm_dups", "group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66", null ],
+    [ "ssm_drops", "group__mem.html#ga8b1681c79051b78cd5f54cb80a0c81f4", null ],
     [ "ssm_mem_alloc", "group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f", null ],
     [ "ssm_mem_prealloc", "group__mem.html#ga1accac4139fc44c56acab9ece5db7f73", null ],
     [ "ssm_mem_free", "group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e", null ]

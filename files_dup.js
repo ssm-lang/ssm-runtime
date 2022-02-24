@@ -1,5 +1,6 @@
 var files_dup =
 [
+    [ "ssm-closure.c", "ssm-closure_8c.html", "ssm-closure_8c" ],
     [ "ssm-internal.h", "ssm-internal_8h.html", "ssm-internal_8h" ],
     [ "ssm-mem.c", "ssm-mem_8c.html", "ssm-mem_8c" ],
     [ "ssm-scheduler.c", "ssm-scheduler_8c.html", "ssm-scheduler_8c" ],

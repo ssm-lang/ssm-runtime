@@ -153,13 +153,16 @@ Macros</h2></td></tr>
 <tr class="memitem:gab4385ed8c6c55bb272f6048a721d533e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v)&#160;&#160;&#160;(((v).packed_val &amp; 0x1) == 0)</td></tr>
 <tr class="memdesc:gab4385ed8c6c55bb272f6048a721d533e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a value is on the heap (i.e., is an object).  <a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">More...</a><br /></td></tr>
 <tr class="separator:gab4385ed8c6c55bb272f6048a721d533e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga9f7765026c74350e37df334c9e59bb12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">ssm_dup</a>(v)</td></tr>
+<tr class="memitem:gac91722f7d8b8a233392cd4f9c8b83821"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac91722f7d8b8a233392cd4f9c8b83821">ssm_is_shared</a>(v)&#160;&#160;&#160;!(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) &amp;&amp; ((v).heap_ptr-&gt;ref_count == 1))</td></tr>
+<tr class="memdesc:gac91722f7d8b8a233392cd4f9c8b83821"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether a value is shared, i.e., unsafe to modify.  <a href="group__mem.html#gac91722f7d8b8a233392cd4f9c8b83821">More...</a><br /></td></tr>
+<tr class="separator:gac91722f7d8b8a233392cd4f9c8b83821"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9f7765026c74350e37df334c9e59bb12"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">ssm_dup</a>(v)&#160;&#160;&#160;(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) ? <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm_dup_unsafe</a>(v) : (v))</td></tr>
 <tr class="memdesc:ga9f7765026c74350e37df334c9e59bb12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a possible heap reference, incrementing its ref count.  <a href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12">More...</a><br /></td></tr>
 <tr class="separator:ga9f7765026c74350e37df334c9e59bb12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gabaf350ad4a1577dee5e31e6efd851054"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">ssm_drop</a>(v)</td></tr>
 <tr class="memdesc:gabaf350ad4a1577dee5e31e6efd851054"><td class="mdescLeft">&#160;</td><td class="mdescRight">Drop a reference to a possible heap item, and free it if necessary.  <a href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">More...</a><br /></td></tr>
 <tr class="separator:gabaf350ad4a1577dee5e31e6efd851054"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gab5dad0cd40fb4260de450e2226d26a8f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm_dup_unsafe</a>(v)</td></tr>
+<tr class="memitem:gab5dad0cd40fb4260de450e2226d26a8f"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm_dup_unsafe</a>(v)&#160;&#160;&#160;((++(v).heap_ptr-&gt;ref_count, (v)))</td></tr>
 <tr class="memdesc:gab5dad0cd40fb4260de450e2226d26a8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Duplicate a heap reference, incrementing its ref count.  <a href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">More...</a><br /></td></tr>
 <tr class="separator:gab5dad0cd40fb4260de450e2226d26a8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga51acf919e4a7bd5b795aa8f302d8605e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e">ssm_drop_unsafe</a>(v)</td></tr>
@@ -176,7 +179,8 @@ Typedefs</h2></td></tr>
 Enumerations</h2></td></tr>
 <tr class="memitem:ga0f26e675a76a28f76a4d31787be19250"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">ssm_kind</a> { <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6">SSM_ADT_K</a> = 0, 
 <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc">SSM_TIME_K</a>, 
-<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e">SSM_CLOSURE_K</a>
  }</td></tr>
 <tr class="memdesc:ga0f26e675a76a28f76a4d31787be19250"><td class="mdescLeft">&#160;</td><td class="mdescRight">The different kinds of heap objects, enumerated.  <a href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">More...</a><br /></td></tr>
 <tr class="separator:ga0f26e675a76a28f76a4d31787be19250"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -192,6 +196,12 @@ Functions</h2></td></tr>
 <tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
 <tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
 <tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafd1921cbc85e9e0e6e3d0ea931e89f66"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66">ssm_dups</a> (size_t cnt, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> *arr)</td></tr>
+<tr class="memdesc:gafd1921cbc85e9e0e6e3d0ea931e89f66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> on an array of values.  <a href="group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66">More...</a><br /></td></tr>
+<tr class="separator:gafd1921cbc85e9e0e6e3d0ea931e89f66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga8b1681c79051b78cd5f54cb80a0c81f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga8b1681c79051b78cd5f54cb80a0c81f4">ssm_drops</a> (size_t cnt, <a class="el" href="unionssm__value__t.html">ssm_value_t</a> *arr)</td></tr>
+<tr class="memdesc:ga8b1681c79051b78cd5f54cb80a0c81f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Call <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> on an array of values.  <a href="group__mem.html#ga8b1681c79051b78cd5f54cb80a0c81f4">More...</a><br /></td></tr>
+<tr class="separator:ga8b1681c79051b78cd5f54cb80a0c81f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f">ssm_mem_alloc</a> (size_t size)</td></tr>
 <tr class="memdesc:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a contiguous range of memory.  <a href="group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f">More...</a><br /></td></tr>
 <tr class="separator:gaeb146ccc4d7843565c93a22084f6ab1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -219,7 +229,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than the word size, i.e., the size of <a class="el" href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24" title="Values are 32-bits, the largest supported machine word size.">ssm_word_t</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00194">194</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00199">199</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -239,7 +249,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00208">208</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00213">213</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -259,7 +269,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00222">222</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00227">227</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -289,7 +299,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the memory pool at position <em>pool</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00236">236</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00241">241</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -308,7 +318,7 @@ Functions</h2></td></tr>
 <p>The size of the largest memory pool. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00243">243</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00248">248</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -327,7 +337,7 @@ Functions</h2></td></tr>
 <p>The size of a memory page; must be greater than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a>. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00250">250</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00255">255</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -418,6 +428,36 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="gac91722f7d8b8a233392cd4f9c8b83821"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac91722f7d8b8a233392cd4f9c8b83821">&#9670;&nbsp;</a></span>ssm_is_shared</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_is_shared</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td>&#160;&#160;&#160;!(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) &amp;&amp; ((v).heap_ptr-&gt;ref_count == 1))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Whether a value is shared, i.e., unsafe to modify. </p>
+<p>The opposite of "shared" is "unique," as in C++'s "unique_ptr."</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">v</td><td>pointer to the <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>non-zero if shared, zero otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00153">153</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
 <a id="ga9f7765026c74350e37df334c9e59bb12"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga9f7765026c74350e37df334c9e59bb12">&#9670;&nbsp;</a></span>ssm_dup</h2>
 
@@ -429,13 +469,11 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">v</td><td>)</td>
-          <td></td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v) ? <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f">ssm_dup_unsafe</a>(v) : (v))</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">if</span> (<a class="code" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v))                                                          \</div>
-<div class="line">  ssm_dup_unsafe(v)</div>
-</div><!-- fragment -->
+
 <p>Duplicate a possible heap reference, incrementing its ref count. </p>
 <p>If the caller knows <em>v</em> is definitely on the heap, call <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a> to eliminate the heap check (and omit call if it is definitely not on the heap).</p>
 <dl class="params"><dt>Parameters</dt><dd>
@@ -445,7 +483,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00154">154</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00163">163</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -464,8 +502,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">if</span> (<a class="code" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v))                                                          \</div>
-<div class="line">  ssm_drop_unsafe(v)</div>
+<b>Value:</b><div class="fragment"><div class="line">  do                                                                           \</div>
+<div class="line">    if (<a class="code" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a>(v))                                                        \</div>
+<div class="line">      ssm_drop_unsafe(v);                                                      \</div>
+<div class="line">  while (0)</div>
 </div><!-- fragment -->
 <p>Drop a reference to a possible heap item, and free it if necessary. </p>
 <p>If <em>v</em> is freed, all references held by the heap item itself will also be be dropped.</p>
@@ -477,7 +517,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00169">169</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00176">176</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -492,14 +532,11 @@ Functions</h2></td></tr>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">v</td><td>)</td>
-          <td></td>
+          <td>&#160;&#160;&#160;((++(v).heap_ptr-&gt;ref_count, (v)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span>                                                                           \</div>
-<div class="line">    ++(v).heap_ptr-&gt;ref_count;                                                 \</div>
-<div class="line">  while (0)</div>
-</div><!-- fragment -->
+
 <p>Duplicate a heap reference, incrementing its ref count. </p>
 <p>Called by <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>assumes that <em>v</em> is a heap pointer, i.e., <code><a class="el" href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e" title="Whether a value is on the heap (i.e., is an object).">ssm_on_heap(v)</a></code>.</dd></dl>
@@ -510,7 +547,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00181">181</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00190">190</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -529,8 +566,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">if</span> (--(v).heap_ptr-&gt;ref_count == 0)                                          \</div>
-<div class="line">  ssm_drop_final(v)</div>
+<b>Value:</b><div class="fragment"><div class="line">  do                                                                           \</div>
+<div class="line">    if (--(v).heap_ptr-&gt;ref_count == 0)                                        \</div>
+<div class="line">      ssm_drop_final(v);                                                       \</div>
+<div class="line">  while (0)</div>
 </div><!-- fragment -->
 <p>Drop a reference to a heap item, and free it if necessary. </p>
 <p>If <em>v</em> is freed, <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a> will be called to drop all heap objects <em>v</em> refers to.</p>
@@ -542,8 +581,9 @@ Functions</h2></td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00197">197</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00204">204</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -588,9 +628,11 @@ Functions</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85"></a>SSM_SV_K&#160;</td><td class="fielddoc"><p>Scheduled variables, <a class="el" href="group__sv.html#ga3ff20b6ba9aa056f1cf64051c20dd779" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv_t</a>. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e"></a>SSM_CLOSURE_K&#160;</td><td class="fielddoc"><p>Closure object, <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a>. </p>
+</td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00138">138</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00142">142</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -704,6 +746,70 @@ Functions</h2></td></tr>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00238">238</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+
+</div>
+</div>
+<a id="gafd1921cbc85e9e0e6e3d0ea931e89f66"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafd1921cbc85e9e0e6e3d0ea931e89f66">&#9670;&nbsp;</a></span>ssm_dups()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ssm_dups </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>cnt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> *&#160;</td>
+          <td class="paramname"><em>arr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Call <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> on an array of values. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00269">269</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+
+</div>
+</div>
+<a id="ga8b1681c79051b78cd5f54cb80a0c81f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga8b1681c79051b78cd5f54cb80a0c81f4">&#9670;&nbsp;</a></span>ssm_drops()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ssm_drops </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>cnt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> *&#160;</td>
+          <td class="paramname"><em>arr</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Call <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> on an array of values. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00274">274</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

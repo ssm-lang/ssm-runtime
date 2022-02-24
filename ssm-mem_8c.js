@@ -18,6 +18,8 @@ var ssm_mem_8c =
     [ "ssm_new_sv", "group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc", null ],
     [ "ssm_new_adt", "group__adt.html#ga12f0353d3348de5943ea702d81659eaf", null ],
     [ "ssm_drop_final", "group__mem.html#gac773e49a0378b73d49552e242a1a7971", null ],
+    [ "ssm_dups", "group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66", null ],
+    [ "ssm_drops", "group__mem.html#ga8b1681c79051b78cd5f54cb80a0c81f4", null ],
     [ "mem_pools", "ssm-mem_8c.html#a02b28cd24b5aa39cb5824b984cd82987", null ],
     [ "alloc_page", "ssm-mem_8c.html#a40385bc630b530cbe8cadeff2008421a", null ],
     [ "alloc_mem", "ssm-mem_8c.html#afe84928b968b035c36a85decd645d13f", null ],

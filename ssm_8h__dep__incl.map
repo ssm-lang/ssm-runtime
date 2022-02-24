@@ -1,7 +1,8 @@
 <map id="ssm.h" name="ssm.h">
-<area shape="rect" id="node1" title="Interface to the SSM runtime." alt="" coords="71,5,132,32"/>
-<area shape="rect" id="node2" href="$ssm-mem_8c.html" title="SSM runtime memory management and allocation." alt="" coords="5,155,104,181"/>
-<area shape="rect" id="node3" href="$ssm-top-act_8c.html" title="Parent of the top&#45;level activation record (entry point)." alt="" coords="46,80,157,107"/>
-<area shape="rect" id="node4" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="181,80,297,107"/>
-<area shape="rect" id="node5" href="$ssm-scheduler_8c.html" title="Implementation of the SSM runtime scheduler." alt="" coords="175,155,302,181"/>
+<area shape="rect" id="node1" title="Interface to the SSM runtime." alt="" coords="223,5,284,32"/>
+<area shape="rect" id="node2" href="$ssm-closure_8c.html" title="SSM closure management and allocation." alt="" coords="5,155,117,181"/>
+<area shape="rect" id="node3" href="$ssm-mem_8c.html" title="SSM runtime memory management and allocation." alt="" coords="293,155,392,181"/>
+<area shape="rect" id="node4" href="$ssm-top-act_8c.html" title="Parent of the top&#45;level activation record (entry point)." alt="" coords="339,80,450,107"/>
+<area shape="rect" id="node5" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="147,80,263,107"/>
+<area shape="rect" id="node6" href="$ssm-scheduler_8c.html" title="Implementation of the SSM runtime scheduler." alt="" coords="142,155,269,181"/>
 </map>

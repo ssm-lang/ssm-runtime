@@ -124,9 +124,10 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <div id="dynsection-1-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="ssm-internal_8h__dep__incl.png" border="0" usemap="#ssm-internal_8hdep" alt=""/></div>
 <map name="ssm-internal_8hdep" id="ssm-internal_8hdep">
-<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="65,5,181,32"/>
-<area shape="rect" href="ssm-mem_8c.html" title="SSM runtime memory management and allocation." alt="" coords="5,80,104,107"/>
-<area shape="rect" href="ssm-scheduler_8c.html" title="Implementation of the SSM runtime scheduler." alt="" coords="129,80,255,107"/>
+<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="133,5,249,32"/>
+<area shape="rect" href="ssm-closure_8c.html" title="SSM closure management and allocation." alt="" coords="5,80,117,107"/>
+<area shape="rect" href="ssm-mem_8c.html" title="SSM runtime memory management and allocation." alt="" coords="141,80,240,107"/>
+<area shape="rect" href="ssm-scheduler_8c.html" title="Implementation of the SSM runtime scheduler." alt="" coords="265,80,391,107"/>
 </map>
 </div>
 </div>
@@ -140,6 +141,8 @@ Macros</h2></td></tr>
 <tr class="memitem:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm_adt_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__adt1.html">ssm_adt1</a>) + sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1))</td></tr>
 <tr class="memdesc:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a heap-allocated ADT.  <a href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">More...</a><br /></td></tr>
 <tr class="separator:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad03ebeeb5b442c8fa9be8e751788d0fe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe">ssm_closure_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1)))</td></tr>
+<tr class="separator:ad03ebeeb5b442c8fa9be8e751788d0fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5514bce5af584559d51b5f75344205ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">SSM_MEM_POOL_MIN</a>&#160;&#160;&#160;16</td></tr>
 <tr class="memdesc:ga5514bce5af584559d51b5f75344205ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block size of the smallest memory pool.  <a href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">More...</a><br /></td></tr>
 <tr class="separator:ga5514bce5af584559d51b5f75344205ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,7 +166,8 @@ Macros</h2></td></tr>
 Enumerations</h2></td></tr>
 <tr class="memitem:ga0f26e675a76a28f76a4d31787be19250"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">ssm_kind</a> { <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6">SSM_ADT_K</a> = 0, 
 <a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc">SSM_TIME_K</a>, 
-<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85">SSM_SV_K</a>, 
+<a class="el" href="group__mem.html#gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e">SSM_CLOSURE_K</a>
  }</td></tr>
 <tr class="memdesc:ga0f26e675a76a28f76a4d31787be19250"><td class="mdescLeft">&#160;</td><td class="mdescRight">The different kinds of heap objects, enumerated.  <a href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250">More...</a><br /></td></tr>
 <tr class="separator:ga0f26e675a76a28f76a4d31787be19250"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,7 +207,28 @@ Functions</h2></td></tr>
 John Hui (j-hui) </dd></dl>
 
 <p class="definition">Definition in file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ad03ebeeb5b442c8fa9be8e751788d0fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad03ebeeb5b442c8fa9be8e751788d0fe">&#9670;&nbsp;</a></span>ssm_closure_size</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_closure_size</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">vc</td><td>)</td>
+          <td>&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1)))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00127">127</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->

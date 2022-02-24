@@ -16,6 +16,7 @@ var group__act =
     ] ],
     [ "SSM_ROOT_PRIORITY", "group__act.html#gabea6090ce063ae674b31fc2ded743d4b", null ],
     [ "SSM_ROOT_DEPTH", "group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a", null ],
+    [ "ssm_has_children", "group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e", null ],
     [ "ssm_priority_t", "group__act.html#gaf0599e969847088348147d8fb9a7bd82", null ],
     [ "ssm_depth_t", "group__act.html#ga22bed0d9ef54aa307caef28a6b3fe010", null ],
     [ "ssm_stepf_t", "group__act.html#gadb557bb02081e7d883bcc7d133eb96f6", null ],
