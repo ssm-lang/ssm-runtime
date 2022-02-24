@@ -94,7 +94,9 @@ $(document).ready(function(){initNavTree('todo.html',''); initResizable(); });
 <div class="contents">
 <div class="textblock"><dl class="reflist">
 <dt>Global <a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm_adt_size</a>  (vc)</dt>
-<dd><a class="anchor" id="_todo000001"></a>document </dd>
+<dd><a class="anchor" id="_todo000001"></a>document  </dd>
+<dt>Global <a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a>  (void(*free_page_handler)(void *))</dt>
+<dd><a class="anchor" id="_todo000002"></a>this doesn't actually call <em>free_page_handler</em> yet. It still needs to be implemented, perhaps with the help of a superblock header to keep track of all pages allocated for each mempool</dd>
 </dl>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->

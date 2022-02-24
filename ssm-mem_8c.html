@@ -113,12 +113,13 @@ $(document).ready(function(){initNavTree('ssm-mem_8c.html',''); initResizable();
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="ssm-mem_8c__incl.png" border="0" usemap="#ssm-mem_8c" alt=""/></div>
 <map name="ssm-mem_8c" id="ssm-mem_8c">
-<area shape="rect" title="SSM runtime memory management and allocation." alt="" coords="241,5,340,32"/>
-<area shape="rect" title=" " alt="" coords="37,80,112,107"/>
-<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="137,80,253,107"/>
-<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="189,155,251,181"/>
-<area shape="rect" title=" " alt="" coords="306,229,377,256"/>
-<area shape="rect" title=" " alt="" coords="379,80,445,107"/>
+<area shape="rect" title="SSM runtime memory management and allocation." alt="" coords="236,5,335,32"/>
+<area shape="rect" title=" " alt="" coords="77,80,152,107"/>
+<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="227,80,343,107"/>
+<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="119,155,180,181"/>
+<area shape="rect" title=" " alt="" coords="338,229,409,256"/>
+<area shape="rect" title=" " alt="" coords="441,80,508,107"/>
+<area shape="rect" title=" " alt="" coords="204,155,367,181"/>
 <area shape="rect" title=" " alt="" coords="5,229,88,256"/>
 <area shape="rect" title=" " alt="" coords="112,229,187,256"/>
 <area shape="rect" title=" " alt="" coords="211,229,282,256"/>
@@ -159,12 +160,17 @@ Functions</h2></td></tr>
 <tr class="memitem:ab679b53c418f0fd42b1bb3e0a0fd9dfd"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-mem_8c.html#ab679b53c418f0fd42b1bb3e0a0fd9dfd">find_pool_size</a> (size_t size)</td></tr>
 <tr class="memdesc:ab679b53c418f0fd42b1bb3e0a0fd9dfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Find the memory pool for some arbitrary size.  <a href="ssm-mem_8c.html#ab679b53c418f0fd42b1bb3e0a0fd9dfd">More...</a><br /></td></tr>
 <tr class="separator:ab679b53c418f0fd42b1bb3e0a0fd9dfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8db65afdce406f6c3acd576a38f5451d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="ssm-mem_8c.html#aeac4cdf7303e3047b0eb7bec7ebb7399">block_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-mem_8c.html#a8db65afdce406f6c3acd576a38f5451d">find_next_block</a> (<a class="el" href="ssm-mem_8c.html#aeac4cdf7303e3047b0eb7bec7ebb7399">block_t</a> *<a class="el" href="unionblock.html">block</a>, size_t pool_size)</td></tr>
+<tr class="separator:a8db65afdce406f6c3acd576a38f5451d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9df693157bde17eda351ca1a94eae032"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-mem_8c.html#a9df693157bde17eda351ca1a94eae032">alloc_pool</a> (size_t p)</td></tr>
 <tr class="memdesc:a9df693157bde17eda351ca1a94eae032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new block for a memory pool.  <a href="ssm-mem_8c.html#a9df693157bde17eda351ca1a94eae032">More...</a><br /></td></tr>
 <tr class="separator:a9df693157bde17eda351ca1a94eae032"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gafe56b79f41cfe1522669c35cbc423231"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">ssm_mem_init</a> (void *(*alloc_page_handler)(void), void *(*alloc_mem_handler)(size_t), void(*free_mem_handler)(void *, size_t))</td></tr>
 <tr class="memdesc:gafe56b79f41cfe1522669c35cbc423231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the underlying allocator system.  <a href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">More...</a><br /></td></tr>
 <tr class="separator:gafe56b79f41cfe1522669c35cbc423231"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a> (void(*free_page_handler)(void *))</td></tr>
+<tr class="memdesc:ga478b2d53579f050c74c7374e75dd8bcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tears down the underlying allocator system.  <a href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">More...</a><br /></td></tr>
+<tr class="separator:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1accac4139fc44c56acab9ece5db7f73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">ssm_mem_prealloc</a> (size_t size, size_t num_pages)</td></tr>
 <tr class="memdesc:ga1accac4139fc44c56acab9ece5db7f73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Preallocate memory pages to ensure capacity in memory pools.  <a href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">More...</a><br /></td></tr>
 <tr class="separator:ga1accac4139fc44c56acab9ece5db7f73"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -323,6 +329,44 @@ Daniel Scanteianu (Scanteianu) </dd></dl>
 
 </div>
 </div>
+<a id="a8db65afdce406f6c3acd576a38f5451d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8db65afdce406f6c3acd576a38f5451d">&#9670;&nbsp;</a></span>find_next_block()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="ssm-mem_8c.html#aeac4cdf7303e3047b0eb7bec7ebb7399">block_t</a>* find_next_block </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="ssm-mem_8c.html#aeac4cdf7303e3047b0eb7bec7ebb7399">block_t</a> *&#160;</td>
+          <td class="paramname"><em>block</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>pool_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00081">81</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+
+</div>
+</div>
 <a id="a9df693157bde17eda351ca1a94eae032"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9df693157bde17eda351ca1a94eae032">&#9670;&nbsp;</a></span>alloc_pool()</h2>
 
@@ -357,7 +401,7 @@ Daniel Scanteianu (Scanteianu) </dd></dl>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00091">91</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00098">98</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

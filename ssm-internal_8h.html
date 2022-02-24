@@ -100,6 +100,7 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <p>The internal interface of the SSM runtime.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="ssm_8h_source.html">ssm.h</a>&gt;</code><br />
+<code>#include &lt;valgrind/memcheck.h&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for ssm-internal.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -107,8 +108,9 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="ssm-internal_8h__incl.png" border="0" usemap="#ssm-internal_8h" alt=""/></div>
 <map name="ssm-internal_8h" id="ssm-internal_8h">
-<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="139,5,255,32"/>
+<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="207,5,323,32"/>
 <area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,80,228,107"/>
+<area shape="rect" title=" " alt="" coords="252,80,415,107"/>
 <area shape="rect" title=" " alt="" coords="5,155,88,181"/>
 <area shape="rect" title=" " alt="" coords="112,155,187,181"/>
 <area shape="rect" title=" " alt="" coords="211,155,282,181"/>
@@ -189,6 +191,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gafe56b79f41cfe1522669c35cbc423231"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">ssm_mem_init</a> (void *(*alloc_page_handler)(void), void *(*alloc_mem_handler)(size_t), void(*free_mem_handler)(void *, size_t))</td></tr>
 <tr class="memdesc:gafe56b79f41cfe1522669c35cbc423231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the underlying allocator system.  <a href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">More...</a><br /></td></tr>
 <tr class="separator:gafe56b79f41cfe1522669c35cbc423231"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a> (void(*free_page_handler)(void *))</td></tr>
+<tr class="memdesc:ga478b2d53579f050c74c7374e75dd8bcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tears down the underlying allocator system.  <a href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">More...</a><br /></td></tr>
+<tr class="separator:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The internal interface of the SSM runtime. </p>

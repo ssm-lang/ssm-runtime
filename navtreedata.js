@@ -52,7 +52,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "annotated.html",
-"structmem__pool.html"
+"ssm-top-act_8c.html#ad97966a1ab94482fd0f37f7915543f06"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

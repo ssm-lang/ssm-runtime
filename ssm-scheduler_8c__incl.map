@@ -1,7 +1,8 @@
 <map id="ssm&#45;scheduler.c" name="ssm&#45;scheduler.c">
-<area shape="rect" id="node1" title="Implementation of the SSM runtime scheduler." alt="" coords="134,5,261,32"/>
-<area shape="rect" id="node2" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="139,80,255,107"/>
+<area shape="rect" id="node1" title="Implementation of the SSM runtime scheduler." alt="" coords="202,5,329,32"/>
+<area shape="rect" id="node2" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="207,80,323,107"/>
 <area shape="rect" id="node3" href="$ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,155,228,181"/>
+<area shape="rect" id="node8" title=" " alt="" coords="252,155,415,181"/>
 <area shape="rect" id="node4" title=" " alt="" coords="5,229,88,256"/>
 <area shape="rect" id="node5" title=" " alt="" coords="112,229,187,256"/>
 <area shape="rect" id="node6" title=" " alt="" coords="211,229,282,256"/>

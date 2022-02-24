@@ -186,6 +186,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gafe56b79f41cfe1522669c35cbc423231"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">ssm_mem_init</a> (void *(*alloc_page_handler)(void), void *(*alloc_mem_handler)(size_t), void(*free_mem_handler)(void *, size_t))</td></tr>
 <tr class="memdesc:gafe56b79f41cfe1522669c35cbc423231"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initializes the underlying allocator system.  <a href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">More...</a><br /></td></tr>
 <tr class="separator:gafe56b79f41cfe1522669c35cbc423231"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a> (void(*free_page_handler)(void *))</td></tr>
+<tr class="memdesc:ga478b2d53579f050c74c7374e75dd8bcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tears down the underlying allocator system.  <a href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">More...</a><br /></td></tr>
+<tr class="separator:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
 <tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
 <tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -216,7 +219,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than the word size, i.e., the size of <a class="el" href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24" title="Values are 32-bits, the largest supported machine word size.">ssm_word_t</a>.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00174">174</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00194">194</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -236,7 +239,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00188">188</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00208">208</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -256,7 +259,7 @@ Functions</h2></td></tr>
 <p>Must be strictly greater than 0.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00202">202</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00222">222</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +289,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the memory pool at position <em>pool</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00216">216</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00236">236</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -305,7 +308,7 @@ Functions</h2></td></tr>
 <p>The size of the largest memory pool. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00223">223</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00243">243</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -324,7 +327,7 @@ Functions</h2></td></tr>
 <p>The size of a memory page; must be greater than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a>. </p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00230">230</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00250">250</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>
@@ -627,17 +630,49 @@ Functions</h2></td></tr>
 <p>Initializes the underlying allocator system. </p>
 <p>Memory pages are requested from the platform/OS on-demand via the provided <em>alloc_page_handler</em>. This handler must return a pointer to the beginning of a range of memory of size <a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388" title="The size of a memory page; must be greater than SSM_MEM_POOL_MAX.">SSM_MEM_PAGE_SIZE</a>, and the page <em>must</em> be zeroed out. These pages are assumed to never be freed.</p>
 <p>To support arbitrarily large allocations, SSM's allocator uses <em>alloc_mem_handler</em> to allocate memory, and <em>free_mem_handler</em> to release it. There are no requirements on the contents of memory allocated with <em>alloc_mem_handler</em>. These handlers may also assume they will not be invoked to request memory ranges of less than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a> bytes.</p>
+<p>If the allocator is compiled with valgrind support (i.e., without defining <em>NVALGRIND</em>), it will perform a leak-check summary, to checkpoint how much memory has already been allocated.</p>
 <dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">alloc_page_handler</td><td>allocates pages. </td></tr>
     <tr><td class="paramname">alloc_mem_handler</td><td>allocates arbitrarily large. </td></tr>
-    <tr><td class="paramname">free_mem_handler</td><td>frees pages allocated with <em>alloc_mem_handler</em>. </td></tr>
+    <tr><td class="paramname">free_mem_handler</td><td>frees memory allocated with <em>alloc_mem_handler</em>. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00101">101</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00115">115</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+
+</div>
+</div>
+<a id="ga478b2d53579f050c74c7374e75dd8bcb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga478b2d53579f050c74c7374e75dd8bcb">&#9670;&nbsp;</a></span>ssm_mem_destroy()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ssm_mem_destroy </td>
+          <td>(</td>
+          <td class="paramtype">void(*)(void *)&#160;</td>
+          <td class="paramname"><em>free_page_handler</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Tears down the underlying allocator system. </p>
+<p>If the allocator is compiled with valgrind support (i.e., without defining <em>NVALGRIND</em>), it will perform a full leak-check summary, to report how much memory has been leaked since <a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231" title="Initializes the underlying allocator system.">ssm_mem_init()</a>.</p>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000002">Todo:</a></b></dt><dd>this doesn't actually call <em>free_page_handler</em> yet. It still needs to be implemented, perhaps with the help of a superblock header to keep track of all pages allocated for each mempool</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Intended for platform code; should not be used in user code.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">free_page_handler</td><td>frees pages allocated with <em>alloc_page_handler</em>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00135">135</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -668,7 +703,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00188">188</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00238">238</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -698,7 +733,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the first byte of the allocate memory block. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00120">120</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00160">160</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -738,7 +773,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00112">112</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00152">152</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -778,7 +813,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00144">144</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00191">191</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

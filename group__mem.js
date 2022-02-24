@@ -30,6 +30,7 @@ var group__mem =
       [ "SSM_SV_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85", null ]
     ] ],
     [ "ssm_mem_init", "group__mem.html#gafe56b79f41cfe1522669c35cbc423231", null ],
+    [ "ssm_mem_destroy", "group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb", null ],
     [ "ssm_drop_final", "group__mem.html#gac773e49a0378b73d49552e242a1a7971", null ],
     [ "ssm_mem_alloc", "group__mem.html#gaeb146ccc4d7843565c93a22084f6ab1f", null ],
     [ "ssm_mem_prealloc", "group__mem.html#ga1accac4139fc44c56acab9ece5db7f73", null ],
