@@ -1,6 +1,6 @@
 #include "posix-common.h"
 
-int ssm_sem_fd;
+int ssm_sem_fd[2];
 atomic_size_t rb_r;
 atomic_size_t rb_w;
 pthread_mutex_t rb_lk;
@@ -8,24 +8,6 @@ pthread_mutex_t rb_lk;
 void ssm_program_init(void);
 void ssm_program_exit(void);
 char **ssm_init_args;
-
-//   // ssm_stdin = ssm_new_sv(ssm_marshal(0));
-//   // ssm_stdout = ssm_new_sv(ssm_marshal(0));
-//   //
-//   // ssm_activate(__enter_stdout_handler(&ssm_top_parent, SSM_ROOT_PRIORITY,
-//   //                                   SSM_ROOT_DEPTH - 1));
-//   // ssm_activate(enter_main(&ssm_top_parent,
-//   //                         SSM_ROOT_PRIORITY + (1 << (SSM_ROOT_DEPTH - 1)),
-//   //                         SSM_ROOT_DEPTH - 1));
-//   //
-//   // pthread_create(&ssm_stdin_tid, &ssm_stdin_attr, ssm_stdin_handler,
-//   //                ssm_to_sv(ssm_stdin));
-// }
-//
-//   // printf("DBG: joining stdin handler\n");
-//   // pthread_join(ssm_stdin_tid, NULL);
-// }
-//
 
 #define MAX_PAGES 2048
 static void *pages[MAX_PAGES];
@@ -61,8 +43,8 @@ size_t r, w;
 
 int main(void) {
   ssm_mem_init(alloc_page, alloc_mem, free_mem);
-  // ssm_sem_fd = eventfd(0, EFD_NONBLOCK);
-  ssm_sem_fd = eventfd(0, 0);
+
+  pipe(ssm_sem_fd);
   pthread_mutex_init(&rb_lk, NULL);
 
   struct timespec init_time;
@@ -97,21 +79,20 @@ int main(void) {
       ssm_tick();
     } else {
       fd_set in_fds;
-      eventfd_t e;
-      FD_SET(ssm_sem_fd, &in_fds);
+      FD_SET(ssm_sem_fd[0], &in_fds);
       if (next_time == SSM_NEVER) {
         DBG("Sleeping indefinitely\n");
-        ret = pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, NULL, NULL);
+        ret = pselect(ssm_sem_fd[0] + 1, &in_fds, NULL, NULL, NULL, NULL);
         DBG("Woke from sleeping indefinitely\n");
-        ret = eventfd_read(ssm_sem_fd, &e);
+        fd_sem_read(ssm_sem_fd);
       } else {
         struct timespec next_spec = timespec_of(next_time);
         struct timespec sleep_time = timespec_diff(next_spec, wall_spec);
         DBG("Sleeping\n");
-        ret = pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, &sleep_time, NULL);
+        ret = pselect(ssm_sem_fd[0] + 1, &in_fds, NULL, NULL, &sleep_time, NULL);
         DBG("Woke up from sleeping\n");
         if (ret > 0)
-          ret = eventfd_read(ssm_sem_fd, &e);
+          fd_sem_read(ssm_sem_fd);
         // otherwise, timed out
       }
     }
