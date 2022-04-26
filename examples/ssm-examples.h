@@ -38,9 +38,17 @@ typedef ssm_value_t ssm_u32_t;
 typedef ssm_value_t ssm_u64_t;
 
 #define EVENT_VALUE (ssm_marshal(0))
+#define NANOS 1000000000L
 
 void ssm_program_init(void);
 void ssm_program_exit(void);
 extern char **ssm_init_args;
+
+ssm_act_t *__enter_stdout_handler(ssm_act_t *parent, ssm_priority_t priority,
+                                  ssm_depth_t depth, ssm_value_t *argv,
+                                  ssm_value_t *ret);
+
+void __spawn_stdin_handler(ssm_sv_t *ssm_stdin);
+void __kill_stdin_handler(void);
 
 #endif /* _SSM_EXAMPLES_H */
