@@ -36,6 +36,15 @@
  */
 ssm_time_t ssm_next_event_time(void);
 
+/** @ingroup act
+ *  @brief Whether there are still active processes in the activation queue.
+ *
+ *  @platformonly
+ *
+ *  @returns true if there is at least one active process, false otherwise.
+ */
+bool ssm_running(void);
+
 /** @ingroup time
  *  @brief Reset the scheduler.
  *
