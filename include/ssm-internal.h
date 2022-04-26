@@ -121,11 +121,11 @@ void ssm_tick(void);
  *  @brief Compute the size of a heap-allocated ADT.
  *  @todo document
  */
-#define ssm_adt_size(vc) (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc) - 1))
-
+#define ssm_adt_size(vc)                                                       \
+  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc)-1))
 
 #define ssm_closure_size(vc)                                                   \
-  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc) - 1)))
+  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc)-1)))
 
 /**
  * @addtogroup mem
@@ -140,10 +140,10 @@ void ssm_tick(void);
  *  object, where even-numbered timestamps may be misinterpreted as pointers.
  */
 enum ssm_kind {
-  SSM_ADT_K = 0,  /**< ADT object, e.g., #ssm_adt1 */
-  SSM_TIME_K,     /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K,  /**< Closure object, #ssm_closure1 */
+  SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
+  SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
+  SSM_CLOSURE_K, /**< Closure object, #ssm_closure1 */
 };
 
 /** @brief Initializes the underlying allocator system.
@@ -311,7 +311,7 @@ void ssm_mem_destroy(void (*free_page_handler)(void *));
  *  timer value can be stored in the @a raw_time64 field. Finally, the 64-bit
  *  timestamp, in nanoseconds, is stored in the @a ssm_time field.
  *
- *
+ *  @TODO these comments trail off/aren't coherent from here onwards.
  *
  *  to store these three 32-bit values, as well as an
  *  ssm_raw_time32_calc() macro to compute the 64-bit counter value from those
@@ -325,16 +325,16 @@ void ssm_mem_destroy(void (*free_page_handler)(void *));
  *  In those contexts, this computation
  *  can be deferred by directly storing the three 32-bit reads into the @a
  *  raw_time field of an #ssm_platform_time_t, and computing the actual
- *  instead storing the result into an #ssm_raw_time_t, and later using the
+ *  instead storing the result into an #ssm_platform_time_t, and later using the
  *  provided ssm_raw_time_calc32() macro to compute the measured #ssm_time_t.
  *
- *  On platforms which have a 64-bit timer, #ssm_raw_time_t just instead wraps
- *  an #ssm_time_t, and ssm_raw_time_calc() macro expands into a zero-overhead
- *  struct access.
+ *  On platforms which have a 64-bit timer, #ssm_platform_time_t just instead
+ *  wraps an #ssm_time_t, and ssm_raw_time_calc() macro expands into a
+ *  zero-overhead struct access.
  *
- *  In any case, an #ssm_raw_time_t is embedded in #ssm_input packets. How these
- *  time are read is platform-dependent, but should follow the read pattern
- *  outlined above.
+ *  In any case, an #ssm_platform_time_t is embedded in #ssm_input packets. How
+ *  these time are read is platform-dependent, but should follow the read
+ *  pattern outlined above.
  *
  *  @platformonly
  */
@@ -361,15 +361,15 @@ typedef union {
  */
 #define ssm_raw_time_combine(hi, lo) ((((uint64_t)(hi)) << 32) + (lo))
 
-/** @brief Compute a #ssm_time_t from an #ssm_raw_time_t.
+/** @brief Compute a #ssm_time_t from an #ssm_platform_time_t.
  *
- *  When #SSM_TIMER64_PRESENT is defined, this is macro becomes a zero-overhead
+ *  When SSM_TIMER64_PRESENT is defined, this is macro becomes a zero-overhead
  *  struct access.
  *
  *  @a hi0 must be equal to or one greater than @a hi1; otherwise the behavior
  *  of this macro is undefined.
  *
- *  @param t  the #ssm_raw_time_t containing the platform-read raw timestamp.
+ *  @param t  the #ssm_platform_time_t containing the raw timestamp.
  *  @returns  the #ssm_time_t computed from @a t.
  */
 #define ssm_raw_time32_calc(t)                                                 \
@@ -410,21 +410,21 @@ extern struct ssm_input ssm_input_rb[SSM_INPUT_RB_SIZE];
 #define ssm_input_idx(i) ((i) % SSM_INPUT_RB_SIZE)
 #define ssm_input_get(i) (&ssm_input_rb[ssm_input_idx(i)])
 
-#define ssm_input_read_ready(r, w)  (ssm_input_idx(r) != ssm_input_idx(w))
+#define ssm_input_read_ready(r, w) (ssm_input_idx(r) != ssm_input_idx(w))
 #define ssm_input_write_ready(r, w) (ssm_input_read_ready(r, w + 1))
 
-/** @brief Consume #ssm_input_packet, to prepare to ssm_tick().
+/** @brief Consume #ssm_input packet, to prepare to ssm_tick().
  *
  *  Consumes zero or more input packets from #ssm_input_rb.
  *
  *  This should only be called when there are a non-zero number of packets to
- *  consume, i.e., when @a begin is less than @a end.
+ *  consume, i.e., when @a r is less than @a w.
  *
  *  @platformonly
  *
- *  @param begin      logical index to the front of #ssm_input_rb.
- *  @param end        logical index to the end of #ssm_input_rb.
- *  @returns          the number of input packets consume.
+ *  @param r  logical index of the front of #ssm_input_rb, i.e., the read head.
+ *  @param w  logical index of the end of #ssm_input_rb, i.e., the write head.
+ *  @returns  the number of input packets consume.
  */
 size_t ssm_input_consume(size_t r, size_t w);
 
