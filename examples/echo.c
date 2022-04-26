@@ -1,103 +1,21 @@
-#include "ssm.h"
-#include <ctype.h>
-#include <execinfo.h>
-#include <pthread.h>
-#include <ssm-internal.h>
-#include <stdatomic.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/eventfd.h>
-#include <sys/select.h>
-#include <time.h>
-#include <unistd.h>
-
-#ifndef SSM_TIMER64_PRESENT
-#error This example needs to be compiled with SSM_TIMER64_PRESENT
-#endif
-// #define DBG(...) fprintf(stderr, __VA_ARGS__)
-#define DBG(...)                                                               \
-  do {                                                                         \
-  } while (0)
-
-#define NANOS 1000000000L
-
-#define timespec_diff(a, b)                                                    \
-  (a).tv_nsec - (b).tv_nsec < 0                                                \
-      ? (struct timespec){.tv_sec = (a).tv_sec - (b).tv_sec - 1,               \
-                          .tv_nsec = (a).tv_nsec - (b).tv_nsec + NANOS}        \
-      : (struct timespec) {                                                    \
-    .tv_sec = (a).tv_sec - (b).tv_sec, .tv_nsec = (a).tv_nsec - (b).tv_nsec    \
-  }
-
-#define timespec_add(a, b)                                                     \
-  (a).tv_nsec + (b).tv_nsec > NANOS                                            \
-      ? (struct timespec){.tv_sec = (a).tv_sec + (b).tv_sec + 1,               \
-                          .tv_nsec = (a).tv_nsec + (b).tv_nsec - NANOS}        \
-      : (struct timespec) {                                                    \
-    .tv_sec = (a).tv_sec + (b).tv_sec, .tv_nsec = (a).tv_nsec + (b).tv_nsec    \
-  }
-
-#define timespec_lt(a, b)                                                      \
-  (a).tv_sec == (b).tv_sec ? (a).tv_nsec < (b).tv_nsec : (a).tv_sec < (b).tv_sec
-
-#define timespec_time(t) (((t).tv_sec * NANOS) + (t).tv_nsec)
-
-#define timespec_of(ns)                                                        \
-  (struct timespec) { .tv_sec = (ns) / NANOS, .tv_nsec = (ns) % NANOS }
-
-static int ssm_sem_fd;
-atomic_size_t rb_r;
-atomic_size_t rb_w;
-pthread_mutex_t rb_lk;
-ssm_value_t ssm_stdin;
-pthread_t ssm_stdin_tid;
-pthread_attr_t ssm_stdin_attr;
-ssm_value_t ssm_stdout;
-
+#include "ssm-examples.h"
 typedef struct {
   ssm_act_t act;
+  ssm_value_t ssm_stdin;
+  ssm_value_t ssm_stdout;
   ssm_trigger_t trigger1;
 } main_act_t;
 
-typedef struct {
-  ssm_act_t act;
-  ssm_trigger_t trigger;
-} stdout_handler_act_t;
-
-ssm_stepf_t step_main, step_stdout_handler;
-
-ssm_act_t *enter_stdout_handler(ssm_act_t *parent, ssm_priority_t priority,
-                                ssm_depth_t depth) {
-  stdout_handler_act_t *cont =
-      container_of(ssm_enter(sizeof(stdout_handler_act_t), step_stdout_handler,
-                             parent, priority, depth),
-                   stdout_handler_act_t, act);
-  cont->trigger.act = &cont->act;
-  return &cont->act;
-}
-
-void step_stdout_handler(ssm_act_t *act) {
-  stdout_handler_act_t *cont = container_of(act, stdout_handler_act_t, act);
-
-  switch (act->pc) {
-  case 0:
-    ssm_sensitize(ssm_stdout, &cont->trigger);
-    act->pc = 1;
-    return;
-  case 1:;
-    char c = ssm_unmarshal(ssm_deref(ssm_stdout));
-    putchar(c);
-    return;
-  }
-  ssm_leave(&cont->act, sizeof(stdout_handler_act_t));
-}
+ssm_stepf_t step_main;
 
 ssm_act_t *enter_main(ssm_act_t *parent, ssm_priority_t priority,
-                      ssm_depth_t depth) {
+                      ssm_depth_t depth, ssm_value_t *argv, ssm_value_t *ret) {
 
   main_act_t *cont = container_of(
       ssm_enter(sizeof(main_act_t), step_main, parent, priority, depth),
       main_act_t, act);
+  cont->ssm_stdin = argv[0];
+  cont->ssm_stdout = argv[1];
   cont->trigger1.act = &cont->act;
   return &cont->act;
 }
@@ -107,21 +25,21 @@ void step_main(ssm_act_t *act) {
   switch (act->pc) {
   case 0:
     for (;;) {
-      ssm_sensitize(ssm_stdin, &cont->trigger1);
+      ssm_sensitize(cont->ssm_stdin, &cont->trigger1);
       act->pc = 1;
       return;
     case 1:;
       ssm_desensitize(&cont->trigger1);
-      char c = ssm_unmarshal(ssm_deref(ssm_stdin));
+      char c = ssm_unmarshal(ssm_deref(cont->ssm_stdin));
 
-      ssm_later(ssm_stdout, ssm_now() + (NANOS / 2),
+      ssm_later(cont->ssm_stdout, ssm_now() + (NANOS / 2),
                 ssm_marshal(c >= 'a' && c <= 'z' ? c + 'A' - 'a' : c));
 
-      ssm_sensitize(ssm_stdout, &cont->trigger1);
+      ssm_sensitize(cont->ssm_stdout, &cont->trigger1);
       act->pc = 2;
       return;
     case 2:;
-      ssm_later(ssm_stdout, ssm_now() + (NANOS / 1000),
+      ssm_later(cont->ssm_stdout, ssm_now() + (NANOS / 1000),
                 ssm_marshal('\n'));
       act->pc = 3;
       return;
@@ -134,204 +52,24 @@ void step_main(ssm_act_t *act) {
   ssm_leave(act, sizeof(main_act_t));
 }
 
-void *ssm_stdin_handler(void *sv) {
-  for (;;) {
-    int c = getchar();
-    if (c == EOF) {
-      return NULL;
-    }
-
-    size_t w, r;
-    w = atomic_load(&rb_w);
-    r = atomic_load(&rb_r);
-
-    if (ssm_input_write_ready(r, w)) {
-      pthread_mutex_lock(&rb_lk);
-
-      struct timespec now;
-      clock_gettime(CLOCK_MONOTONIC, &now);
-      uint64_t t = timespec_time(now);
-
-      struct ssm_input *packet = ssm_input_get(w);
-      packet->sv = sv;
-      packet->payload = ssm_marshal(c);
-      packet->time.raw_time64 = t;
-      atomic_store(&rb_w, w + 1);
-      pthread_mutex_unlock(&rb_lk);
-      eventfd_write(ssm_sem_fd, 1);
-    } else {
-      // fprintf(stderr, "Dropped input packet: %c (r=%ld, w=%ld)\n", c, r, w);
-    }
-  }
-}
-
+ssm_value_t ssm_stdin;
+ssm_value_t ssm_stdout;
 void ssm_program_init(void) {
   ssm_stdin = ssm_new_sv(ssm_marshal(0));
   ssm_stdout = ssm_new_sv(ssm_marshal(0));
 
-  ssm_activate(enter_stdout_handler(&ssm_top_parent, SSM_ROOT_PRIORITY,
-                                    SSM_ROOT_DEPTH - 1));
+  ssm_activate(__enter_stdout_handler(&ssm_top_parent, SSM_ROOT_PRIORITY,
+                                      SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL));
+
+  ssm_value_t argv_main[2] = {ssm_stdin, ssm_stdout};
   ssm_activate(enter_main(&ssm_top_parent,
                           SSM_ROOT_PRIORITY + (1 << (SSM_ROOT_DEPTH - 1)),
-                          SSM_ROOT_DEPTH - 1));
+                          SSM_ROOT_DEPTH - 1, argv_main, NULL));
 
-  pthread_create(&ssm_stdin_tid, &ssm_stdin_attr, ssm_stdin_handler,
-                 ssm_to_sv(ssm_stdin));
+  __spawn_stdin_handler(ssm_to_sv(ssm_stdin));
 }
 
 void ssm_program_exit(void) {
   printf("DBG: joining stdin handler\n");
-  pthread_join(ssm_stdin_tid, NULL);
-}
-
-#define MAX_PAGES 2048
-static void *pages[MAX_PAGES];
-static size_t allocated_pages = 0;
-static void *alloc_page(void) {
-  if (allocated_pages >= MAX_PAGES) {
-    SSM_THROW(SSM_EXHAUSTED_MEMORY);
-    exit(3);
-  }
-  void *m = pages[allocated_pages++] = malloc(SSM_MEM_PAGE_SIZE);
-  memset(m, 0, SSM_MEM_PAGE_SIZE);
-  return m;
-}
-
-static void *alloc_mem(size_t size) { return malloc(size); }
-
-static void free_mem(void *mem, size_t size) { free(mem); }
-
-static inline void poll_input_queue(size_t *r, size_t *w) {
-  static size_t scaled = 0;
-  // eventfd_t e;
-  // eventfd_read(ssm_sem_fd, &e);
-  pthread_mutex_lock(&rb_lk);
-  *r = atomic_load(&rb_r);
-  *w = atomic_load(&rb_w);
-  pthread_mutex_unlock(&rb_lk);
-  for (; scaled < *w; scaled++)
-    ssm_input_get(scaled)->time =
-        ssm_raw_time64_scale(ssm_input_get(scaled)->time, 1);
-}
-
-int ret = 0;
-ssm_time_t next_time, wall_time;
-size_t r, w;
-
-int main(void) {
-  ssm_mem_init(alloc_page, alloc_mem, free_mem);
-  // ssm_sem_fd = eventfd(0, EFD_NONBLOCK);
-  ssm_sem_fd = eventfd(0, 0);
-  pthread_mutex_init(&rb_lk, NULL);
-
-  struct timespec init_time;
-  clock_gettime(CLOCK_MONOTONIC, &init_time);
-  ssm_set_now(timespec_time(init_time));
-  ssm_program_init();
-  // int ret = 0;
-
-#if 1
-  for (;;) {
-    // ssm_time_t next_time, wall_time;
-    struct timespec wall_spec;
-    // size_t r, w;
-
-    DBG("before getting wall time\n");
-    clock_gettime(CLOCK_MONOTONIC, &wall_spec);
-    wall_time = timespec_time(wall_spec);
-    next_time = ssm_next_event_time();
-
-    poll_input_queue(&r, &w);
-    if (ssm_input_read_ready(r, w)) {
-      if (ssm_input_get(r)->time.ssm_time <= next_time) {
-        DBG("Consuming input of time: %ld\n", ssm_input_get(r)->time.ssm_time);
-        r = ssm_input_consume(r, w);
-        atomic_store(&rb_r, r);
-        goto do_tick;
-      }
-    }
-
-    if (next_time <= wall_time) {
-    do_tick:
-      ssm_tick();
-    } else {
-      fd_set in_fds;
-      eventfd_t e;
-      FD_SET(ssm_sem_fd, &in_fds);
-      if (next_time == SSM_NEVER) {
-        DBG("Sleeping indefinitely\n");
-        ret = pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, NULL, NULL);
-        DBG("Woke from sleeping indefinitely\n");
-        ret = eventfd_read(ssm_sem_fd, &e);
-      } else {
-        struct timespec next_spec = timespec_of(next_time);
-        struct timespec sleep_time = timespec_diff(next_spec, wall_spec);
-        DBG("Sleeping\n");
-        ret = pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, &sleep_time, NULL);
-        DBG("Woke up from sleeping\n");
-        if (ret > 0)
-          ret = eventfd_read(ssm_sem_fd, &e);
-        // otherwise, timed out
-      }
-    }
-  }
-
-#else
-  for (;;) {
-    size_t r, w;
-    poll_input_queue(&r, &w);
-  consume_loop:
-    do {
-      r = ssm_input_consume(r, w);
-      atomic_store(&rb_r, r);
-      ssm_tick();
-    } while (ssm_input_read_ready(r, w));
-
-    fflush(stdout);
-
-    fd_set in_fds;
-    FD_SET(ssm_sem_fd, &in_fds);
-
-    ssm_time_t next = ssm_next_event_time();
-    if (next == SSM_NEVER) {
-      // printf("%s: sleeping indefinitely\n", __FUNCTION__);
-      pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, NULL, NULL);
-    } else {
-      struct timespec next_time = timespec_of(next);
-      struct timespec wall_time;
-      clock_gettime(CLOCK_MONOTONIC, &wall_time);
-
-      poll_input_queue(&r, &w);
-      if (ssm_input_read_ready(r, w))
-        goto consume_loop;
-
-      // printf("%s: next time is %ld (currently (%ld)\n", __FUNCTION__,
-      //        timespec_time(next_time), timespec_time(wall_time));
-      if (timespec_lt(wall_time, next_time)) {
-        struct timespec sleep_time = timespec_diff(next_time, wall_time);
-        // printf("%s: sleeping for %ld\n", __FUNCTION__,
-        //        timespec_time(sleep_time));
-        pselect(ssm_sem_fd + 1, &in_fds, NULL, NULL, &sleep_time, NULL);
-      }
-    }
-  }
-#endif
-
-  ssm_program_exit();
-
-  for (size_t p = 0; p < allocated_pages; p++)
-    free(pages[p]);
-
-  return ret;
-}
-void ssm_throw(enum ssm_error reason, const char *file, int line,
-               const char *func) {
-  fprintf(stderr, "SSM error at %s:%s:%d: reason: %d\n", file, func, line,
-          reason);
-  void *array[64];
-  int size;
-  fprintf(stderr, "Backtrace:\n\n");
-  size = backtrace(array, 64);
-  backtrace_symbols_fd(array, size, STDERR_FILENO);
-  exit(1);
+  __kill_stdin_handler();
 }
