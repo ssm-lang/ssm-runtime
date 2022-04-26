@@ -24,12 +24,15 @@ MAKE_CC ?= cc
 MAKE_LD ?= $(MAKE_CC)
 MAKE_AR ?= ar
 
+PLATFORM ?= simulation
+
 BUILD_DIR := build
 SRC_DIR := src
 INC_DIR := include
 TEST_DIR := test
 EXE_DIR := examples
 DOC_DIR := doc
+PLATFORM_DIR := platform/$(PLATFORM)
 GCOVR_CFG := test/gcovr.cfg
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
@@ -54,6 +57,10 @@ TLIB_TGT := $(BUILD_DIR)/lib$(TLIB_NAME).a
 TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJ := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/test_%.o, $(TEST_SRC))
 TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
+
+PLATFORM_SRC := $(wildcard $(PLATFORM_DIR)/src/*.c)
+PLATFORM_OBJ := $(patsubst $(PLATFORM_DIR)/src/%.c, $(BUILD_DIR)/%.o, $(PLATFORM_SRC))
+$(info PLATFORM is $(PLATFORM))
 
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
@@ -97,13 +104,13 @@ $(TLIB_TGT): $(TLIB_OBJ)
 	rm -f $@
 	$(AR) $(ARFLAGS) $@ $+
 
-$(EXE_TGT): %: %.o $(LIB_TGT)
-	$(LD) $(LDFLAGS) -o $@ $@.o -l$(LIB_NAME) $(LDLIBS)
+$(EXE_TGT): %: %.o $(PLATFORM_OBJ) $(LIB_TGT)
+	$(LD) $(LDFLAGS) -o $@ $@.o $(PLATFORM_OBJ) -l$(LIB_NAME) $(LDLIBS)
 
 $(TEST_TGT): %: %.o $(TLIB_TGT)
 	$(LD) $(TEST_LDFLAGS) -o $@ $@.o -l$(TLIB_NAME) $(LDLIBS)
 
-vpath %.c $(SRC_DIR) $(EXE_DIR) $(TEST_DIR)
+vpath %.c $(SRC_DIR) $(EXE_DIR) $(TEST_DIR) $(PLATFORM_DIR)/src
 
 $(EXE_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) $(EXE_INC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -114,6 +121,9 @@ $(LIB_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	rm -f $(patsubst %.o, %.gcda, $@) $(patsubst %.o, %.gcno, $@)
 	$(CC) $(TEST_CFLAGS) -c -o $@ $<
+
+$(PLATFORM_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(COV_TGT): $(GCOVR_CFG) $(TEST_TGT)
 	@for i in $(TEST_TGT) ; do \
