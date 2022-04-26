@@ -59,7 +59,7 @@ void *ssm_stdin_handler(void *sv) {
       packet->time.raw_time64 = t;
       atomic_store(&rb_w, w + 1);
       pthread_mutex_unlock(&rb_lk);
-      eventfd_write(ssm_sem_fd, 1);
+      fd_sem_write(ssm_sem_fd);
     } else {
       // fprintf(stderr, "Dropped input packet: %c (r=%ld, w=%ld)\n", c, r, w);
     }
