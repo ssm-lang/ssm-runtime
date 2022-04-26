@@ -43,7 +43,7 @@ ssm_time_t ssm_next_event_time(void);
  *
  *  @returns true if there is at least one active process, false otherwise.
  */
-bool ssm_running(void);
+bool ssm_active(void);
 
 /** @ingroup time
  *  @brief Reset the scheduler.
