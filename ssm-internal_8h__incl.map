@@ -1,7 +1,6 @@
 <map id="ssm&#45;internal.h" name="ssm&#45;internal.h">
-<area shape="rect" id="node1" title="The internal interface of the SSM runtime." alt="" coords="207,5,323,32"/>
+<area shape="rect" id="node1" title="The internal interface of the SSM runtime." alt="" coords="139,5,255,32"/>
 <area shape="rect" id="node2" href="$ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,80,228,107"/>
-<area shape="rect" id="node7" title=" " alt="" coords="252,80,415,107"/>
 <area shape="rect" id="node3" title=" " alt="" coords="5,155,88,181"/>
 <area shape="rect" id="node4" title=" " alt="" coords="112,155,187,181"/>
 <area shape="rect" id="node5" title=" " alt="" coords="211,155,282,181"/>

@@ -253,8 +253,8 @@ $(document).ready(function(){initNavTree('ssm-internal_8h_source.html',''); init
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;<span class="comment"> *  alloc_mem_handler. These handlers may also assume they will not be invoked</span></div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;<span class="comment"> *  to request memory ranges of less than #SSM_MEM_POOL_MAX bytes.</span></div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment"> *  If the allocator is compiled with valgrind support (i.e., without defining</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"> *  @a NVALGRIND), it will perform a leak-check summary, to checkpoint how much</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment"> *  If the allocator is compiled with valgrind support (i.e., @a USE_VALGRIND is</span></div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment"> *  defined), it will perform a leak-check summary, to checkpoint how much</span></div>
 <div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;<span class="comment"> *  memory has already been allocated.</span></div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;<span class="comment"> *  @platformonly</span></div>
@@ -269,8 +269,8 @@ $(document).ready(function(){initNavTree('ssm-internal_8h_source.html',''); init
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="comment">/** @brief Tears down the underlying allocator system.</span></div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="comment"> *</span></div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment"> *  If the allocator is compiled with valgrind support (i.e., without defining</span></div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="comment"> *  @a NVALGRIND), it will perform a full leak-check summary, to report how much</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;<span class="comment"> *  If the allocator is compiled with valgrind support (i.e., @a USE_VALGRIND is</span></div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;<span class="comment"> *  defined), it will perform a full leak-check summary, to report how much</span></div>
 <div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;<span class="comment"> *  memory has been leaked since ssm_mem_init().</span></div>
 <div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;<span class="comment"> *</span></div>
 <div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;<span class="comment"> *  @TODO this doesn&#39;t actually call @a free_page_handler yet. It still needs to</span></div>
@@ -351,7 +351,7 @@ $(document).ready(function(){initNavTree('ssm-internal_8h_source.html',''); init
 <div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="comment"></span> </div>
 <div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="comment">/** @} */</span></div>
 <div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160; </div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="preprocessor">#ifndef NVALGRIND</span></div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="preprocessor">#ifdef USE_VALGRIND</span></div>
 <div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="preprocessor">#include &lt;valgrind/memcheck.h&gt;</span></div>
 <div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;<span class="preprocessor">#endif</span></div>
 <div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160; </div>
