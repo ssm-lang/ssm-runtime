@@ -51,6 +51,7 @@ int main(void) {
   clock_gettime(CLOCK_MONOTONIC, &init_time);
   ssm_set_now(timespec_time(init_time));
   ssm_program_init();
+  ssm_tick();
   int ret = 0;
 
 #if 1
