@@ -26,7 +26,7 @@ MAKE_AR ?= ar
 
 PLATFORM ?= simulation
 
-BUILD_DIR := build
+BUILD_DIR := build/$(PLATFORM)
 SRC_DIR := src
 INC_DIR := include
 TEST_DIR := test
