@@ -26,7 +26,7 @@ MAKE_AR ?= ar
 
 PLATFORM ?= simulation
 
-BUILD_DIR := build/$(PLATFORM)
+BUILD_DIR := build
 SRC_DIR := src
 INC_DIR := include
 TEST_DIR := test
@@ -65,19 +65,20 @@ $(info PLATFORM is $(PLATFORM))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
-CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT # -std=c99
-# C99 removes access to some POSIX high-precision timing APIs
-# TODO: only use C99 for building core lib
+CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -DSSM_TIMER64_PRESENT
 
-# Check whether valgrind is available.
-ifeq ($(shell command -v valgrind),)
-# If not, we probably shouldn't try to include <valgrind/valgrind.h>,
-# which we use to instrument our memory allocator.
-# 
-# NOTE: this is just a heuristic that may not be very reliable.
-# We should probably implement better dependency management.
-CFLAGS += -DNVALGRIND
-endif
+# # Check whether valgrind is available.
+# ifeq ($(shell which valgrind),)
+# $(info # Valgrind is not available; compiling without it.)
+# else
+# # If available, we try to #include <valgrind/valgrind.h>, which we use to
+# # instrument our memory allocator.
+# #
+# # NOTE: this is just a heuristic that may not be very reliable.
+# # We should probably implement better dependency management.
+# $(info # Valgrind seems to be available; compiling libssm with Valgrind support.)
+# CFLAGS += -DUSE_VALGRIND
+# endif
 
 TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
 

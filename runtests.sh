@@ -6,16 +6,15 @@
 #
 # Use this script to run all tests and compare against expected output, which
 # can found in test/{examples,tests}.out). Example and test outputs are written
-# to $BUILD_DIR/{examples,tests}.out, respectively.
+# to build/{examples,tests}.out, respectively.
 #
 # If Valgrind is installed, this script also uses it to check for memory errors.
-# Valgrind output is written to $BUILD_DIR/{examples,tests}.vg-out.
+# Valgrind output is written to build/{examples,tests}.vg-out.
 
 set -euf
 set -o pipefail
 
-PLATFORM=simulation
-BUILD_DIR="./build/$PLATFORM"
+BUILD_DIR=./build
 declare -a VG_FLAGS=("--leak-check=full" "--show-leak-kinds=all")
 
 scriptname="$(basename "$0")"

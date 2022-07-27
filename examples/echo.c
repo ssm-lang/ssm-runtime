@@ -52,11 +52,9 @@ void step_main(ssm_act_t *act) {
   ssm_leave(act, sizeof(main_act_t));
 }
 
-ssm_value_t ssm_stdin;
-ssm_value_t ssm_stdout;
 void ssm_program_init(void) {
-  ssm_stdin = ssm_new_sv(ssm_marshal(0));
-  ssm_stdout = ssm_new_sv(ssm_marshal(0));
+  ssm_value_t ssm_stdin = ssm_new_sv(ssm_marshal(0));
+  ssm_value_t ssm_stdout = ssm_new_sv(ssm_marshal(0));
 
   ssm_activate(__enter_stdout_handler(&ssm_top_parent, SSM_ROOT_PRIORITY,
                                       SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL));

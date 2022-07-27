@@ -82,6 +82,8 @@ int main(void) {
       fd_set in_fds;
       FD_SET(ssm_sem_fd[0], &in_fds);
       if (next_time == SSM_NEVER) {
+        if (!ssm_active())
+          break;
         DBG("Sleeping indefinitely\n");
         ret = pselect(ssm_sem_fd[0] + 1, &in_fds, NULL, NULL, NULL, NULL);
         DBG("Woke from sleeping indefinitely\n");
@@ -140,6 +142,7 @@ int main(void) {
   }
 #endif
 
+  DBG("Broke out of main loop, quitting\n");
   ssm_program_exit();
 
   for (size_t p = 0; p < allocated_pages; p++)
