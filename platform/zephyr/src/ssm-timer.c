@@ -1,6 +1,5 @@
-#include <platform/ssm-timer.h>
 #include <platform/ssm-log.h>
-#include <board-specific/ssm-timer.h>
+#include <board/ssm-timer.h>
 
 #include <drivers/counter.h>
 #include <drivers/clock_control.h>

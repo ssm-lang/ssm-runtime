@@ -3,15 +3,27 @@
 
 #include <toolchain/common.h>
 
-#include <platform-specific/ssm-io.h>
+#include <platform/ssm-io.h>
 
 BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(sw0), okay),
              "sw0 device alias not defined");
+BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(sw1), okay),
+             "sw1 device alias not defined");
+BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(sw2), okay),
+             "sw2 device alias not defined");
+BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(sw3), okay),
+             "sw3 device alias not defined");
 
 #define SSM_IN_SPEC_0 GPIO_DT_SPEC_GET(DT_ALIAS(sw0), gpios)
 #define SSM_IN_INIT_0 initialize_input_gpio_event
+#define SSM_IN_SPEC_1 GPIO_DT_SPEC_GET(DT_ALIAS(sw1), gpios)
+#define SSM_IN_INIT_1 initialize_input_gpio_event
+#define SSM_IN_SPEC_2 GPIO_DT_SPEC_GET(DT_ALIAS(sw2), gpios)
+#define SSM_IN_INIT_2 initialize_input_gpio_event
+#define SSM_IN_SPEC_3 GPIO_DT_SPEC_GET(DT_ALIAS(sw3), gpios)
+#define SSM_IN_INIT_3 initialize_input_gpio_event
 
-#define SSM_IN_COUNT 1
+#define SSM_IN_COUNT 4
 
 BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay),
              "led0 device alias not defined");

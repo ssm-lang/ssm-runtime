@@ -4,7 +4,7 @@
 #include <drivers/gpio.h>
 
 #include <ssm.h>
-#include <board-specific/ssm-io.h>
+#include <board/ssm-io.h>
 
 #ifndef SSM_OUT_COUNT
 #error "SSM_OUT_COUNT not defined for board"
