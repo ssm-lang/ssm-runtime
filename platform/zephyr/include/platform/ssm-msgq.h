@@ -1,5 +1,5 @@
-#ifndef _PLATFORM_SPECIFIC_SSM_MSGQ_H
-#define _PLATFORM_SPECIFIC_SSM_MSGQ_H
+#ifndef _PLATFORM_SSM_MSGQ_H
+#define _PLATFORM_SSM_MSGQ_H
 
 #include <kernel.h>
 
@@ -15,4 +15,4 @@
 #define ssm_msgq_get(q, msg, fl) \
   k_msgq_get(q, msg, fl)
 
-#endif /* ifndef _PLATFORM_SPECIFIC_SSM_MSGQ_H */
+#endif /* ifndef _PLATFORM_SSM_MSGQ_H */

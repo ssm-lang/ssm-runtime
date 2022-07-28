@@ -21,8 +21,8 @@
  * TODO: write config for enabling clock.
  * TODO: make this optional for platforms without GPIO
  */
-#ifndef _BOARD_SPECIFIC_SSM_PROF_H
-#define _BOARD_SPECIFIC_SSM_PROF_H
+#ifndef _BOARD_SSM_PROF_H
+#define _BOARD_SSM_PROF_H
 
 #include <drivers/gpio.h>
 #include <hal/nrf_gpio.h>
@@ -95,4 +95,4 @@
   } while (0)
 #endif
 
-#endif /* _BOARD_SPECIFIC_SSM_PROF_H */
+#endif /* _BOARD_SSM_PROF_H */

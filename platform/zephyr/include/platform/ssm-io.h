@@ -1,5 +1,5 @@
-#ifndef _PLATFORM_SPECIFIC_SSM_IO_H
-#define _PLATFORM_SPECIFIC_SSM_IO_H
+#ifndef _PLATFORM_SSM_IO_H
+#define _PLATFORM_SSM_IO_H
 
 #include <drivers/gpio.h>
 
@@ -44,4 +44,4 @@ extern ssm_output_t static_outputs[SSM_OUT_COUNT];
   (SSM_OUT_INIT_##fd(parent, priority, depth, sv, &static_outputs[fd]), \
    &static_outputs[fd].act)
 
-#endif /* _PLATFORM_SPECIFIC_SSM_IO_H */
+#endif /* _PLATFORM_SSM_IO_H */

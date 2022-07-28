@@ -1,8 +1,8 @@
 /**
  * Wrapper around Zephyr's semaphore API
  */
-#ifndef _PLATFORM_SPECIFIC_SSM_SEM_H
-#define _PLATFORM_SPECIFIC_SSM_SEM_H
+#ifndef _PLATFORM_SSM_SEM_H
+#define _PLATFORM_SSM_SEM_H
 
 #include <kernel.h>
 
@@ -14,4 +14,4 @@
 #define ssm_sem_wait(sem) k_sem_take(sem, K_FOREVER)
 #define ssm_sem_reset(sem) k_sem_reset(sem)
 
-#endif /* ifndef _PLATFORM_SPECIFIC_SSM_SEM_H */
+#endif /* ifndef _PLATFORM_SSM_SEM_H */

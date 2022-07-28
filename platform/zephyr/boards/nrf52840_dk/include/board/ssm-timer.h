@@ -1,5 +1,5 @@
-#ifndef _BOARD_SPECIFIC_SSM_TIMER_H
-#define _BOARD_SPECIFIC_SSM_TIMER_H
+#ifndef _BOARD_SSM_TIMER_H
+#define _BOARD_SSM_TIMER_H
 
 #include <drivers/clock_control/nrf_clock_control.h>
 #include <logging/log.h>
@@ -60,4 +60,4 @@ static inline void show_clocks(const struct device *ssm_timer_dev) {
     show_clocks(ssm_timer_dev);                                                \
   } while (0)
 
-#endif /* _BOARD_SPECIFIC_SSM_TIMER_H */
+#endif /* _BOARD_SSM_TIMER_H */

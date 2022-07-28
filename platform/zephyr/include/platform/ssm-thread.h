@@ -1,5 +1,5 @@
-#ifndef _PLATFORM_SPECIFIC_SSM_THREAD_H
-#define _PLATFORM_SPECIFIC_SSM_THREAD_H
+#ifndef _PLATFORM_SSM_THREAD_H
+#define _PLATFORM_SSM_THREAD_H
 
 #include <kernel.h>
 
@@ -17,4 +17,4 @@
                     K_NO_WAIT);                                                  \
   } while (0)
 
-#endif /* ifndef _PLATFORM_SPECIFIC_SSM_THREAD_H */
+#endif /* ifndef _PLATFORM_SSM_THREAD_H */

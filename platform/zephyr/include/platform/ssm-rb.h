@@ -1,5 +1,5 @@
-#ifndef _PLATFORM_SPECIFIC_SSM_RB_H
-#define _PLATFORM_SPECIFIC_SSM_RB_H
+#ifndef _PLATFORM_SSM_RB_H
+#define _PLATFORM_SSM_RB_H
 
 #include <sys/atomic.h>
 

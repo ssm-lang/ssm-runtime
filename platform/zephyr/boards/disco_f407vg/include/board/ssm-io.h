@@ -1,5 +1,5 @@
-#ifndef _BOARD_SPECIFIC_SSM_IO_H
-#define _BOARD_SPECIFIC_SSM_IO_H
+#ifndef _BOARD_SSM_IO_H
+#define _BOARD_SSM_IO_H
 
 #include <toolchain/common.h>
 
@@ -33,4 +33,4 @@ BUILD_ASSERT(DT_NODE_HAS_STATUS(DT_ALIAS(led3), okay),
 
 #define SSM_OUT_COUNT 4
 
-#endif /* _BOARD_SPECIFIC_SSM_IO_H */
+#endif /* _BOARD_SSM_IO_H */
