@@ -1,11 +1,11 @@
-#ifndef _BOARD_SSM_TIMER_H
-#define _BOARD_SSM_TIMER_H
+#include <board/zephyr-timer.h>
 
 #include <drivers/clock_control/nrf_clock_control.h>
 #include <logging/log.h>
 
+LOG_MODULE_DECLARE(ssm_timer);
+
 static inline void show_clocks(const struct device *ssm_timer_dev) {
-  LOG_MODULE_DECLARE(ssm_timer);
 
   static const char *const lfsrc_s[] = {
 #if defined(CLOCK_LFCLKSRC_SRC_LFULP)
@@ -46,18 +46,19 @@ static inline void show_clocks(const struct device *ssm_timer_dev) {
           hfsrc_s[src.hf]);
 }
 
-#define BOARD_TIMER_INIT(ssm_timer_dev)                                        \
-  do {                                                                         \
-    const struct device *clock;                                                \
-                                                                               \
-    /* Configure nrf board to use external oscillator for timer */             \
-    if (!(clock = device_get_binding(DT_LABEL(DT_INST(0, nordic_nrf_clock))))) \
-      return -ENODEV;                                                          \
-                                                                               \
-    if ((err = clock_control_on(clock, CLOCK_CONTROL_NRF_SUBSYS_HF)))          \
-      return err;                                                              \
-                                                                               \
-    show_clocks(ssm_timer_dev);                                                \
-  } while (0)
+int ssm_timer_board_start(const struct device *ssm_timer_dev) {
 
-#endif /* _BOARD_SSM_TIMER_H */
+  const struct device *clock;
+  int err;
+
+  /* Configure nrf board to use external oscillator for timer */
+  if (!(clock = device_get_binding(DT_LABEL(DT_INST(0, nordic_nrf_clock)))))
+    return -ENODEV;
+
+  if ((err = clock_control_on(clock, CLOCK_CONTROL_NRF_SUBSYS_HF)))
+    return err;
+
+  show_clocks(ssm_timer_dev);
+
+  return 0;
+}

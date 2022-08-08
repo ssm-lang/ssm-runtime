@@ -1,8 +1,5 @@
-#include <platform/ssm-log.h>
-#include <board/ssm-timer.h>
-
-#include <drivers/counter.h>
-#include <drivers/clock_control.h>
+#include <board/zephyr-timer.h>
+#include <platform/ssm-timer.h>
 
 #include <logging/log.h>
 
@@ -12,17 +9,27 @@ LOG_MODULE_REGISTER(ssm_timer);
 #error "ssm-timer device is not supported on this board"
 #endif
 
+const struct device *ssm_timer_dev;
+
 #define SSM_TIMER_ALARM_CHANNEL 0
 
-const struct device *ssm_timer_dev;
+#define SSM_TIMER32_TOTAL_BITS 32
+
+#define SSM_TIMER32_TOP                                                        \
+  ((0x1u << (SSM_TIMER32_TOTAL_BITS - 1)) |                                    \
+   ((0x1u << (SSM_TIMER32_TOTAL_BITS - 1)) - 1))
+
+#define SSM_TIMER32_GUARD (SSM_TIMER32_TOP / 2)
+
+volatile uint32_t __ssm_timer_hi;
 
 static void overflow_handler(const struct device *dev, void *user_data) {
   uint32_t key = irq_lock();
-  SSM_TIMER32_OVERFLOW_HANDLE();
+  ++__ssm_timer_hi;
   irq_unlock(key);
 }
 
-int ssm_timer32_start(void) {
+int ssm_timer_start(void) {
   int err;
   struct counter_top_cfg top_cfg = {
       .callback = overflow_handler,
@@ -30,10 +37,9 @@ int ssm_timer32_start(void) {
       .user_data = NULL,
       .flags = COUNTER_TOP_CFG_DONT_RESET,
   };
-#ifdef BOARD_TIMER_INIT
-  // This macro may return from within
-  BOARD_TIMER_INIT(ssm_timer_dev);
-#endif
+
+  if ((err = ssm_timer_board_start(ssm_timer_dev)))
+    return err;
 
   if (!(ssm_timer_dev = device_get_binding(DT_LABEL(DT_ALIAS(ssm_timer)))))
     return -ENODEV;
@@ -54,22 +60,26 @@ int ssm_timer32_start(void) {
   return counter_start(ssm_timer_dev);
 }
 
-static ssm_timer32_callback_t timer_cb;
+static ssm_timer_callback_t timer_cb;
 
-void counter_alarm_callback(const struct device *dev,
-	                    uint8_t chan_id, uint32_t ticks, void *user_data) {
-  SSM_DEBUG_ASSERT(chan_id == SSM_TIMER_ALARM_CHANNEL,
-                   "counter_alarm_callback: unexpected chan_id: %u\r\n", chan_id);
-  SSM_DEBUG_ASSERT(timer_cb, "counter_alarm_callback: timer_cb not set\r\n");
+void counter_alarm_callback(const struct device *dev, uint8_t chan_id,
+                            uint32_t ticks, void *user_data) {
+  // SSM_DEBUG_ASSERT(chan_id == SSM_TIMER_ALARM_CHANNEL,
+  //                  "counter_alarm_callback: unexpected chan_id: %u\r\n",
+  //                  chan_id);
+  // SSM_DEBUG_ASSERT(timer_cb, "counter_alarm_callback: timer_cb not set\r\n");
   timer_cb(ticks, user_data);
+  timer_cb = NULL;
 }
 
-int ssm_timer32_set_alarm(uint32_t wake_time, ssm_timer32_callback_t cb,
-                          void *user_data) {
+int ssm_timer_set_alarm(ssm_time_t wake_time, ssm_timer_callback_t cb,
+                        void *user_data) {
+
   struct counter_alarm_cfg cfg;
 
-  // Overwriting the global is fine since we can only have one alarm at a time;
-  // counter_set_channel_alarm should return an error if an alarm was already set.
+  if (cb)
+    return -EALREADY;
+
   timer_cb = cb;
 
   cfg.flags = COUNTER_ALARM_CFG_ABSOLUTE | COUNTER_ALARM_CFG_EXPIRE_WHEN_LATE;
@@ -80,11 +90,17 @@ int ssm_timer32_set_alarm(uint32_t wake_time, ssm_timer32_callback_t cb,
                                    &cfg);
 }
 
-int ssm_timer_cancel_alarm(void) {
+int ssm_timer_cancel(void) {
   return counter_cancel_channel_alarm(ssm_timer_dev, SSM_TIMER_ALARM_CHANNEL);
 }
 
-uint32_t ssm_timer32_read(void) {
+ssm_time_t ssm_timer_read(void) {
+  ssm_raw_time_t t;
+  ssm_timer_read_raw(&t);
+  return ssm_timer_calc(t);
+}
+
+uint32_t ssm_timer_read32(void) {
   uint32_t ticks;
   counter_get_value(ssm_timer_dev, &ticks);
   return ticks;
