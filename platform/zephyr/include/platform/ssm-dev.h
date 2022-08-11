@@ -1,6 +1,8 @@
 #ifndef _PLATFORM_SSM_IO_H
 #define _PLATFORM_SSM_IO_H
 
+#if 0 // This subsystem isn't really ready yet
+
 /**
  * @addtogroup device
  * @{
@@ -118,5 +120,7 @@ int ssm_zephyr_initialize_output_device_gpio(ssm_act_t *parent,
   } while (0)
 
 /** @} */
+
+#endif // #if 0
 
 #endif /* _PLATFORM_SSM_IO_H */

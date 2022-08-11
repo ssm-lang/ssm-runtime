@@ -24,10 +24,11 @@ int ssm_platform_entry(void);
  *  @param val  the value @a sv should be updated with.
  *  @returns    0 on success, negative otherwise.
  */
-int ssm_insert_input_event(ssm_sv_t *sv, ssm_value_t val);
+int ssm_insert_input(ssm_sv_t *sv, ssm_value_t val);
 
 /** @} */
 
+#if 0 // This subsystem isn't really ready yet.
 /**
  * @addtogroup device
  * @{
@@ -104,5 +105,6 @@ int ssm_insert_input_event(ssm_sv_t *sv, ssm_value_t val);
   extern ssm_sv_t SSM_DEVICE(name);
 
 /** @} */
+#endif // #if 0
 
 #endif /* ifndef _SSM_PLATFORM_H */

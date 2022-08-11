@@ -1,15 +1,20 @@
 #include <ssm-internal.h>
 #include <ssm-platform.h>
 
-#include <platform/ssm-sem.h>
+// #include <platform/ssm-sem.h>
 #include <platform/ssm-timer.h>
 
 #include <drivers/gpio.h>
+#include <kernel.h>
 
 K_SEM_DEFINE(ssm_tick_sem, 0, 1);
 
 #ifndef SSM_INPUT_RB_SIZE
 #define SSM_INPUT_RB_SIZE 32
+#endif
+
+#ifndef SSM_NUM_PAGES
+#define SSM_NUM_PAGES 32
 #endif
 
 typedef union {
@@ -34,35 +39,13 @@ struct ssm_input ssm_input_rb[SSM_INPUT_RB_SIZE];
 atomic_t rb_r;
 atomic_t rb_w;
 
-int ssm_insert_input_event(ssm_sv_t *sv, ssm_value_t val) {
-  size_t w, r;
+static void sem_post(void) { k_sem_give(&ssm_tick_sem); }
 
-  ssm_raw_time_t raw_time;
-  ssm_timer_read_raw(&raw_time);
+static void sem_wait(void) { k_sem_take(&ssm_tick_sem, K_FOREVER); }
 
-  w = atomic_get(&rb_w);
-  r = atomic_get(&rb_r);
+static void sem_reset(void) { k_sem_reset(&ssm_tick_sem); }
 
-  if (ssm_input_write_ready(r, w)) {
-    struct ssm_input *pkt = ssm_input_get(w);
-
-    pkt->sv = sv;
-    pkt->payload = val;
-    pkt->time.raw = raw_time;
-
-    atomic_set(&rb_w, w + 1);
-
-    ssm_sem_post(&ssm_tick_sem);
-
-    return 0;
-  } else {
-    return -1;
-  }
-}
-
-static void send_timeout_event(ssm_time_t wake_time, void *user_data) {
-  ssm_sem_post(&ssm_tick_sem);
-}
+static void send_timeout_event(ssm_time_t t, void *d) { sem_post(); }
 
 static inline void poll_input_queue(size_t *r, size_t *w) {
   static size_t scaled = 0;
@@ -92,13 +75,54 @@ static inline size_t consume_input_queue(size_t r, size_t w) {
   return r;
 }
 
-void ssm_tick_loop(void) {
+int ssm_insert_input(ssm_sv_t *sv, ssm_value_t val) {
+  size_t w, r;
 
-  // ssm_mem_init(alloc_page, alloc_mem, free_mem);
+  ssm_raw_time_t raw_time;
+  ssm_timer_read_raw(&raw_time);
 
+  w = atomic_get(&rb_w);
+  r = atomic_get(&rb_r);
+
+  if (ssm_input_write_ready(r, w)) {
+    struct ssm_input *pkt = ssm_input_get(w);
+
+    pkt->sv = sv;
+    pkt->payload = val;
+    pkt->time.raw = raw_time;
+
+    atomic_set(&rb_w, w + 1);
+
+    sem_post();
+
+    return 0;
+  } else {
+    return -1;
+  }
+}
+
+static void setup_entry_point(void) {
+  // NOTE: this is kind of a hack. Ideally the user program is able to specify
+  // what it wants the entry point to be. But for now, we assume that there's
+  // some entry point named 'main' whose activation record is set up using
+  // '__enter_main'.
+  extern ssm_act_t *__enter_main(ssm_act_t *, ssm_priority_t, ssm_depth_t,
+                                 ssm_value_t *, ssm_value_t *);
+  ssm_value_t nothing0 = ssm_new_sv(ssm_marshal(0));
+  ssm_value_t nothing1 = ssm_new_sv(ssm_marshal(0));
+  ssm_value_t main_argv[2] = {nothing0, nothing1};
+
+  /* Start up main routine */
+  ssm_activate(__enter_main(&ssm_top_parent, SSM_ROOT_PRIORITY, SSM_ROOT_DEPTH,
+                            main_argv, NULL));
+}
+
+static void tick_loop(void) {
   ssm_timer_start();
 
-  ssm_platform_entry(); // TODO: handle return value
+  setup_entry_point();
+
+  ssm_tick(); // NOTE: we are assuming no input events at time 0.
 
   for (;;) {
     ssm_time_t next_time, wall_time;
@@ -135,7 +159,7 @@ void ssm_tick_loop(void) {
         // if (!ssm_active())
         //   break;
 
-        ssm_sem_wait(&ssm_tick_sem);
+        sem_wait();
 
       } else {
         // Need to set alarm
@@ -149,20 +173,35 @@ void ssm_tick_loop(void) {
           return; // unreachable
         }
 
-        ssm_sem_wait(&ssm_tick_sem);
+        sem_wait();
 
         // Cancel any potential pending alarm if it hasn't gone off yet.
         ssm_timer_cancel();
 
         // It's possible that the alarm went off before we cancelled it; make
         // sure that its sem_give doesn't cause premature wake-up later on.
-        ssm_sem_reset(&ssm_tick_sem);
+        sem_reset();
       }
     }
   }
+}
 
-  // ssm_program_exit();
-  //
-  // for (size_t p = 0; p < allocated_pages; p++)
-  //   free(pages[p]);
+static char mem[SSM_NUM_PAGES][SSM_MEM_PAGE_SIZE] = {0};
+static size_t allocated_pages = 0;
+
+static void *alloc_page(void) {
+  if (allocated_pages >= SSM_NUM_PAGES)
+    SSM_THROW(SSM_EXHAUSTED_MEMORY);
+  return mem[allocated_pages++];
+}
+
+static void *alloc_mem(size_t size) { return malloc(size); }
+
+static void free_mem(void *mem, size_t size) { free(mem); }
+
+int ssm_platform_entry(void) {
+  ssm_mem_init(alloc_page, alloc_mem, free_mem);
+
+  tick_loop();
+  return 0;
 }

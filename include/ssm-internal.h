@@ -11,6 +11,7 @@
 #define _SSM_SCHED_H
 
 #include <ssm.h>
+#include <ssm-platform.h>
 
 /** @ingroup error
  *  @brief Throw an internal error.

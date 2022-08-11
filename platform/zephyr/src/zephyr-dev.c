@@ -1,3 +1,7 @@
+int __dumy_decl = 0;
+
+#if 0 // This subsystem isn't really ready yet
+
 #include <platform/ssm-dev.h>
 #include <ssm-internal.h>
 #include <ssm-platform.h>
@@ -12,9 +16,10 @@ extern atomic_t rb_w;
 static void input_event_handler(const struct device *port,
                                 struct gpio_callback *cb,
                                 gpio_port_pins_t pins) {
-  ssm_zephyr_input_gpio_t *input = container_of(cb, ssm_zephyr_input_gpio_t, cb);
+  ssm_zephyr_input_gpio_t *input =
+      container_of(cb, ssm_zephyr_input_gpio_t, cb);
   uint32_t key = irq_lock();
-  ssm_insert_input_event(input->sv, ssm_marshal(gpio_pin_get(port, input->spec.pin)));
+  ssm_insert_input(input->sv, ssm_marshal(gpio_pin_get(port, input->spec.pin)));
 
   irq_unlock(key);
 }
@@ -42,7 +47,8 @@ int ssm_zephyr_initialize_input_device_gpio(ssm_zephyr_input_gpio_t *input) {
 /**** OUTPUT ******************************************************************/
 
 static void step_output_gpio_handler(ssm_act_t *actg) {
-  ssm_zephyr_output_gpio_t *out = container_of(actg, ssm_zephyr_output_gpio_t, act);
+  ssm_zephyr_output_gpio_t *out =
+      container_of(actg, ssm_zephyr_output_gpio_t, act);
   ssm_sv_t *sv = out->sv;
 
   switch (actg->pc) {
@@ -67,9 +73,9 @@ static void step_output_gpio_handler(ssm_act_t *actg) {
 }
 
 int ssm_zephyr_initialize_output_device_gpio(ssm_act_t *parent,
-                                      ssm_priority_t priority,
-                                      ssm_depth_t depth,
-                                      ssm_zephyr_output_gpio_t *out) {
+                                             ssm_priority_t priority,
+                                             ssm_depth_t depth,
+                                             ssm_zephyr_output_gpio_t *out) {
   int err;
   if ((err = gpio_pin_configure(out->spec.port, out->spec.pin,
                                 GPIO_OUTPUT_ACTIVE | out->spec.dt_flags)))
@@ -91,7 +97,4 @@ int ssm_zephyr_initialize_output_device_gpio(ssm_act_t *parent,
   ++parent->children;
   return 0;
 }
-
-int ssm_initialize_platform(void) {
-  return 0;
-}
+#endif // #if 0

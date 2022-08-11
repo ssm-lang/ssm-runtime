@@ -77,7 +77,7 @@ int ssm_timer_set_alarm(ssm_time_t wake_time, ssm_timer_callback_t cb,
 
   struct counter_alarm_cfg cfg;
 
-  if (cb)
+  if (timer_cb)
     return -EALREADY;
 
   timer_cb = cb;
