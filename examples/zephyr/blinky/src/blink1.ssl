@@ -17,8 +17,7 @@ main cin cout =
        loop
          wait led
          putc (deref led + 48)
-	 putc 10
-  let led = new 0       
+         putc 10
+  let led = new 0
   par blink 10 led
       display led
-  
