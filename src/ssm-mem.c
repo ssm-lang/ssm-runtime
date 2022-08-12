@@ -235,6 +235,15 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
   return (ssm_value_t){.heap_ptr = mm};
 }
 
+ssm_value_t ssm_new_adt(uint16_t elems) {
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_adt_size(val_count));
+  mm->ref_count = 1;
+  mm->kind = SSM_ADT_K;
+  mm->val_count = val_count;
+  mm->tag = tag;
+  return (ssm_value_t){.heap_ptr = mm};
+}
+
 ssm_value_t ssm_new_blob(uint16_t size) {
   struct ssm_blob4 *b = ssm_mem_alloc(ssm_blob_size(size));
   b->header.mm.ref_count = 1;

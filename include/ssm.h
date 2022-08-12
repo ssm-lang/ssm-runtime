@@ -112,7 +112,7 @@ typedef union {
  *  @note The interpretation and usage of the @a ref_count and @a tag fields may
  *  depend on the value of @a kind. For instance, some object kinds don't use
  * one or both of those fields, while others may use them together as a single
- *  16-bit field.
+ *  16-bit field (see #ssm_mm16).
  */
 struct ssm_mm {
   uint8_t ref_count; /**< The number of references to this object. */
@@ -120,6 +120,30 @@ struct ssm_mm {
   uint8_t val_count; /**< Number of #ssm_value_t values in payload. */
   uint8_t tag;       /**< Which variant is inhabited by this object. */
 };
+
+/** @brief An alternate layout of #ssm_mm combining the last two fields.
+ *
+ *  Some object kinds do not have any use for #ssm_mm's @a tag field, but
+ *  benefit from being able to represent a greater number of fields.
+ *  To support these object kinds, we use this alternate layout where the
+ *  @a val_count and @a tag fields are combined into a single 16-bit @a size
+ *  field.
+ *
+ *  @note The interpretation of the 16-bit @a size field depends on the object
+ *  kind. For example, @a size may represent the number of bytes of one kind, or
+ *  the nubmer of values for another.
+ */
+union ssm_mm16 {
+  struct ssm_mm mm; /**< Aliased memory management header. */
+  struct {
+    uint8_t ref_count; /**< The number of references to this object. */
+    uint8_t kind;      /**< The #ssm_kind of object this is. */
+    uint16_t size;     /**< 16-bit size of this object. */
+  } mm16;
+};
+
+/** @brief Cast an #ssm_mm into a
+#define ssm_mm16_of(mmp) (&(container_of((mmp), union ssm_mm16, mm).mm16))
 
 /** @brief The different kinds of heap objects, enumerated.
  *
@@ -133,7 +157,8 @@ enum ssm_kind {
   SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
   SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
   SSM_CLOSURE_K, /**< Closure object, e.g., #ssm_closure1 */
-  SSM_BLOB_K,    /**< Blob of data, e.g., #ssm_blob4 */
+  SSM_ARRAY_K,   /**< Array of values, e.g., #ssm_array1 */
+  SSM_BLOB_K,    /**< Blob of arbitrary data, e.g., #ssm_blob4 */
 };
 
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
