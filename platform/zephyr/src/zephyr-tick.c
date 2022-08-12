@@ -1,8 +1,7 @@
 #include <ssm-internal.h>
 #include <ssm-platform.h>
 
-// #include <platform/ssm-sem.h>
-#include <platform/ssm-timer.h>
+#include <platform/zephyr-timer.h>
 
 #include <drivers/gpio.h>
 #include <kernel.h>

@@ -2,7 +2,7 @@ int __dumy_decl = 0;
 
 #if 0 // This subsystem isn't really ready yet
 
-#include <platform/ssm-dev.h>
+#include <platform/zephyr-dev.h>
 #include <ssm-internal.h>
 #include <ssm-platform.h>
 

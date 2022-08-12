@@ -1,5 +1,4 @@
-#include <board/zephyr-timer.h>
-#include <platform/ssm-timer.h>
+#include <platform/zephyr-timer.h>
 
 #include <logging/log.h>
 

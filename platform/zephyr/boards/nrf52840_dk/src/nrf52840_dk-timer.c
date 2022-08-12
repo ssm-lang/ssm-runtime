@@ -1,4 +1,4 @@
-#include <board/zephyr-timer.h>
+#include <platform/zephyr-timer.h>
 
 #include <drivers/clock_control/nrf_clock_control.h>
 #include <logging/log.h>

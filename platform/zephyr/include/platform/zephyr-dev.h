@@ -1,5 +1,5 @@
-#ifndef _PLATFORM_SSM_IO_H
-#define _PLATFORM_SSM_IO_H
+#ifndef _PLATFORM_ZEPHYR_DEV_H
+#define _PLATFORM_ZEPHYR_DEV_H
 
 #if 0 // This subsystem isn't really ready yet
 
@@ -123,4 +123,4 @@ int ssm_zephyr_initialize_output_device_gpio(ssm_act_t *parent,
 
 #endif // #if 0
 
-#endif /* _PLATFORM_SSM_IO_H */
+#endif /* _PLATFORM_ZEPHYR_DEV_H */

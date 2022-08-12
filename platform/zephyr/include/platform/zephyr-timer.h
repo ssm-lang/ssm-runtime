@@ -1,7 +1,8 @@
-#ifndef _SSM_TIMER_H
-#define _SSM_TIMER_H
+#ifndef _PLATFORM_ZEPHYR_TIMER_H
+#define _PLATFORM_ZEPHYR_TIMER_H
 
 #include <stdint.h>
+#include <drivers/counter.h>
 
 /** @brief Absolute time; never to overflow. */
 typedef uint64_t ssm_time_t;
@@ -106,4 +107,11 @@ typedef struct ssm_raw_time {
     (tp)->hi1 = __ssm_timer_hi;                                                \
   } while (0)
 
-#endif /* ifndef _SSM_TIMER_H */
+/** @brief Board-specific Zephyr timer configuration.
+ *
+ *  @param ssm_timer_dev  timer device to initialize.
+ *  @returns              0 on success, non-zero otherwise.
+ */
+int ssm_timer_board_start(const struct device *ssm_timer_dev);
+
+#endif /* ifndef _PLATFORM_ZEPHYR_TIMER_H */
