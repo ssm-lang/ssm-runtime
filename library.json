@@ -12,6 +12,12 @@
       "email": "sedwards@cs.columbia.edu",
       "url": "http://www.cs.columbia.edu/~sedwards",
       "maintainer": true
+    },
+    {
+      "name": "John Hui",
+      "email": "j-hui@cs.columbia.edu",
+      "url": "https://j-hui.com",
+      "maintainer": true
     }
   ],
   "license": "BSD-3-Clause",
