@@ -132,7 +132,8 @@ enum ssm_kind {
   SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
   SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
   SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K, /**< Closure object, #ssm_closure1 */
+  SSM_CLOSURE_K, /**< Closure object, e.g., #ssm_closure1 */
+  SSM_BLOB_K,    /**< Blob of data, e.g., #ssm_blob4 */
 };
 
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
@@ -239,6 +240,81 @@ void ssm_dups(size_t cnt, ssm_value_t *arr);
 
 /** @brief Call ssm_drop() on an array of values. */
 void ssm_drops(size_t cnt, ssm_value_t *arr);
+
+/** @} */
+
+/**
+ * @addtogroup blob
+ * @{
+ */
+
+/** @brief The struct template of a heap-allocated blob.
+ *
+ *  Blobs are just arbitrary chunks of memory in the heap where any kind of data
+ *  can be stored, with any layout. Since the memory manager will not scan blobs
+ *  for pointers, any resources maintained within blobs must be managed via
+ *  other means.
+ *
+ *  Though this struct's @a payload is only declared with 4 bytes, actual
+ *  heap-allocated blobs may have large payloads. (We construct this template
+ *  with 4 bytes rather than 1 byte to avoid padding irregularities.) For
+ *  instance, a 48-byte blob might look like:
+ *
+ *  ~~~{.c}
+ *  struct ssm_blob48 {
+ *    struct ssm_mm mm;
+ *    char payload[48];
+ *  };
+ *  ~~~
+ *
+ *  The memory layout of all blobs is the same save for the size of the
+ *  @a payload, so we use this struct definition as the "base case" of blobs.
+ */
+struct ssm_blob4 {
+  union ssm_blob_header {
+    struct ssm_mm mm; /**< Aliased memory management header. */
+    struct {
+      uint8_t ref_count; /**< #ssm_mm field. */
+      uint8_t kind;      /**< #ssm_mm field. */
+      uint16_t size;     /**< 16-bit field size. */
+    } mm16; /**< Aliased memory management header containing size. */
+  } header;
+  char payload[4]; /**< Payload of heap-allocated blob. */
+};
+
+/** @brief Obtain pointer to #ssm_blob4 pointed by some #ssm_value_t.
+ *
+ *  @param v  #ssm_value_t pointing to some #ssm_blob4
+ *  @returns  pointer to #ssm_blob4
+ */
+#define ssm_blob_container_of(v)                                               \
+  (container_of(container_of((v).heap_ptr, union ssm_blob_header, mm),         \
+                struct ssm_blob4, header))
+
+/** @brief Compute the size of a blob with its header.
+ *
+ *  @param size   size of the blob's payload.
+ *  @returns      size that a blob of @a size payload may occupy in the heap.
+ */
+#define ssm_blob_size(size) (sizeof(struct ssm_blob4) + (size)-4)
+
+/** @brief Compute the size a blob in the heap.
+ *
+ *  @param v  #ssm_value_t pointing to some blob in the heap.
+ *  @returns  size of the blob that @a v points to.
+ */
+#define ssm_blob_heap_size(v)                                                  \
+  ssm_blob_size(ssm_blob_container_of(v)->header.mm16.size)
+
+/** @brief Obtain pointer to the payload of a blob from an #ssm_value_t. */
+#define ssm_blob_payload(v) ((char *)ssm_blob_container_of(v)->payload)
+
+/** @brief Allocate a blob on the heap.
+ *
+ *  @param size   size of the payload to the allocated (not including payload).
+ *  @returns      #ssm_value_t pointing to heap-allocated blob.
+ */
+ssm_value_t ssm_new_blob(uint16_t size);
 
 /** @} */
 
@@ -749,6 +825,14 @@ struct ssm_closure1 {
   ssm_func_t f;        /**< Enter function pointer. */
   ssm_value_t argv[1]; /**< An array of arguments. */
 };
+
+/** @brief Compute the size of a closure object.
+ *
+ *  @param val_count  the @a val_count field of the closure's #ssm_mm header.
+ *  @returns          the size of the closure object.
+ */
+#define ssm_closure_size(val_count)                                            \
+  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((val_count)-1)))
 
 /** @brief Retrieve the argument array of a closure. */
 #define ssm_closure_argv(v)                                                    \

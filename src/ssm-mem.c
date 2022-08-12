@@ -235,6 +235,14 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
   return (ssm_value_t){.heap_ptr = mm};
 }
 
+ssm_value_t ssm_new_blob(uint16_t size) {
+  struct ssm_blob4 *b = ssm_mem_alloc(ssm_blob_size(size));
+  b->header.mm.ref_count = 1;
+  b->header.mm.kind = SSM_BLOB_K;
+  b->header.mm16.size = size;
+  return (ssm_value_t){.heap_ptr = &b->header.mm};
+}
+
 void ssm_drop_final(ssm_value_t v) {
   size_t size = 0;
   switch (v.heap_ptr->kind) {
@@ -257,6 +265,12 @@ void ssm_drop_final(ssm_value_t v) {
     size = ssm_closure_heap_size(v);
     for (size_t i = 0; i < ssm_closure_arg_count(v); i++)
       ssm_drop(ssm_closure_arg(v, i));
+    break;
+  case SSM_BLOB_K:
+    size = ssm_blob_heap_size(v);
+    break;
+  default:
+    SSM_THROW(SSM_INTERNAL_ERROR); // Unknown memory type
     break;
   }
   ssm_mem_free(v.heap_ptr, size);
