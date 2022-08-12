@@ -239,7 +239,7 @@ void ssm_drop_final(ssm_value_t v) {
   size_t size = 0;
   switch (v.heap_ptr->kind) {
   case SSM_ADT_K:
-    size = ssm_adt_size(v.heap_ptr->val_count);
+    size = ssm_adt_heap_size(v);
     for (size_t i = 0; i < v.heap_ptr->val_count; i++)
       ssm_drop(ssm_adt_field(v, i));
     break;
@@ -254,7 +254,7 @@ void ssm_drop_final(ssm_value_t v) {
       ssm_drop(ssm_to_sv(v)->later_value);
     break;
   case SSM_CLOSURE_K:
-    size = ssm_closure_size(ssm_closure_arg_cap(v));
+    size = ssm_closure_heap_size(v);
     for (size_t i = 0; i < ssm_closure_arg_count(v); i++)
       ssm_drop(ssm_closure_arg(v, i));
     break;

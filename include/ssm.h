@@ -121,6 +121,20 @@ struct ssm_mm {
   uint8_t tag;       /**< Which variant is inhabited by this object. */
 };
 
+/** @brief The different kinds of heap objects, enumerated.
+ *
+ *  Types enumerated here that are not ADTs are chosen because they cannot be
+ *  easily or efficiently expressed as a product of words. For instance, 64-bit
+ *  timestamps cannot be directly stored in the payload of a regular heap
+ *  object, where even-numbered timestamps may be misinterpreted as pointers.
+ */
+enum ssm_kind {
+  SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
+  SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
+  SSM_CLOSURE_K, /**< Closure object, #ssm_closure1 */
+};
+
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
  *
  *  @param v  the 31-bit integral value.
@@ -679,6 +693,17 @@ ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag);
  */
 #define ssm_tag(v) (ssm_on_heap(v) ? (v).heap_ptr->tag : ssm_unmarshal(v))
 
+/** @brief Compute the size of a heap-allocated ADT.
+ *
+ *  @param val_count  the @a val_count field of the ADT object's #ssm_mm header.
+ *  @returns          the size of the ADT object in the heap.
+ */
+#define ssm_adt_size(val_count)                                                \
+  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((val_count)-1))
+
+/** @brief Compute the size of an ADT already allocated on the heap. */
+#define ssm_adt_heap_size(v) ssm_adt_size((v).heap_ptr->val_count)
+
 /** @} */
 
 /**
@@ -743,6 +768,9 @@ struct ssm_closure1 {
 /** @brief Obtain the number of argument values accommodated by a closure. */
 #define ssm_closure_arg_cap(v)                                                 \
   container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.tag
+
+/** @brief Compute the size of a closure already allocated on the heap. */
+#define ssm_closure_heap_size(v) ssm_closure_size(ssm_closure_arg_cap(v))
 
 /** @brief Add an argument to a closure.
  *
