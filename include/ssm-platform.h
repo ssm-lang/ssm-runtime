@@ -8,7 +8,10 @@
  * @{
  */
 
-/** @brief Platform-defined entry point. */
+/** @brief Platform-defined entry point.
+ *
+ *  @returns    0 on success, negative errno otherwise.
+ */
 int ssm_platform_entry(void);
 
 /** @brief Insert an input event into the input queue.
@@ -22,7 +25,7 @@ int ssm_platform_entry(void);
  *
  *  @param sv   the scheduled variable to be updated.
  *  @param val  the value @a sv should be updated with.
- *  @returns    0 on success, negative otherwise.
+ *  @returns    0 on success, negative errno otherwise.
  */
 int ssm_insert_input(ssm_sv_t *sv, ssm_value_t val);
 
