@@ -10,5 +10,4 @@ stored resources themselves, because the garbage collector will not scan the
 payload for other managed heap pointers.
 
 Since there is no meaningful interpretation to the @a tag field of the memory
-management header, blobs combines the latter two @a ssm_mm fields as a single
-16-bit size field; see #ssm_mm16.
+management header, blobs use the @a size field of its #ssm_mm header.

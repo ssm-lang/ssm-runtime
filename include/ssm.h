@@ -88,328 +88,6 @@ struct ssm_trigger;
 struct ssm_act;
 
 /**
- * @addtogroup mem
- * @{
- */
-
-/** @brief Values are 32-bits, the largest supported machine word size. */
-typedef uint32_t ssm_word_t;
-
-/** @brief SSM values are either "packed" values or heap-allocated. */
-typedef union {
-  struct ssm_mm *heap_ptr; /**< Pointer to a heap-allocated object. */
-  ssm_word_t packed_val;   /**< Packed value. */
-} ssm_value_t;
-
-/** @brief The metadata "header" accompanying any heap-allocated object.
- *
- *  This header should be embedded in heap-allocated objects as the first field
- *  (at memory offset 0).
- *
- *  The @a kind field is used to indicate what #ssm_kind an object is, and thus
- *  what its size and memory layout are.
- *
- *  @note The interpretation and usage of the @a ref_count and @a tag fields may
- *  depend on the value of @a kind. For instance, some object kinds don't use
- * one or both of those fields, while others may use them together as a single
- *  16-bit field (see #ssm_mm16).
- */
-struct ssm_mm {
-  uint8_t ref_count; /**< The number of references to this object. */
-  uint8_t kind;      /**< The #ssm_kind of object this is. */
-  uint8_t val_count; /**< Number of #ssm_value_t values in payload. */
-  uint8_t tag;       /**< Which variant is inhabited by this object. */
-};
-
-/** @brief An alternate layout of #ssm_mm combining the last two fields.
- *
- *  Some object kinds do not have any use for #ssm_mm's @a tag field, but
- *  benefit from being able to represent a greater number of fields.
- *  To support these object kinds, we use this alternate layout where the
- *  @a val_count and @a tag fields are combined into a single 16-bit @a size
- *  field.
- *
- *  @note The interpretation of the 16-bit @a size field depends on the object
- *  kind. For example, @a size may represent the number of bytes of one kind, or
- *  the nubmer of values for another.
- */
-union ssm_mm16 {
-  struct ssm_mm mm; /**< Aliased memory management header. */
-  struct {
-    uint8_t ref_count; /**< The number of references to this object. */
-    uint8_t kind;      /**< The #ssm_kind of object this is. */
-    uint16_t size;     /**< 16-bit size of this object. */
-  } mm16;
-};
-
-/** @brief Cast an #ssm_mm into a
-#define ssm_mm16_of(mmp) (&(container_of((mmp), union ssm_mm16, mm).mm16))
-
-/** @brief The different kinds of heap objects, enumerated.
- *
- *  Types enumerated here that are not ADTs are chosen because they cannot be
- *  easily or efficiently expressed as a product of words. For instance, 64-bit
- *  timestamps cannot be directly stored in the payload of a regular heap
- *  object, where even-numbered timestamps may be misinterpreted as pointers.
- */
-enum ssm_kind {
-  SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
-  SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K, /**< Closure object, e.g., #ssm_closure1 */
-  SSM_ARRAY_K,   /**< Array of values, e.g., #ssm_array1 */
-  SSM_BLOB_K,    /**< Blob of arbitrary data, e.g., #ssm_blob4 */
-};
-
-/** @brief Construct an #ssm_value_t from a 31-bit integral value.
- *
- *  @param v  the 31-bit integral value.
- *  @return   a packed #ssm_value_t.
- */
-#define ssm_marshal(v)                                                         \
-  (ssm_value_t) { .packed_val = ((v) << 1 | 1) }
-
-/** @brief Extract an integral value from a packed #ssm_value_t.
- *
- *  @param v  the packed #ssm_value_t.
- *  @return   the raw 31-bit integral value.
- */
-#define ssm_unmarshal(v) ((v).packed_val >> 1)
-
-/** @brief Whether a value is on the heap (i.e., is an object).
- *
- *  @param v  pointer to the #ssm_value_t.
- *  @returns  non-zero if on heap, zero otherwise.
- */
-#define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
-
-/** @brief Whether a value is shared, i.e., unsafe to modify.
- *
- *  The opposite of "shared" is "unique," as in C++'s "unique_ptr."
- *
- *  @param v  pointer to the #ssm_value_t.
- *  @returns  non-zero if shared, zero otherwise.
- */
-#define ssm_is_shared(v) !(ssm_on_heap(v) && ((v).heap_ptr->ref_count == 1))
-
-/** @brief Duplicate a possible heap reference, incrementing its ref count.
- *
- *  If the caller knows @a v is definitely on the heap, call ssm_drop_unsafe()
- *  to eliminate the heap check (and omit call if it is definitely not on the
- *  heap).
- *
- *  @param v  pointer to the #ssm_mm header of the heap item.
- */
-#define ssm_dup(v) (ssm_on_heap(v) ? ssm_dup_unsafe(v) : (v))
-
-/** @brief Drop a reference to a possible heap item, and free it if necessary.
- *
- *  If @a v is freed, all references held by the heap item itself will also be
- *  be dropped.
- *
- *  If the caller knows that @a v is definitely a heap item, call
- *  ssm_drop_unsafe() to eliminate the heap check (and omit call if it is
- *  definitely not on the heap).
- *
- *  @param v  #ssm_value_t to be dropped.
- */
-#define ssm_drop(v)                                                            \
-  do                                                                           \
-    if (ssm_on_heap(v))                                                        \
-      ssm_drop_unsafe(v);                                                      \
-  while (0)
-
-/** @brief Duplicate a heap reference, incrementing its ref count.
- *
- *  Called by ssm_dup().
- *
- *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
- *
- *  @param v  pointer to the #ssm_mm header of the heap item.
- */
-#define ssm_dup_unsafe(v) ((++(v).heap_ptr->ref_count, (v)))
-
-/** @brief Drop a reference to a heap item, and free it if necessary.
- *
- *  If @a v is freed, ssm_drop_final() will be called to drop all heap objects
- *  @a v refers to.
- *
- *  Called by ssm_drop().
- *
- *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
- *
- *  @param v  #ssm_value_t to be dropped.
- *  @returns  0 on success.
- */
-#define ssm_drop_unsafe(v)                                                     \
-  do                                                                           \
-    if (--(v).heap_ptr->ref_count == 0)                                        \
-      ssm_drop_final(v);                                                       \
-  while (0)
-
-/** @brief Finalize and free a heap object.
- *
- *  Drops all heap objects @a v refers to, and perform any additional
- *  finalization as required by the #ssm_kind of @a v.
- *
- *  Called by ssm_drop_unsafe().
- *
- *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
- *
- *  @param v  #ssm_value_t to be finalized and freed.
- */
-void ssm_drop_final(ssm_value_t v);
-
-/** @brief Call ssm_dup() on an array of values. */
-void ssm_dups(size_t cnt, ssm_value_t *arr);
-
-/** @brief Call ssm_drop() on an array of values. */
-void ssm_drops(size_t cnt, ssm_value_t *arr);
-
-/** @} */
-
-/**
- * @addtogroup blob
- * @{
- */
-
-/** @brief The struct template of a heap-allocated blob.
- *
- *  Blobs are just arbitrary chunks of memory in the heap where any kind of data
- *  can be stored, with any layout. Since the memory manager will not scan blobs
- *  for pointers, any resources maintained within blobs must be managed via
- *  other means.
- *
- *  Though this struct's @a payload is only declared with 4 bytes, actual
- *  heap-allocated blobs may have large payloads. (We construct this template
- *  with 4 bytes rather than 1 byte to avoid padding irregularities.) For
- *  instance, a 48-byte blob might look like:
- *
- *  ~~~{.c}
- *  struct ssm_blob48 {
- *    struct ssm_mm mm;
- *    char payload[48];
- *  };
- *  ~~~
- *
- *  The memory layout of all blobs is the same save for the size of the
- *  @a payload, so we use this struct definition as the "base case" of blobs.
- */
-struct ssm_blob4 {
-  union ssm_blob_header {
-    struct ssm_mm mm; /**< Aliased memory management header. */
-    struct {
-      uint8_t ref_count; /**< #ssm_mm field. */
-      uint8_t kind;      /**< #ssm_mm field. */
-      uint16_t size;     /**< 16-bit field size. */
-    } mm16; /**< Aliased memory management header containing size. */
-  } header;
-  char payload[4]; /**< Payload of heap-allocated blob. */
-};
-
-/** @brief Obtain pointer to #ssm_blob4 pointed by some #ssm_value_t.
- *
- *  @param v  #ssm_value_t pointing to some #ssm_blob4
- *  @returns  pointer to #ssm_blob4
- */
-#define ssm_blob_container_of(v)                                               \
-  (container_of(container_of((v).heap_ptr, union ssm_blob_header, mm),         \
-                struct ssm_blob4, header))
-
-/** @brief Compute the size of a blob with its header.
- *
- *  @param size   size of the blob's payload.
- *  @returns      size that a blob of @a size payload may occupy in the heap.
- */
-#define ssm_blob_size(size) (sizeof(struct ssm_blob4) + (size)-4)
-
-/** @brief Compute the size a blob in the heap.
- *
- *  @param v  #ssm_value_t pointing to some blob in the heap.
- *  @returns  size of the blob that @a v points to.
- */
-#define ssm_blob_heap_size(v)                                                  \
-  ssm_blob_size(ssm_blob_container_of(v)->header.mm16.size)
-
-/** @brief Obtain pointer to the payload of a blob from an #ssm_value_t. */
-#define ssm_blob_payload(v) ((char *)ssm_blob_container_of(v)->payload)
-
-/** @brief Allocate a blob on the heap.
- *
- *  @param size   size of the payload to the allocated (not including payload).
- *  @returns      #ssm_value_t pointing to heap-allocated blob.
- */
-ssm_value_t ssm_new_blob(uint16_t size);
-
-/** @} */
-
-/**
- * @addtogroup time
- * @{
- */
-
-/** @brief Absolute time; never to overflow. */
-typedef uint64_t ssm_time_t;
-
-/** @brief Heap-allocated time values.
- *
- *  These should never be declared on their own, and should only be allocated on
- *  the heap using ssm_new_time().
- *
- *  @invariant for all `struct ssm_time t`, `t.mm.kind == SSM_TIME_K`.
- */
-struct ssm_time {
-  struct ssm_mm mm; /**< Embedded memory management header. */
-  ssm_time_t time;  /**< Time value payload. */
-};
-
-/** @brief Time indicating something will never happen.
- *
- *  The value of this must be derived from the underlying type of #ssm_time_t.
- */
-#define SSM_NEVER UINT64_MAX
-
-/** Ticks per nanosecond */
-#define SSM_NANOSECOND 1L
-/** Ticks per microsecond */
-#define SSM_MICROSECOND (SSM_NANOSECOND * 1000L)
-/** Ticks per millisecond */
-#define SSM_MILLISECOND (SSM_MICROSECOND * 1000L)
-/** Ticks per second */
-#define SSM_SECOND (SSM_MILLISECOND * 1000L)
-/** Ticks per minute */
-#define SSM_MINUTE (SSM_SECOND * 60L)
-/** Ticks per hour */
-#define SSM_HOUR (SSM_MINUTE * 60L)
-
-/** @brief The current model time.
- *
- *  @returns the current model time.
- */
-ssm_time_t ssm_now(void);
-
-/** @brief Allocate a #ssm_time on the heap.
- *
- *  @param time what the heap-allocated @a time field is initialized to.
- *  @returns    #ssm_value_t pointing to the heap-allocated #ssm_time.
- */
-ssm_value_t ssm_new_time(ssm_time_t time);
-
-/** @brief Read the heap-allocated time pointed to by an #ssm_value_t.
- *
- *  @note The behavior of using this macro on an #ssm_value_t that does not
- *        point to an #ssm_time is undefined.
- *  @note The behavior of using the result of this macro as an l-value is
- *        undefined.
- *
- *  @param v  the #ssm_value_t
- *  @returns  the #ssm_time_t in the heap.
- */
-#define ssm_time_read(v) (container_of((v).heap_ptr, struct ssm_time, mm)->time)
-
-/** @} */
-
-/**
  * @addtogroup act
  * @{
  */
@@ -526,6 +204,331 @@ void ssm_activate(ssm_act_t *act);
  *  ~~~
  */
 extern ssm_act_t ssm_top_parent;
+
+/** @} */
+
+/**
+ * @addtogroup mem
+ * @{
+ */
+
+/** @brief Values are 32-bits, the largest supported machine word size. */
+typedef uint32_t ssm_word_t;
+
+/** @brief SSM values are either "packed" values or heap-allocated. */
+typedef union {
+  struct ssm_mm *heap_ptr; /**< Pointer to a heap-allocated object. */
+  ssm_word_t packed_val;   /**< Packed value. */
+} ssm_value_t;
+
+/** @brief The memory management metadata "header" for heap-allocated objects.
+ *
+ *  This header should always be embedded in heap-allocated objects as the first
+ *  field (at memory offset 0); values of type #ssm_value_t will point to this
+ *  header and use its @a kind and other fields to figure out the size and
+ *  memory layout of the rest of the object.
+ *
+ *  The interpretation and usage of the latter 16 bits of this header, i.e., the
+ *  @a info field, depends on the value of @a kind. For objects encoding
+ *  variants (e.g., #ssm_adt1), the @a count field counts the number of fields
+ *  in the object payload, while the @a tag records which variant is inhabited
+ *  by the object. Meanwhile, vector-style objects (e.g., #ssm_closure1) also
+ *  use the @a count field to record the number of values present, but use the
+ *  @a cap field to determine the full capacity of the payload. Finally, objects
+ *  like arrays and blobs do not need to record more than their size, and
+ *  benefit from making use of all 16 bits to support up to 65536 sizes.
+ */
+struct ssm_mm {
+  uint8_t ref_count; /**< The number of references to this object. */
+  uint8_t kind;      /**< The #ssm_kind of object this is. */
+  union {
+    struct {
+      uint8_t count; /**< Number of #ssm_value_t values in payload. */
+      uint8_t tag;   /**< Which variant is inhabited by this object. */
+    } variant;
+    struct {
+      uint8_t count; /**< Number of #ssm_value_t values in payload. */
+      uint8_t cap;   /**< Which variant is inhabited by this object. */
+    } vector;
+    uint16_t size; /**< 16-bit size */
+  } info; /**< Three "flavors" of information embedded in the header. */
+};
+
+/** @brief The different kinds of heap objects, enumerated.
+ *
+ *  Types enumerated here that are not ADTs are chosen because they cannot be
+ *  easily or efficiently expressed as a product of words. For instance, 64-bit
+ *  timestamps cannot be directly stored in the payload of a regular heap
+ *  object, where even-numbered timestamps may be misinterpreted as pointers.
+ */
+enum ssm_kind {
+  SSM_TIME_K = 0, /**< 64-bit timestamps, #ssm_time_t */
+  SSM_ADT_K,      /**< ADT object, e.g., #ssm_adt1 */
+  SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
+  SSM_CLOSURE_K,  /**< Closure object, e.g., #ssm_closure1 */
+  SSM_ARRAY_K,    /**< Array of values, e.g., #ssm_array1 */
+  SSM_BLOB_K,     /**< Blob of arbitrary data, e.g., #ssm_blob4 */
+};
+
+/** @brief Construct an #ssm_value_t from a 31-bit integral value.
+ *
+ *  @param v  the 31-bit integral value.
+ *  @return   a packed #ssm_value_t.
+ */
+#define ssm_marshal(v)                                                         \
+  (ssm_value_t) { .packed_val = ((v) << 1 | 1) }
+
+/** @brief Extract an integral value from a packed #ssm_value_t.
+ *
+ *  @param v  the packed #ssm_value_t.
+ *  @return   the raw 31-bit integral value.
+ */
+#define ssm_unmarshal(v) ((v).packed_val >> 1)
+
+/** @brief Whether a value is on the heap (i.e., is an object).
+ *
+ *  @param v  pointer to the #ssm_value_t.
+ *  @returns  non-zero if on heap, zero otherwise.
+ */
+#define ssm_on_heap(v) (((v).packed_val & 0x1) == 0)
+
+/** @brief Whether a value is shared, i.e., unsafe to modify.
+ *
+ *  The opposite of "shared" is "unique," as in C++'s "unique_ptr."
+ *
+ *  @param v  pointer to the #ssm_value_t.
+ *  @returns  non-zero if shared, zero otherwise.
+ */
+#define ssm_is_shared(v) !(ssm_on_heap(v) && ((v).heap_ptr->ref_count == 1))
+
+/** @brief Duplicate a possible heap reference, incrementing its ref count.
+ *
+ *  If the caller knows @a v is definitely on the heap, call ssm_drop_unsafe()
+ *  to eliminate the heap check (and omit call if it is definitely not on the
+ *  heap).
+ *
+ *  @param v  pointer to the #ssm_mm header of the heap item.
+ */
+#define ssm_dup(v) (ssm_on_heap(v) ? ssm_dup_unsafe(v) : (v))
+
+/** @brief Drop a reference to a possible heap item, and free it if necessary.
+ *
+ *  If @a v is freed, all references held by the heap item itself will also be
+ *  be dropped.
+ *
+ *  If the caller knows that @a v is definitely a heap item, call
+ *  ssm_drop_unsafe() to eliminate the heap check (and omit call if it is
+ *  definitely not on the heap).
+ *
+ *  @param v  #ssm_value_t to be dropped.
+ */
+#define ssm_drop(v)                                                            \
+  do                                                                           \
+    if (ssm_on_heap(v))                                                        \
+      ssm_drop_unsafe(v);                                                      \
+  while (0)
+
+/** @brief Duplicate a heap reference, incrementing its ref count.
+ *
+ *  Called by ssm_dup().
+ *
+ *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
+ *
+ *  @param v  pointer to the #ssm_mm header of the heap item.
+ */
+#define ssm_dup_unsafe(v) ((++(v).heap_ptr->ref_count, (v)))
+
+/** @brief Drop a reference to a heap item, and free it if necessary.
+ *
+ *  If @a v is freed, ssm_drop_final() will be called to drop all heap objects
+ *  @a v refers to.
+ *
+ *  Called by ssm_drop().
+ *
+ *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
+ *
+ *  @param v  #ssm_value_t to be dropped.
+ *  @returns  0 on success.
+ */
+#define ssm_drop_unsafe(v)                                                     \
+  do                                                                           \
+    if (--(v).heap_ptr->ref_count == 0)                                        \
+      ssm_drop_final(v);                                                       \
+  while (0)
+
+/** @brief Finalize and free a heap object.
+ *
+ *  Drops all heap objects @a v refers to, and perform any additional
+ *  finalization as required by the #ssm_kind of @a v.
+ *
+ *  Called by ssm_drop_unsafe().
+ *
+ *  @note assumes that @a v is a heap pointer, i.e., `ssm_on_heap(v)`.
+ *
+ *  @param v  #ssm_value_t to be finalized and freed.
+ */
+void ssm_drop_final(ssm_value_t v);
+
+/** @brief Call ssm_dup() on an array of values. */
+void ssm_dups(size_t cnt, ssm_value_t *arr);
+
+/** @brief Call ssm_drop() on an array of values. */
+void ssm_drops(size_t cnt, ssm_value_t *arr);
+
+/** @} */
+
+/**
+ * @addtogroup time
+ * @{
+ */
+
+/** @brief Absolute time; never to overflow. */
+typedef uint64_t ssm_time_t;
+
+/** @brief Heap-allocated time values.
+ *
+ *  These should never be declared on their own, and should only be allocated on
+ *  the heap using ssm_new_time().
+ *
+ *  @invariant for all `struct ssm_time t`, `t.mm.kind == SSM_TIME_K`.
+ */
+struct ssm_time {
+  struct ssm_mm mm; /**< Embedded memory management header. */
+  ssm_time_t time;  /**< Time value payload. */
+};
+
+/** @brief Time indicating something will never happen.
+ *
+ *  The value of this must be derived from the underlying type of #ssm_time_t.
+ */
+#define SSM_NEVER UINT64_MAX
+
+/** Ticks per nanosecond */
+#define SSM_NANOSECOND 1L
+/** Ticks per microsecond */
+#define SSM_MICROSECOND (SSM_NANOSECOND * 1000L)
+/** Ticks per millisecond */
+#define SSM_MILLISECOND (SSM_MICROSECOND * 1000L)
+/** Ticks per second */
+#define SSM_SECOND (SSM_MILLISECOND * 1000L)
+/** Ticks per minute */
+#define SSM_MINUTE (SSM_SECOND * 60L)
+/** Ticks per hour */
+#define SSM_HOUR (SSM_MINUTE * 60L)
+
+/** @brief The current model time.
+ *
+ *  @returns the current model time.
+ */
+ssm_time_t ssm_now(void);
+
+/** @brief Allocate a #ssm_time on the heap.
+ *
+ *  @param time what the heap-allocated @a time field is initialized to.
+ *  @returns    #ssm_value_t pointing to the heap-allocated #ssm_time.
+ */
+ssm_value_t ssm_new_time(ssm_time_t time);
+
+/** @brief Read the heap-allocated time pointed to by an #ssm_value_t.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *        point to an #ssm_time is undefined.
+ *  @note The behavior of using the result of this macro as an l-value is
+ *        undefined.
+ *
+ *  @param v  the #ssm_value_t
+ *  @returns  the #ssm_time_t in the heap.
+ */
+#define ssm_time_read(v) (container_of((v).heap_ptr, struct ssm_time, mm)->time)
+
+/** @} */
+
+/**
+ * @addtogroup adt
+ * @{
+ */
+
+/** @brief The struct template of a heap-allocated ADT object.
+ *
+ *  This ADT struct is meant to be used as a template for performing other
+ *  ADT-related pointer arithmetic; no instance of this should ever be declared.
+ *
+ *  Though this struct's @a fields is only declared with 1 #ssm_value_t, actual
+ *  heap-allocated ADT objects may have more fields. For instance, an object
+ *  with 3 fields might look like:
+ *
+ *  ~~~{.c}
+ *  struct ssm_adt3 {
+ *    struct ssm_mm mm;
+ *    ssm_value_t fields[3];
+ *  };
+ *  ~~~
+ *
+ *  Note that the memory layout of all ADTs is the same save for the length of
+ *  the @a fields, so we use this struct definition as the "base case" of ADT
+ *  object lengths.
+ */
+struct ssm_adt1 {
+  struct ssm_mm mm;      /**< Variant-flavored memory management header. */
+  ssm_value_t fields[1]; /**< Array of ADT object fields. */
+};
+
+/** @brief Allocate a new ADT object on the heap.
+ *
+ *  @note This function fully initializes the #ssm_mm header of the ADT object,
+ *        but leaves its fields uninitialized. It is the responsibility of the
+ *        caller to properly <em>all</em> @a val_count fields.
+ *
+ *  @param field_count  the number of fields in the ADT object.
+ *  @param tag          the tag of the ADT object, stored in the #ssm_mm header.
+ *  @returns            #ssm_value_t poining to the ADT object on the heap.
+ */
+ssm_value_t ssm_new_adt(uint8_t field_count, uint8_t tag);
+
+/** @brief Access the field of an ADT object.
+ *
+ *  The result of this macro can also be used as an l-value, i.e., it may be
+ *  assigned to, e.g.,:
+ *
+ *  ~~~{.c}
+ *  ssm_adt_field(v, 0) = ssm_marshal(1);
+ *  ~~~
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that does not
+ *        point to an ADT object of sufficient size (@a val_count greater than
+ *        @a i) is undefined.
+ *
+ *  @param v  the #ssm_value_t pointing to a heap-allocated ADT object.
+ *  @param i  the 0-base index of the field in @a v to be accessed.
+ *  @returns  the @a i'th field of @a v.
+ */
+#define ssm_adt_field(v, i)                                                    \
+  (&*container_of((v).heap_ptr, struct ssm_adt1, mm)->fields)[i]
+
+/** @brief Retrieve the tag of an ADT object.
+ *
+ *  @note The behavior of using this macro on an #ssm_value_t that points to
+ *        anything other than an ADT object is undefined.
+ *
+ *  @param v  the #ssm_value_t whose tag is being retrieved.
+ *  @returns  the tag of @a v.
+ */
+#define ssm_tag(v)                                                             \
+  (ssm_on_heap(v) ? (v).heap_ptr->info.variant.tag : ssm_unmarshal(v))
+
+/** @brief Obtain number of fields in the ADT pointed by @a v. */
+#define ssm_adt_field_count(v) ((v).heap_ptr->info.variant.count)
+
+/** @brief Compute the size of a heap-allocated ADT.
+ *
+ *  @param val_count  the @a val_count field of the ADT object's #ssm_mm header.
+ *  @returns          the size of the ADT object in the heap.
+ */
+#define ssm_adt_size(val_count)                                                \
+  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((val_count)-1))
+
+/** @brief Compute the size of an ADT already allocated on the heap. */
+#define ssm_adt_heap_size(v) ssm_adt_size(ssm_adt_field_count(v))
 
 /** @} */
 
@@ -723,91 +726,6 @@ void ssm_sv_desensitize(ssm_trigger_t *trig);
 /** @} */
 
 /**
- * @addtogroup adt
- * @{
- */
-
-/** @brief The struct template of a heap-allocated ADT object.
- *
- *  This ADT struct is meant to be used as a template for performing other
- *  ADT-related pointer arithmetic; no instance of this should ever be declared.
- *
- *  Though this struct's @a fields is only declared with 1 #ssm_value_t, actual
- *  heap-allocated ADT objects may have more fields. For instance, an object
- *  with 3 fields might look like:
- *
- *  ~~~{.c}
- *  struct ssm_adt3 {
- *    struct ssm_mm mm;
- *    ssm_value_t fields[3];
- *  };
- *  ~~~
- *
- *  Note that the memory layout of all ADTs is the same save for the length of
- *  the @a fields, so we use this struct definition as the "base case" of ADT
- *  object lengths.
- */
-struct ssm_adt1 {
-  struct ssm_mm mm;
-  ssm_value_t fields[1];
-};
-
-/** @brief Allocate a new ADT object on the heap.
- *
- *  @note This function fully initializes the #ssm_mm header of the ADT object,
- *        but leaves its fields uninitialized. It is the responsibility of the
- *        caller to properly <em>all</em> @a val_count fields.
- *
- *  @param val_count  the number of fields in the ADT object.
- *  @param tag        the tag of the ADT object, stored in the #ssm_mm header.
- *  @returns          #ssm_value_t poining to the ADT object on the heap.
- */
-ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag);
-
-/** @brief Access the field of an ADT object.
- *
- *  The result of this macro can also be used as an l-value, i.e., it may be
- *  assigned to, e.g.,:
- *
- *  ~~~{.c}
- *  ssm_adt_field(v, 0) = ssm_marshal(1);
- *  ~~~
- *
- *  @note The behavior of using this macro on an #ssm_value_t that does not
- *        point to an ADT object of sufficient size (@a val_count greater than
- *        @a i) is undefined.
- *
- *  @param v  the #ssm_value_t pointing to a heap-allocated ADT object.
- *  @param i  the 0-base index of the field in @a v to be accessed.
- *  @returns  the @a i'th field of @a v.
- */
-#define ssm_adt_field(v, i)                                                    \
-  (&*container_of((v).heap_ptr, struct ssm_adt1, mm)->fields)[i]
-
-/** @brief Retrieve the tag of an ADT object.
- *
- *  @note The behavior of using this macro on an #ssm_value_t that points to
- *        anything other than an ADT object is undefined.
- *
- *  @param v  the #ssm_value_t whose tag is being retrieved.
- *  @returns  the tag of @a v.
- */
-#define ssm_tag(v) (ssm_on_heap(v) ? (v).heap_ptr->tag : ssm_unmarshal(v))
-
-/** @brief Compute the size of a heap-allocated ADT.
- *
- *  @param val_count  the @a val_count field of the ADT object's #ssm_mm header.
- *  @returns          the size of the ADT object in the heap.
- */
-#define ssm_adt_size(val_count)                                                \
-  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((val_count)-1))
-
-/** @brief Compute the size of an ADT already allocated on the heap. */
-#define ssm_adt_heap_size(v) ssm_adt_size((v).heap_ptr->val_count)
-
-/** @} */
-
-/**
  * @addtogroup closure
  * @{
  */
@@ -851,13 +769,17 @@ struct ssm_closure1 {
   ssm_value_t argv[1]; /**< An array of arguments. */
 };
 
-/** @brief Compute the size of a closure object.
- *
- *  @param val_count  the @a val_count field of the closure's #ssm_mm header.
- *  @returns          the size of the closure object.
- */
-#define ssm_closure_size(val_count)                                            \
-  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((val_count)-1)))
+/** @brief Obtain the number of argument values owned by a closure. */
+#define ssm_closure_arg_count(v)                                               \
+  (container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.info.vector.count)
+
+/** @brief Obtain the number of argument values accommodated by a closure. */
+#define ssm_closure_arg_cap(v)                                                 \
+  (container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.info.vector.cap)
+
+/** @brief Obtain the enter function pointer of a closure. */
+#define ssm_closure_func(v)                                                    \
+  (container_of((v).heap_ptr, struct ssm_closure1, mm)->f)
 
 /** @brief Retrieve the argument array of a closure. */
 #define ssm_closure_argv(v)                                                    \
@@ -866,17 +788,13 @@ struct ssm_closure1 {
 /** @brief Obtain the ith argument of a closure. */
 #define ssm_closure_arg(v, i) ssm_closure_argv(v)[i]
 
-/** @brief Obtain the enter function pointer of a closure. */
-#define ssm_closure_func(v)                                                    \
-  container_of((v).heap_ptr, struct ssm_closure1, mm)->f
-
-/** @brief Obtain the number of argument values owned by a closure. */
-#define ssm_closure_arg_count(v)                                               \
-  container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.val_count
-
-/** @brief Obtain the number of argument values accommodated by a closure. */
-#define ssm_closure_arg_cap(v)                                                 \
-  container_of((v).heap_ptr, struct ssm_closure1, mm)->mm.tag
+/** @brief Compute the size of a closure object.
+ *
+ *  @param val_count  the @a val_count field of the closure's #ssm_mm header.
+ *  @returns          the size of the closure object.
+ */
+#define ssm_closure_size(val_count)                                            \
+  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((val_count)-1)))
 
 /** @brief Compute the size of a closure already allocated on the heap. */
 #define ssm_closure_heap_size(v) ssm_closure_size(ssm_closure_arg_cap(v))
@@ -1032,6 +950,115 @@ void ssm_closure_apply_final(ssm_value_t closure, ssm_value_t arg,
 #define ssm_closure_free(closure)                                              \
   ssm_mem_free((closure).heap_ptr,                                             \
                ssm_closure_size(ssm_closure_arg_cap(closure)))
+
+/** @} */
+
+/**
+ * @addtogroup array
+ * @{
+ */
+
+/** @brief The struct template of a heap-allocated array of values.
+ *
+ */
+struct ssm_array1 {
+  struct ssm_mm mm;        /**< Size-flavored memory management header. */
+  ssm_value_t elements[1]; /**< Elements of the heap-allocated array. */
+};
+
+/** @brief The length of an array pointed by @a v. */
+#define ssm_array_len(v) ((v).heap_ptr->info.size)
+
+/** @brief Obtain pointer to the array elements payload pointed to by @ a v. */
+#define ssm_array_elements(v)                                                  \
+  (&*(container_of((v).heap_ptr, struct ssm_array1, mm)->elements))
+
+/** @brief Obtain pointer to the ith element of the array pointed by @a v. */
+#define ssm_array_element(v, i) (ssm_array_elements(v)[i])
+
+/** @brief Compute the size of an array with its header.
+ *
+ *  @param count  the number of array elements, i.e., the @a size field.
+ *  @returns      size that a array of @a count elemtns occupies in the heap.
+ */
+#define ssm_array_size(count)                                                  \
+  (sizeof(struct ssm_array1) + sizeof(ssm_value_t) * ((count)-1))
+
+/** @brief Compute the size an array in the heap from an #ssm_value_t.
+ *
+ *  @param v  #ssm_value_t pointing to some blob in the heap.
+ *  @returns  size of the array that @a v points to.
+ */
+#define ssm_array_heap_size(v) ssm_array_size(ssm_array_len(v))
+
+/** @brief Allocate an array on the heap.
+ *
+ *  Note that this function returns an array with all elements uninitialized,
+ *  which must be initialized before ssm_drop() can be called on the array.
+ *
+ *  @param count  number of #ssm_value_t elements to be stored in the array.
+ *  @returns      #ssm_value_t pointing to heap-allocated array.
+ */
+ssm_value_t ssm_new_array(uint16_t count);
+
+/** @} */
+
+/**
+ * @addtogroup blob
+ * @{
+ */
+
+/** @brief The struct template of a heap-allocated blob.
+ *
+ *  Blobs are just arbitrary chunks of memory in the heap where any kind of
+ * data can be stored, with any layout. Since the memory manager will not scan
+ * blobs for pointers, any resources maintained within blobs must be managed
+ * via other means.
+ *
+ *  Though this struct's @a payload is only declared with 4 bytes, actual
+ *  heap-allocated blobs may have large payloads. (We construct this template
+ *  with 4 bytes rather than 1 byte to avoid padding irregularities.) For
+ *  instance, a 48-byte blob might look like:
+ *
+ *  ~~~{.c}
+ *  struct ssm_blob48 {
+ *    struct ssm_mm mm;
+ *    char payload[48];
+ *  };
+ *  ~~~
+ *
+ *  The memory layout of all blobs is the same save for the size of the
+ *  @a payload, so we use this struct definition as the "base case" of blobs.
+ */
+struct ssm_blob4 {
+  struct ssm_mm mm; /**< Size-flavored memory management header. */
+  char payload[4];  /**< Payload of heap-allocated blob. */
+};
+
+/** @brief Compute the size of a blob with its header.
+ *
+ *  @param size   size of the blob's payload.
+ *  @returns      size that a blob of @a size payload occupies in the heap.
+ */
+#define ssm_blob_size(size) (sizeof(struct ssm_blob4) + (size)-4)
+
+/** @brief Compute the size a blob in the heap.
+ *
+ *  @param v  #ssm_value_t pointing to some blob in the heap.
+ *  @returns  size of the blob that @a v points to.
+ */
+#define ssm_blob_heap_size(v) ssm_blob_size((v).heap_ptr->info.size)
+
+/** @brief Obtain pointer to the payload of a blob from an #ssm_value_t. */
+#define ssm_blob_payload(v)                                                    \
+  (&*(container_of((v).heap_ptr, struct ssm_blob4, mm)->payload))
+
+/** @brief Allocate a blob on the heap.
+ *
+ *  @param size   size of the payload to the allocated.
+ *  @returns      #ssm_value_t pointing to heap-allocated blob.
+ */
+ssm_value_t ssm_new_blob(uint16_t size);
 
 /** @} */
 

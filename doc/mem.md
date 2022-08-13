@@ -32,11 +32,7 @@ This information is used by ssm_drop_final() to figure out which values (if
 any) to ssm_drop().
 
 Heap objects are allocated for each #ssm_kind using functions with prefix @a
-ssm_new_:
-
-- ssm_new_adt()
-- ssm_new_time()
-- ssm_new_sv()
+ssm_new_, such as ssm_new_adt() or ssm_new_time().
 
 The SSM runtime comes with its own platform-agnostic allocator, parameterized
 by handlers set using ssm_mem_init().

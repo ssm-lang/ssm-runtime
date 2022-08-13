@@ -215,6 +215,15 @@ ssm_value_t ssm_new_time(ssm_time_t time) {
   return (ssm_value_t){.heap_ptr = &t->mm};
 }
 
+ssm_value_t ssm_new_adt(uint8_t field_count, uint8_t tag) {
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_adt_size(field_count));
+  mm->ref_count = 1;
+  mm->kind = SSM_ADT_K;
+  mm->info.variant.count = field_count;
+  mm->info.variant.tag = tag;
+  return (ssm_value_t){.heap_ptr = mm};
+}
+
 ssm_value_t ssm_new_sv(ssm_value_t val) {
   struct ssm_sv *sv = ssm_mem_alloc(sizeof(struct ssm_sv));
   sv->mm.ref_count = 1;
@@ -226,42 +235,43 @@ ssm_value_t ssm_new_sv(ssm_value_t val) {
   return (ssm_value_t){.heap_ptr = &sv->mm};
 }
 
-ssm_value_t ssm_new_adt(uint8_t val_count, uint8_t tag) {
-  struct ssm_mm *mm = ssm_mem_alloc(ssm_adt_size(val_count));
-  mm->ref_count = 1;
-  mm->kind = SSM_ADT_K;
-  mm->val_count = val_count;
-  mm->tag = tag;
-  return (ssm_value_t){.heap_ptr = mm};
+ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap) {
+  struct ssm_closure1 *closure = container_of(
+      ssm_mem_alloc(ssm_closure_size(arg_cap)), struct ssm_closure1, mm);
+  closure->mm.ref_count = 1;
+  closure->mm.kind = SSM_CLOSURE_K;
+  closure->mm.info.vector.count = 0;
+  closure->mm.info.vector.cap = arg_cap;
+  closure->f = f;
+  return (ssm_value_t){.heap_ptr = &closure->mm};
 }
 
-ssm_value_t ssm_new_adt(uint16_t elems) {
-  struct ssm_mm *mm = ssm_mem_alloc(ssm_adt_size(val_count));
+ssm_value_t ssm_new_array(uint16_t elems) {
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_array_size(elems));
   mm->ref_count = 1;
-  mm->kind = SSM_ADT_K;
-  mm->val_count = val_count;
-  mm->tag = tag;
+  mm->kind = SSM_ARRAY_K;
+  mm->info.size = elems;
   return (ssm_value_t){.heap_ptr = mm};
 }
 
 ssm_value_t ssm_new_blob(uint16_t size) {
-  struct ssm_blob4 *b = ssm_mem_alloc(ssm_blob_size(size));
-  b->header.mm.ref_count = 1;
-  b->header.mm.kind = SSM_BLOB_K;
-  b->header.mm16.size = size;
-  return (ssm_value_t){.heap_ptr = &b->header.mm};
+  struct ssm_mm *mm = ssm_mem_alloc(ssm_blob_size(size));
+  mm->ref_count = 1;
+  mm->kind = SSM_BLOB_K;
+  mm->info.size = size;
+  return (ssm_value_t){.heap_ptr = mm};
 }
 
 void ssm_drop_final(ssm_value_t v) {
   size_t size = 0;
   switch (v.heap_ptr->kind) {
-  case SSM_ADT_K:
-    size = ssm_adt_heap_size(v);
-    for (size_t i = 0; i < v.heap_ptr->val_count; i++)
-      ssm_drop(ssm_adt_field(v, i));
-    break;
   case SSM_TIME_K:
     size = sizeof(struct ssm_time);
+    break;
+  case SSM_ADT_K:
+    size = ssm_adt_heap_size(v);
+    for (size_t i = 0; i < ssm_adt_field_count(v); i++)
+      ssm_drop(ssm_adt_field(v, i));
     break;
   case SSM_SV_K:
     size = sizeof(struct ssm_sv);
@@ -275,11 +285,16 @@ void ssm_drop_final(ssm_value_t v) {
     for (size_t i = 0; i < ssm_closure_arg_count(v); i++)
       ssm_drop(ssm_closure_arg(v, i));
     break;
+  case SSM_ARRAY_K:
+    size = ssm_array_heap_size(v);
+    for (size_t i = 0; i < ssm_array_len(v); i++)
+      ssm_drop(ssm_array_element(v, i));
+    break;
   case SSM_BLOB_K:
     size = ssm_blob_heap_size(v);
     break;
   default:
-    SSM_THROW(SSM_INTERNAL_ERROR); // Unknown memory type
+    SSM_THROW(SSM_INTERNAL_ERROR); // Unknown object kind
     break;
   }
   ssm_mem_free(v.heap_ptr, size);
