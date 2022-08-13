@@ -11,6 +11,7 @@
 #define _SSM_SCHED_H
 
 #include <ssm.h>
+#include <ssm-platform.h>
 
 /** @ingroup error
  *  @brief Throw an internal error.
@@ -35,6 +36,15 @@
  *  @returns the next event time, or #SSM_NEVER if the event queue is empty.
  */
 ssm_time_t ssm_next_event_time(void);
+
+/** @ingroup act
+ *  @brief Whether there are still active processes in the activation queue.
+ *
+ *  @platformonly
+ *
+ *  @returns true if there is at least one active process, false otherwise.
+ */
+bool ssm_active(void);
 
 /** @ingroup time
  *  @brief Reset the scheduler.
@@ -121,11 +131,11 @@ void ssm_tick(void);
  *  @brief Compute the size of a heap-allocated ADT.
  *  @todo document
  */
-#define ssm_adt_size(vc) (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc) - 1))
-
+#define ssm_adt_size(vc)                                                       \
+  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc)-1))
 
 #define ssm_closure_size(vc)                                                   \
-  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc) - 1)))
+  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc)-1)))
 
 /**
  * @addtogroup mem
@@ -140,10 +150,10 @@ void ssm_tick(void);
  *  object, where even-numbered timestamps may be misinterpreted as pointers.
  */
 enum ssm_kind {
-  SSM_ADT_K = 0,  /**< ADT object, e.g., #ssm_adt1 */
-  SSM_TIME_K,     /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K,  /**< Closure object, #ssm_closure1 */
+  SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
+  SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
+  SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
+  SSM_CLOSURE_K, /**< Closure object, #ssm_closure1 */
 };
 
 /** @brief Initializes the underlying allocator system.
