@@ -100,6 +100,7 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <p>The internal interface of the SSM runtime.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="ssm_8h_source.html">ssm.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="ssm-platform_8h_source.html">ssm-platform.h</a>&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Include dependency graph for ssm-internal.h:</div>
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
@@ -108,11 +109,12 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <div class="center"><img src="ssm-internal_8h__incl.png" border="0" usemap="#ssm-internal_8h" alt=""/></div>
 <map name="ssm-internal_8h" id="ssm-internal_8h">
 <area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="139,5,255,32"/>
-<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,80,228,107"/>
-<area shape="rect" title=" " alt="" coords="5,155,88,181"/>
-<area shape="rect" title=" " alt="" coords="112,155,187,181"/>
-<area shape="rect" title=" " alt="" coords="211,155,282,181"/>
-<area shape="rect" title=" " alt="" coords="306,155,377,181"/>
+<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,155,228,181"/>
+<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="185,80,308,107"/>
+<area shape="rect" title=" " alt="" coords="5,229,88,256"/>
+<area shape="rect" title=" " alt="" coords="112,229,187,256"/>
+<area shape="rect" title=" " alt="" coords="211,229,282,256"/>
+<area shape="rect" title=" " alt="" coords="306,229,377,256"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -136,10 +138,10 @@ Macros</h2></td></tr>
 <tr class="memitem:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">SSM_ASSERT</a>(cond)</td></tr>
 <tr class="memdesc:ga3d0f3851fe9b66a8c421974262799fd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Throw an internal error.  <a href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">More...</a><br /></td></tr>
 <tr class="separator:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm_adt_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__adt1.html">ssm_adt1</a>) + sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1))</td></tr>
+<tr class="memitem:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">ssm_adt_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__adt1.html">ssm_adt1</a>) + sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc)-1))</td></tr>
 <tr class="memdesc:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a heap-allocated ADT.  <a href="group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621">More...</a><br /></td></tr>
 <tr class="separator:ga6cde5a1cbfe21a39e396ceeef858e621"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad03ebeeb5b442c8fa9be8e751788d0fe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe">ssm_closure_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1)))</td></tr>
+<tr class="memitem:ad03ebeeb5b442c8fa9be8e751788d0fe"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe">ssm_closure_size</a>(vc)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc)-1)))</td></tr>
 <tr class="separator:ad03ebeeb5b442c8fa9be8e751788d0fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga5514bce5af584559d51b5f75344205ef"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">SSM_MEM_POOL_MIN</a>&#160;&#160;&#160;16</td></tr>
 <tr class="memdesc:ga5514bce5af584559d51b5f75344205ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Block size of the smallest memory pool.  <a href="group__mem.html#ga5514bce5af584559d51b5f75344205ef">More...</a><br /></td></tr>
@@ -175,6 +177,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gae3e5f51dac6ee65b5be5034045b01a79"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm_next_event_time</a> (void)</td></tr>
 <tr class="memdesc:gae3e5f51dac6ee65b5be5034045b01a79"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time of the next event in the event queue.  <a href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">More...</a><br /></td></tr>
 <tr class="separator:gae3e5f51dac6ee65b5be5034045b01a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6">ssm_active</a> (void)</td></tr>
+<tr class="memdesc:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether there are still active processes in the activation queue.  <a href="group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6">More...</a><br /></td></tr>
+<tr class="separator:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga46e6a55e8441ee224a641dbdd92c45c6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">ssm_reset</a> (void)</td></tr>
 <tr class="memdesc:ga46e6a55e8441ee224a641dbdd92c45c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the scheduler.  <a href="group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6">More...</a><br /></td></tr>
 <tr class="separator:ga46e6a55e8441ee224a641dbdd92c45c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -217,12 +222,12 @@ John Hui (j-hui) </dd></dl>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">vc</td><td>)</td>
-          <td>&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc) - 1)))</td>
+          <td>&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((vc)-1)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00127">127</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-internal_8h_source.html#l00137">137</a> of file <a class="el" href="ssm-internal_8h_source.html">ssm-internal.h</a>.</p>
 
 </div>
 </div>

@@ -16,6 +16,7 @@ var ssm_internal_8h =
       [ "SSM_CLOSURE_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e", null ]
     ] ],
     [ "ssm_next_event_time", "group__time.html#gae3e5f51dac6ee65b5be5034045b01a79", null ],
+    [ "ssm_active", "group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6", null ],
     [ "ssm_reset", "group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6", null ],
     [ "ssm_set_now", "group__time.html#gabdccd038383abd0cefc8066f0c8b6237", null ],
     [ "ssm_update", "group__sv.html#ga6057c5089f21df48a1e618b83886144e", null ],

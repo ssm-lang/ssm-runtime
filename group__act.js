@@ -22,6 +22,7 @@ var group__act =
     [ "ssm_stepf_t", "group__act.html#gadb557bb02081e7d883bcc7d133eb96f6", null ],
     [ "ssm_act_t", "group__act.html#gab35cf37819a1a1538704654128b1db4f", null ],
     [ "ssm_trigger_t", "group__act.html#ga167a544c7e87c34a6e4dbf1a8a234f7e", null ],
+    [ "ssm_active", "group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6", null ],
     [ "ssm_tick", "group__act.html#gaba874593a4027732c9a8c84a25a8bb8d", null ],
     [ "ssm_enter", "group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0", null ],
     [ "ssm_leave", "group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5", null ],

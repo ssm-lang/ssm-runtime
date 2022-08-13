@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['scheduled_20variables_350',['Scheduled variables',['../group__sv.html',1,'']]]
+  ['platform_359',['Platform',['../group__platform.html',1,'']]]
 ];
