@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['platform_359',['Platform',['../group__platform.html',1,'']]]
+  ['memory_20management_405',['Memory management',['../group__mem.html',1,'']]]
 ];

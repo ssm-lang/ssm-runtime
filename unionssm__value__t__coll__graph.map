@@ -1,4 +1,4 @@
 <map id="ssm_value_t" name="ssm_value_t">
 <area shape="rect" id="node1" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="5,95,109,121"/>
-<area shape="rect" id="node2" href="$structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="16,5,99,32"/>
+<area shape="rect" id="node2" href="$structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="16,5,99,32"/>
 </map>

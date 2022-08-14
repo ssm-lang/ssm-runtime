@@ -105,13 +105,8 @@ $(document).ready(function(){initNavTree('group__closure.html',''); initResizabl
 <p>When closures are applied to arguments, they may or may not <em>reduce</em>. When a reduction takes place, a child process is created: the enter function pointer is applied to <em>argv</em>, and the resulting activation record is scheduled via <a class="el" href="group__act.html#gaf9d88d2b23295c4d405e9479c421efca" title="Schedule a routine to run in the current instant.">ssm_activate()</a>. If this happens, the caller must yield (i.e., set the program counter and return) so that the child process may run to completion before the caller resumes.</p>
 <p>It might be possible to statically determine whether a caller needs to yield, so in the general case, the caller should yield <em>conditionally</em>, using <a class="el" href="group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e" title="Whether an activation record has any children.">ssm_has_children()</a> to determine whether any reduction took place. Optimizations may eliminate this check.</p>
 <p>Closures are allocated with enough space for all eventual arguments to be stored in <em>argv</em>, which is in turn passed to the callee. Though this wastes extra space, it vastly increases opportunities to reuse the same closure (if it is uniquely owned by the caller).</p>
-<p>The <a class="el" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap-allocated object.">ssm_mm</a> header's <em>val_count</em> field indicates how many arguments are currently applied (also called <em>arg_count</em>), i.e., how many fields the garbage collector should scan when the closure is dropped. The header's <em>tag</em> field indicates how many arguments the closure will accommodate (also called <em>arg_cap</em>), and determines its memory layout and size. When <em>arg_count</em> reaches <em>arg_cap</em>, the closure should reduce.</p>
-<p>A closure with an <em>arg_cap</em> of <code>N</code> has the following layout:</p>
-<div class="fragment"><div class="line"><span class="keyword">struct </span>ssm_closureN {</div>
-<div class="line">  <span class="keyword">struct </span><a class="code" href="structssm__mm.html">ssm_mm</a> mm;</div>
-<div class="line">  <a class="code" href="unionssm__value__t.html">ssm_value_t</a> argv[N];</div>
-<div class="line">};</div>
-</div><!-- fragment --><p>The "template" for each closure's memory layout is defined by <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a>; closures with more argument capacity look like <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a> with longer <em>argv</em>.</p>
+<p>Closures' <a class="el" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap-allocated objects.">ssm_mm</a> headers are vector-flavored; the <em>cap</em> field indicates how many arguments the closure is allocated with (i.e., how many can be applied to it), while the <em>count</em> field indicates how many arguments are currently applied. <em>cap</em> is used to determine the size, while <em>count</em> is used to determine how many valid values the garbage collector needs to scan when a closure is deallocated.</p>
+<p>The "template" for each closure's memory layout is defined by <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a>; closures with more argument capacity look like <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a> with a longer <em>argv</em>.</p>
 <p>The function <a class="el" href="group__closure.html#ga2cecadddeda0060a2eecd394b41c0588" title="Apply an argument to a closure.">ssm_closure_apply()</a> applies a closure to an argument, with or without reduction. The SSM runtime library defines many helper interfaces to allow compilers to generate optimized code for interacting with closures. For example, <a class="el" href="group__closure.html#ga3a8b76546d87060af917b4e6d1b2d272" title="Add an argument to a closure.">ssm_closure_push()</a> and <a class="el" href="group__closure.html#ga2c557ccba40dc1ee7124ab385484ee1d" title="Remove an argument from a closure.">ssm_closure_pop()</a> directly add and remove arguments to <em>argv</em> without any runtime checks or function call overhead. <a class="el" href="group__closure.html#ga2cecadddeda0060a2eecd394b41c0588" title="Apply an argument to a closure.">ssm_closure_apply()</a> is implemented in terms of these helpers, and should be inlined by an optimizing code generator where appropriate.</p>
 <p>Meanwhile, <a class="el" href="group__closure.html#ga8187d02ef5541bc83fe16528b3114c29" title="Apply an argument to a closure that is used for the last time.">ssm_closure_apply_final()</a> optimizes the last time a closure value is used. It assumes that the caller is releasing the last remaining reference to a closure, so that the closure may be safely modified in-place.</p>
 <p>When process <code>a</code> applies function <code>f</code> to argument <code>x</code>, and saves the result to <code>r</code>, the most general case (omitting reference-counting) looks like:</p>
@@ -132,21 +127,27 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">ssm_closure_arg_count</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.info.vector.count)</td></tr>
+<tr class="memdesc:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the number of argument values owned by a closure.  <a href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">More...</a><br /></td></tr>
+<tr class="separator:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.info.vector.cap)</td></tr>
+<tr class="memdesc:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the number of argument values accommodated by a closure.  <a href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">More...</a><br /></td></tr>
+<tr class="separator:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">ssm_closure_func</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;f)</td></tr>
+<tr class="memdesc:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the enter function pointer of a closure.  <a href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">More...</a><br /></td></tr>
+<tr class="separator:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga8e37db240b2d11c9d52644ee2ffd12fc"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga8e37db240b2d11c9d52644ee2ffd12fc">ssm_closure_argv</a>(v)&#160;&#160;&#160;(&amp;*<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;argv)</td></tr>
 <tr class="memdesc:ga8e37db240b2d11c9d52644ee2ffd12fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the argument array of a closure.  <a href="group__closure.html#ga8e37db240b2d11c9d52644ee2ffd12fc">More...</a><br /></td></tr>
 <tr class="separator:ga8e37db240b2d11c9d52644ee2ffd12fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga6673e1b1f13e4a8afcba06f1272c4bae"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga6673e1b1f13e4a8afcba06f1272c4bae">ssm_closure_arg</a>(v,  i)&#160;&#160;&#160;<a class="el" href="group__closure.html#ga8e37db240b2d11c9d52644ee2ffd12fc">ssm_closure_argv</a>(v)[i]</td></tr>
 <tr class="memdesc:ga6673e1b1f13e4a8afcba06f1272c4bae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the ith argument of a closure.  <a href="group__closure.html#ga6673e1b1f13e4a8afcba06f1272c4bae">More...</a><br /></td></tr>
 <tr class="separator:ga6673e1b1f13e4a8afcba06f1272c4bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">ssm_closure_func</a>(v)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;f</td></tr>
-<tr class="memdesc:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the enter function pointer of a closure.  <a href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">More...</a><br /></td></tr>
-<tr class="separator:gafe77d5af1eea62e462f6ee9494fd1e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">ssm_closure_arg_count</a>(v)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.val_count</td></tr>
-<tr class="memdesc:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the number of argument values owned by a closure.  <a href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">More...</a><br /></td></tr>
-<tr class="separator:ga3a5e3e969e73bd926752b98d9f3c9399"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(v)&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.tag</td></tr>
-<tr class="memdesc:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Obtain the number of argument values accommodated by a closure.  <a href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">More...</a><br /></td></tr>
-<tr class="separator:ga819bdfd11f5a5379888c55bd043f5fdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga5a778fdfd18a57c92f9140c7d7acf1bd"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">ssm_closure_size</a>(val_count)&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((val_count)-1)))</td></tr>
+<tr class="memdesc:ga5a778fdfd18a57c92f9140c7d7acf1bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a closure object.  <a href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">More...</a><br /></td></tr>
+<tr class="separator:ga5a778fdfd18a57c92f9140c7d7acf1bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga3ac227004bd7db3d7fb47373d3c09fb1"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga3ac227004bd7db3d7fb47373d3c09fb1">ssm_closure_heap_size</a>(v)&#160;&#160;&#160;<a class="el" href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">ssm_closure_size</a>(<a class="el" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(v))</td></tr>
+<tr class="memdesc:ga3ac227004bd7db3d7fb47373d3c09fb1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size of a closure already allocated on the heap.  <a href="group__closure.html#ga3ac227004bd7db3d7fb47373d3c09fb1">More...</a><br /></td></tr>
+<tr class="separator:ga3ac227004bd7db3d7fb47373d3c09fb1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga3a8b76546d87060af917b4e6d1b2d272"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga3a8b76546d87060af917b4e6d1b2d272">ssm_closure_push</a>(closure,  arg)</td></tr>
 <tr class="memdesc:ga3a8b76546d87060af917b4e6d1b2d272"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an argument to a closure.  <a href="group__closure.html#ga3a8b76546d87060af917b4e6d1b2d272">More...</a><br /></td></tr>
 <tr class="separator:ga3a8b76546d87060af917b4e6d1b2d272"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -188,6 +189,72 @@ Functions</h2></td></tr>
 <tr class="separator:ga8187d02ef5541bc83fe16528b3114c29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ga3a5e3e969e73bd926752b98d9f3c9399"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3a5e3e969e73bd926752b98d9f3c9399">&#9670;&nbsp;</a></span>ssm_closure_arg_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_closure_arg_count</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.info.vector.count)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the number of argument values owned by a closure. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00773">773</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="ga819bdfd11f5a5379888c55bd043f5fdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga819bdfd11f5a5379888c55bd043f5fdf">&#9670;&nbsp;</a></span>ssm_closure_arg_cap</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_closure_arg_cap</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.info.vector.cap)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the number of argument values accommodated by a closure. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00777">777</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="gafe77d5af1eea62e462f6ee9494fd1e20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gafe77d5af1eea62e462f6ee9494fd1e20">&#9670;&nbsp;</a></span>ssm_closure_func</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_closure_func</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">v</td><td>)</td>
+          <td>&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;f)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Obtain the enter function pointer of a closure. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00781">781</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
 <a id="ga8e37db240b2d11c9d52644ee2ffd12fc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga8e37db240b2d11c9d52644ee2ffd12fc">&#9670;&nbsp;</a></span>ssm_closure_argv</h2>
 
@@ -206,7 +273,7 @@ Functions</h2></td></tr>
 
 <p>Retrieve the argument array of a closure. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00729">729</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00785">785</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -238,73 +305,58 @@ Functions</h2></td></tr>
 
 <p>Obtain the ith argument of a closure. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00733">733</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00789">789</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
-<a id="gafe77d5af1eea62e462f6ee9494fd1e20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gafe77d5af1eea62e462f6ee9494fd1e20">&#9670;&nbsp;</a></span>ssm_closure_func</h2>
+<a id="ga5a778fdfd18a57c92f9140c7d7acf1bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5a778fdfd18a57c92f9140c7d7acf1bd">&#9670;&nbsp;</a></span>ssm_closure_size</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ssm_closure_func</td>
+          <td class="memname">#define ssm_closure_size</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;f</td>
+          <td class="paramname">val_count</td><td>)</td>
+          <td>&#160;&#160;&#160;(sizeof(struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>) + (sizeof(<a class="el" href="unionssm__value__t.html">ssm_value_t</a>) * ((val_count)-1)))</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Obtain the enter function pointer of a closure. </p>
+<p>Compute the size of a closure object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val_count</td><td>the <em>val_count</em> field of the closure's <a class="el" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap-allocated objects.">ssm_mm</a> header. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the size of the closure object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00736">736</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00796">796</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
-<a id="ga3a5e3e969e73bd926752b98d9f3c9399"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga3a5e3e969e73bd926752b98d9f3c9399">&#9670;&nbsp;</a></span>ssm_closure_arg_count</h2>
+<a id="ga3ac227004bd7db3d7fb47373d3c09fb1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga3ac227004bd7db3d7fb47373d3c09fb1">&#9670;&nbsp;</a></span>ssm_closure_heap_size</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">#define ssm_closure_arg_count</td>
+          <td class="memname">#define ssm_closure_heap_size</td>
           <td>(</td>
           <td class="paramtype">&#160;</td>
           <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.val_count</td>
+          <td>&#160;&#160;&#160;<a class="el" href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">ssm_closure_size</a>(<a class="el" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(v))</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Obtain the number of argument values owned by a closure. </p>
+<p>Compute the size of a closure already allocated on the heap. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00740">740</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
-
-</div>
-</div>
-<a id="ga819bdfd11f5a5379888c55bd043f5fdf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga819bdfd11f5a5379888c55bd043f5fdf">&#9670;&nbsp;</a></span>ssm_closure_arg_cap</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">#define ssm_closure_arg_cap</td>
-          <td>(</td>
-          <td class="paramtype">&#160;</td>
-          <td class="paramname">v</td><td>)</td>
-          <td>&#160;&#160;&#160;<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__closure1.html">ssm_closure1</a>, mm)-&gt;mm.tag</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Obtain the number of argument values accommodated by a closure. </p>
-
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00744">744</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00800">800</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -340,7 +392,7 @@ Functions</h2></td></tr>
 <p>Add an argument to a closure. </p>
 <p>Note that this helper increments the <em>arg_count</em> of <em>closure</em> but does not perform memory management, i.e., does not <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> <em>arg</em>. It also does not check whether <em>closure</em> has capacity for <em>arg</em>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00753">753</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00808">808</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -366,7 +418,7 @@ Functions</h2></td></tr>
 <p>Remove an argument from a closure. </p>
 <p>Note that this helper decrements the <em>arg_count</em> of <em>closure</em> but does not perform memory management, i.e., does not <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> <em>arg</em>. It also does not check whether <em>closure</em> has a non-zero number of arguments already applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00765">765</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00820">820</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -419,7 +471,7 @@ Functions</h2></td></tr>
 <p>Spawn and schedule a new child process from a fully-applied closure. </p>
 <p>Note that this helper does not perform any memory management, nor does it ensure that <em>closure</em> has all arguments applied. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00775">775</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00830">830</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -491,7 +543,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00870">870</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00925">925</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -563,7 +615,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00888">888</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00943">943</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -583,11 +635,11 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <b>Value:</b><div class="fragment"><div class="line">  <a class="code" href="group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e">ssm_mem_free</a>((closure).heap_ptr,                                             \</div>
-<div class="line">               <a class="code" href="ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe">ssm_closure_size</a>(<a class="code" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(closure)))</div>
+<div class="line">               <a class="code" href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">ssm_closure_size</a>(<a class="code" href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a>(closure)))</div>
 </div><!-- fragment -->
 <p>Helper to free a closure (without reference counting). </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00895">895</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00950">950</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -618,7 +670,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>an allocated activation record for the callee. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00701">701</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00745">745</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -659,7 +711,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a value pointing to the heap-allocated closure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00012">12</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00238">238</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -689,7 +741,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a value pointing to the heap-allocated closure. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00023">23</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00012">12</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
 
 </div>
 </div>
@@ -760,7 +812,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00036">36</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00025">25</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
 
 </div>
 </div>
@@ -837,25 +889,23 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00054">54</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-closure_8c_source.html#l00043">43</a> of file <a class="el" href="ssm-closure_8c_source.html">ssm-closure.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__closure_html_ga819bdfd11f5a5379888c55bd043f5fdf"><div class="ttname"><a href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a></div><div class="ttdeci">#define ssm_closure_arg_cap(v)</div><div class="ttdoc">Obtain the number of argument values accommodated by a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00744">ssm.h:744</a></div></div>
-<div class="ttc" id="aunionssm__value__t_html"><div class="ttname"><a href="unionssm__value__t.html">ssm_value_t</a></div><div class="ttdoc">SSM values are either &quot;packed&quot; values or heap-allocated.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00099">ssm.h:99</a></div></div>
-<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The metadata &quot;header&quot; accompanying any heap-allocated object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00117">ssm.h:117</a></div></div>
-<div class="ttc" id="agroup__closure_html_ga8e37db240b2d11c9d52644ee2ffd12fc"><div class="ttname"><a href="group__closure.html#ga8e37db240b2d11c9d52644ee2ffd12fc">ssm_closure_argv</a></div><div class="ttdeci">#define ssm_closure_argv(v)</div><div class="ttdoc">Retrieve the argument array of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00729">ssm.h:729</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga819bdfd11f5a5379888c55bd043f5fdf"><div class="ttname"><a href="group__closure.html#ga819bdfd11f5a5379888c55bd043f5fdf">ssm_closure_arg_cap</a></div><div class="ttdeci">#define ssm_closure_arg_cap(v)</div><div class="ttdoc">Obtain the number of argument values accommodated by a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00777">ssm.h:777</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga8e37db240b2d11c9d52644ee2ffd12fc"><div class="ttname"><a href="group__closure.html#ga8e37db240b2d11c9d52644ee2ffd12fc">ssm_closure_argv</a></div><div class="ttdeci">#define ssm_closure_argv(v)</div><div class="ttdoc">Retrieve the argument array of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00785">ssm.h:785</a></div></div>
 <div class="ttc" id="agroup__act_html_gaf9d88d2b23295c4d405e9479c421efca"><div class="ttname"><a href="group__act.html#gaf9d88d2b23295c4d405e9479c421efca">ssm_activate</a></div><div class="ttdeci">void ssm_activate(ssm_act_t *act)</div><div class="ttdoc">Schedule a routine to run in the current instant.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00291">ssm-scheduler.c:291</a></div></div>
-<div class="ttc" id="agroup__mem_html_gabaf350ad4a1577dee5e31e6efd851054"><div class="ttname"><a href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">ssm_drop</a></div><div class="ttdeci">#define ssm_drop(v)</div><div class="ttdoc">Drop a reference to a possible heap item, and free it if necessary.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00176">ssm.h:176</a></div></div>
-<div class="ttc" id="assm-internal_8h_html_ad03ebeeb5b442c8fa9be8e751788d0fe"><div class="ttname"><a href="ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe">ssm_closure_size</a></div><div class="ttdeci">#define ssm_closure_size(vc)</div><div class="ttdef"><b>Definition:</b> <a href="ssm-internal_8h_source.html#l00137">ssm-internal.h:137</a></div></div>
+<div class="ttc" id="agroup__mem_html_gabaf350ad4a1577dee5e31e6efd851054"><div class="ttname"><a href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054">ssm_drop</a></div><div class="ttdeci">#define ssm_drop(v)</div><div class="ttdoc">Drop a reference to a possible heap item, and free it if necessary.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00325">ssm.h:325</a></div></div>
 <div class="ttc" id="agroup__mem_html_ga3087c5edfa451e28309ea0cb234ad02e"><div class="ttname"><a href="group__mem.html#ga3087c5edfa451e28309ea0cb234ad02e">ssm_mem_free</a></div><div class="ttdeci">void ssm_mem_free(void *m, size_t size)</div><div class="ttdoc">Deallocate memory allocated by ssm_mem_alloc().</div><div class="ttdef"><b>Definition:</b> <a href="ssm-mem_8c_source.html#l00191">ssm-mem.c:191</a></div></div>
-<div class="ttc" id="agroup__act_html_ga22f3a7b6991a73f7c173f5a488de5f1e"><div class="ttname"><a href="group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e">ssm_has_children</a></div><div class="ttdeci">#define ssm_has_children(act)</div><div class="ttdoc">Whether an activation record has any children.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00352">ssm.h:352</a></div></div>
-<div class="ttc" id="agroup__closure_html_ga2cecadddeda0060a2eecd394b41c0588"><div class="ttname"><a href="group__closure.html#ga2cecadddeda0060a2eecd394b41c0588">ssm_closure_apply</a></div><div class="ttdeci">void ssm_closure_apply(ssm_value_t closure, ssm_value_t arg, ssm_act_t *parent, ssm_priority_t prio, ssm_depth_t depth, ssm_value_t *ret)</div><div class="ttdoc">Apply an argument to a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-closure_8c_source.html#l00036">ssm-closure.c:36</a></div></div>
-<div class="ttc" id="agroup__closure_html_gafe77d5af1eea62e462f6ee9494fd1e20"><div class="ttname"><a href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">ssm_closure_func</a></div><div class="ttdeci">#define ssm_closure_func(v)</div><div class="ttdoc">Obtain the enter function pointer of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00736">ssm.h:736</a></div></div>
-<div class="ttc" id="agroup__closure_html_ga6673e1b1f13e4a8afcba06f1272c4bae"><div class="ttname"><a href="group__closure.html#ga6673e1b1f13e4a8afcba06f1272c4bae">ssm_closure_arg</a></div><div class="ttdeci">#define ssm_closure_arg(v, i)</div><div class="ttdoc">Obtain the ith argument of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00733">ssm.h:733</a></div></div>
-<div class="ttc" id="agroup__closure_html_ga3a5e3e969e73bd926752b98d9f3c9399"><div class="ttname"><a href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">ssm_closure_arg_count</a></div><div class="ttdeci">#define ssm_closure_arg_count(v)</div><div class="ttdoc">Obtain the number of argument values owned by a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00740">ssm.h:740</a></div></div>
+<div class="ttc" id="agroup__act_html_ga22f3a7b6991a73f7c173f5a488de5f1e"><div class="ttname"><a href="group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e">ssm_has_children</a></div><div class="ttdeci">#define ssm_has_children(act)</div><div class="ttdoc">Whether an activation record has any children.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00145">ssm.h:145</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga2cecadddeda0060a2eecd394b41c0588"><div class="ttname"><a href="group__closure.html#ga2cecadddeda0060a2eecd394b41c0588">ssm_closure_apply</a></div><div class="ttdeci">void ssm_closure_apply(ssm_value_t closure, ssm_value_t arg, ssm_act_t *parent, ssm_priority_t prio, ssm_depth_t depth, ssm_value_t *ret)</div><div class="ttdoc">Apply an argument to a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-closure_8c_source.html#l00025">ssm-closure.c:25</a></div></div>
+<div class="ttc" id="agroup__closure_html_gafe77d5af1eea62e462f6ee9494fd1e20"><div class="ttname"><a href="group__closure.html#gafe77d5af1eea62e462f6ee9494fd1e20">ssm_closure_func</a></div><div class="ttdeci">#define ssm_closure_func(v)</div><div class="ttdoc">Obtain the enter function pointer of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00781">ssm.h:781</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga6673e1b1f13e4a8afcba06f1272c4bae"><div class="ttname"><a href="group__closure.html#ga6673e1b1f13e4a8afcba06f1272c4bae">ssm_closure_arg</a></div><div class="ttdeci">#define ssm_closure_arg(v, i)</div><div class="ttdoc">Obtain the ith argument of a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00789">ssm.h:789</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga5a778fdfd18a57c92f9140c7d7acf1bd"><div class="ttname"><a href="group__closure.html#ga5a778fdfd18a57c92f9140c7d7acf1bd">ssm_closure_size</a></div><div class="ttdeci">#define ssm_closure_size(val_count)</div><div class="ttdoc">Compute the size of a closure object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00796">ssm.h:796</a></div></div>
+<div class="ttc" id="agroup__closure_html_ga3a5e3e969e73bd926752b98d9f3c9399"><div class="ttname"><a href="group__closure.html#ga3a5e3e969e73bd926752b98d9f3c9399">ssm_closure_arg_count</a></div><div class="ttdeci">#define ssm_closure_arg_count(v)</div><div class="ttdoc">Obtain the number of argument values owned by a closure.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00773">ssm.h:773</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

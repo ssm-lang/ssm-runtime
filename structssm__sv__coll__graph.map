@@ -2,6 +2,6 @@
 <area shape="rect" id="node1" title="A scheduled variable that supports scheduled updates with triggers." alt="" coords="195,201,266,228"/>
 <area shape="rect" id="node2" href="$structssm__trigger.html" title="Indicates a routine should run when a scheduled variable is written." alt="" coords="5,96,104,123"/>
 <area shape="rect" id="node3" href="$structssm__act.html" title="Activation record for an SSM routine." alt="" coords="17,5,93,32"/>
-<area shape="rect" id="node4" href="$structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="227,5,309,32"/>
+<area shape="rect" id="node4" href="$structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="227,5,309,32"/>
 <area shape="rect" id="node5" href="$unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="285,96,389,123"/>
 </map>

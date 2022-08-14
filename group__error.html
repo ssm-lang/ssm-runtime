@@ -103,16 +103,18 @@ $(document).ready(function(){initNavTree('group__error.html',''); initResizable(
 <a name="details" id="details"></a><h2 class="groupheader">Discussion</h2>
 <p>The <a class="el" href="group__error.html#ga6ca5ca738e3da4343dbe0721aabea13e" title="Terminate due to a non-recoverable error, with a specified reason.">SSM_THROW()</a> macro is used to throw unrecoverable runtime errors. </p>
 <p><a class="el" href="group__error.html#ga6ca5ca738e3da4343dbe0721aabea13e" title="Terminate due to a non-recoverable error, with a specified reason.">SSM_THROW()</a> calls the underlying <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> function with information about where in the source code the error was encountered. Because each platform may have different error-handling and logging capabilities, this library requires that the <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> symbol to be defined externally, typically by platform-specific bindings.</p>
-<p>Any definition of <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> should not be expected to return; otherwise, the behavior of subsequently interacting with the runtime library becomes undefined. For example, a platform-independent definition of <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> may just spin indefinitely, though this does not provide very helpful feedback for debugging: </p><pre class="fragment">void ssm_throw(ssm_error_t reason, const char *file, int line,
-               const char *func) {
-  for (;;);
-}
-</pre><p>A more sensible definition might call exit(), perhaps after logging some relevant information using the provided arguments: </p><pre class="fragment">void ssm_throw(ssm_error_t reason, const char *file, int line,
-               const char *func) {
-  printf("SSM error at %s:%d (%s): reason: %d\n", file, line, func, reason);
-  exit(reason);
-}
-</pre> <table class="memberdecls">
+<p>Any definition of <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> should not be expected to return; otherwise, the behavior of subsequently interacting with the runtime library becomes undefined. For example, a platform-independent definition of <a class="el" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c" title="Underlying exception handler; must be overridden by each platform.">ssm_throw()</a> may just spin indefinitely, though this does not provide very helpful feedback for debugging:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c">ssm_throw</a>(<a class="code" href="group__error.html#gaca12022b221b8e463af5cbb715c6341b">ssm_error_t</a> reason, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> line,</div>
+<div class="line">               <span class="keyword">const</span> <span class="keywordtype">char</span> *func) {</div>
+<div class="line">  <span class="keywordflow">for</span> (;;);</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>A more sensible definition might call exit(), perhaps after logging some relevant information using the provided arguments:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> <a class="code" href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c">ssm_throw</a>(<a class="code" href="group__error.html#gaca12022b221b8e463af5cbb715c6341b">ssm_error_t</a> reason, <span class="keyword">const</span> <span class="keywordtype">char</span> *file, <span class="keywordtype">int</span> line,</div>
+<div class="line">               <span class="keyword">const</span> <span class="keywordtype">char</span> *func) {</div>
+<div class="line">  printf(<span class="stringliteral">&quot;SSM error at %s:%d (%s): reason: %d\n&quot;</span>, file, line, func, reason);</div>
+<div class="line">  exit(reason);</div>
+<div class="line">}</div>
+</div><!-- fragment --> <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">SSM_ASSERT</a>(cond)</td></tr>
@@ -340,6 +342,8 @@ Functions</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
+<div class="ttc" id="agroup__error_html_ga5517edfadb0e55e2ebeb100e6d3bb97c"><div class="ttname"><a href="group__error.html#ga5517edfadb0e55e2ebeb100e6d3bb97c">ssm_throw</a></div><div class="ttdeci">void ssm_throw(ssm_error_t reason, const char *file, int line, const char *func)</div><div class="ttdoc">Underlying exception handler; must be overridden by each platform.</div></div>
+<div class="ttc" id="agroup__error_html_gaca12022b221b8e463af5cbb715c6341b"><div class="ttname"><a href="group__error.html#gaca12022b221b8e463af5cbb715c6341b">ssm_error_t</a></div><div class="ttdeci">enum ssm_error ssm_error_t</div><div class="ttdoc">Error codes indicating reason for failure.</div></div>
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5ace5e9b0c69c64d0576b85c14366e0e1d"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5ace5e9b0c69c64d0576b85c14366e0e1d">SSM_PLATFORM_ERROR</a></div><div class="ttdeci">@ SSM_PLATFORM_ERROR</div><div class="ttdoc">Start of platform-specific error code range.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00051">ssm.h:51</a></div></div>
 <div class="ttc" id="agroup__error_html_ggaca45923425917b02a000ff716a2c8ed5a220928aa46c061b095cd11e66415b012"><div class="ttname"><a href="group__error.html#ggaca45923425917b02a000ff716a2c8ed5a220928aa46c061b095cd11e66415b012">SSM_INTERNAL_ERROR</a></div><div class="ttdeci">@ SSM_INTERNAL_ERROR</div><div class="ttdoc">Reserved for unforeseen, non-user-facing errors.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00035">ssm.h:35</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->

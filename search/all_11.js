@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['val_5fcount_208',['val_count',['../structssm__mm.html#a22b4bc1b68ad5db3213f12c8676a2369',1,'ssm_mm']]],
-  ['value_209',['value',['../structssm__sv.html#a8ae2ace8ee046dc594aaf5a35b843e2c',1,'ssm_sv']]]
+  ['util_234',['util',['../md_doc_util.html',1,'']]],
+  ['uninitialized_5ffree_5fblock_235',['UNINITIALIZED_FREE_BLOCK',['../ssm-mem_8c.html#a6f798b3dcc78cc8ef1fe40aff68ccfd8',1,'ssm-mem.c']]],
+  ['utilities_236',['Utilities',['../group__util.html',1,'']]],
+  ['util_2emd_237',['util.md',['../util_8md.html',1,'']]]
 ];

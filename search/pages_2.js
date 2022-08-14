@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['error_367',['error',['../md_doc_error.html',1,'']]]
+  ['contributing_414',['Contributing',['../contributing.html',1,'']]],
+  ['closure_415',['closure',['../md_doc_closure.html',1,'']]]
 ];

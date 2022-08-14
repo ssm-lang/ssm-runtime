@@ -185,7 +185,7 @@ Variables</h2></td></tr>
 
 <p>The priority for the entry point of an SSM program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00309">309</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00102">102</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -203,7 +203,7 @@ Variables</h2></td></tr>
 
 <p>The depth at the entry point of an SSM program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00318">318</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00111">111</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -225,7 +225,7 @@ Variables</h2></td></tr>
 
 <p>Whether an activation record has any children. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00352">352</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00145">145</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -245,7 +245,7 @@ Variables</h2></td></tr>
 <p>Thread priority. </p>
 <p>Lower numbers execute first in an instant. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00306">306</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00099">99</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -264,7 +264,7 @@ Variables</h2></td></tr>
 <p>Index of least significant bit in a group of priorities. </p>
 <p>This only needs to represent the number of bits in the <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82" title="Thread priority.">ssm_priority_t</a> type. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00315">315</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00108">108</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -282,7 +282,7 @@ Variables</h2></td></tr>
 
 <p>The function that does an instant's work for a routine. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00321">321</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00114">114</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -551,9 +551,9 @@ Variables</h2></td></tr>
 </div><!-- doc-content -->
 <div class="ttc" id="agroup__act_html_gae5a581a8b2ef63d0403c80d2fdfc25e0"><div class="ttname"><a href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm_enter</a></div><div class="ttdeci">ssm_act_t * ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent, ssm_priority_t priority, ssm_depth_t depth)</div><div class="ttdoc">Allocate and initialize a routine activation record.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00268">ssm-scheduler.c:268</a></div></div>
 <div class="ttc" id="agroup__act_html_gaec0cb9b65b0fae98389b310a6d34e5f5"><div class="ttname"><a href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a></div><div class="ttdeci">ssm_act_t ssm_top_parent</div><div class="ttdoc">An activation record for the parent of the top-most routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-top-act_8c_source.html#l00009">ssm-top-act.c:9</a></div></div>
-<div class="ttc" id="astructssm__act_html"><div class="ttname"><a href="structssm__act.html">ssm_act</a></div><div class="ttdoc">Activation record for an SSM routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00329">ssm.h:329</a></div></div>
-<div class="ttc" id="agroup__act_html_gabea6090ce063ae674b31fc2ded743d4b"><div class="ttname"><a href="group__act.html#gabea6090ce063ae674b31fc2ded743d4b">SSM_ROOT_PRIORITY</a></div><div class="ttdeci">#define SSM_ROOT_PRIORITY</div><div class="ttdoc">The priority for the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00309">ssm.h:309</a></div></div>
-<div class="ttc" id="agroup__act_html_ga50b5df0fe51a91d9667ec34eecc9210a"><div class="ttname"><a href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">SSM_ROOT_DEPTH</a></div><div class="ttdeci">#define SSM_ROOT_DEPTH</div><div class="ttdoc">The depth at the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00318">ssm.h:318</a></div></div>
+<div class="ttc" id="astructssm__act_html"><div class="ttname"><a href="structssm__act.html">ssm_act</a></div><div class="ttdoc">Activation record for an SSM routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00122">ssm.h:122</a></div></div>
+<div class="ttc" id="agroup__act_html_gabea6090ce063ae674b31fc2ded743d4b"><div class="ttname"><a href="group__act.html#gabea6090ce063ae674b31fc2ded743d4b">SSM_ROOT_PRIORITY</a></div><div class="ttdeci">#define SSM_ROOT_PRIORITY</div><div class="ttdoc">The priority for the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00102">ssm.h:102</a></div></div>
+<div class="ttc" id="agroup__act_html_ga50b5df0fe51a91d9667ec34eecc9210a"><div class="ttname"><a href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">SSM_ROOT_DEPTH</a></div><div class="ttdeci">#define SSM_ROOT_DEPTH</div><div class="ttdoc">The depth at the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00111">ssm.h:111</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

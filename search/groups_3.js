@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['memory_20management_358',['Memory management',['../group__mem.html',1,'']]]
+  ['error_20handling_404',['Error handling',['../group__error.html',1,'']]]
 ];

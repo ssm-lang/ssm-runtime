@@ -1,20 +1,12 @@
 var ssm_internal_8h =
 [
     [ "SSM_ASSERT", "group__error.html#ga3d0f3851fe9b66a8c421974262799fd4", null ],
-    [ "ssm_adt_size", "group__adt.html#ga6cde5a1cbfe21a39e396ceeef858e621", null ],
-    [ "ssm_closure_size", "ssm-internal_8h.html#ad03ebeeb5b442c8fa9be8e751788d0fe", null ],
     [ "SSM_MEM_POOL_MIN", "group__mem.html#ga5514bce5af584559d51b5f75344205ef", null ],
     [ "SSM_MEM_POOL_FACTOR_BASE2", "group__mem.html#ga1ef7f3f854e79719bd5bb8e8f3694a23", null ],
     [ "SSM_MEM_POOL_COUNT", "group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790", null ],
     [ "SSM_MEM_POOL_SIZE", "group__mem.html#ga9fe24b7e82f37df88331c2acef65ed2c", null ],
     [ "SSM_MEM_POOL_MAX", "group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52", null ],
     [ "SSM_MEM_PAGE_SIZE", "group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388", null ],
-    [ "ssm_kind", "group__mem.html#ga0f26e675a76a28f76a4d31787be19250", [
-      [ "SSM_ADT_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250aa01b94ecfba291193b6e9e96bd5189d6", null ],
-      [ "SSM_TIME_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc", null ],
-      [ "SSM_SV_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a6766cac5e3a9d55b0615a0706dfc8a85", null ],
-      [ "SSM_CLOSURE_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a173db97b4cb3fc306482e4a2b4ab623e", null ]
-    ] ],
     [ "ssm_next_event_time", "group__time.html#gae3e5f51dac6ee65b5be5034045b01a79", null ],
     [ "ssm_active", "group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6", null ],
     [ "ssm_reset", "group__time.html#ga46e6a55e8441ee224a641dbdd92c45c6", null ],

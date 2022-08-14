@@ -1,0 +1,4 @@
+<map id="ssm_blob1" name="ssm_blob1">
+<area shape="rect" id="node1" title="The struct template of a heap&#45;allocated blob." alt="" coords="5,95,97,121"/>
+<area shape="rect" id="node2" href="$structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="10,5,93,32"/>
+</map>

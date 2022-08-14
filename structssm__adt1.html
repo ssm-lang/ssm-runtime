@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('structssm__adt1.html',''); initResizab
 <div class="center"><img src="structssm__adt1__coll__graph.png" border="0" usemap="#ssm__adt1_coll__map" alt="Collaboration graph"/></div>
 <map name="ssm__adt1_coll__map" id="ssm__adt1_coll__map">
 <area shape="rect" title="The struct template of a heap&#45;allocated ADT object." alt="" coords="5,184,91,211"/>
-<area shape="rect" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="7,5,89,32"/>
+<area shape="rect" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="7,5,89,32"/>
 <area shape="rect" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="81,95,185,121"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
@@ -115,8 +115,10 @@ $(document).ready(function(){initNavTree('structssm__adt1.html',''); initResizab
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Data Fields</h2></td></tr>
 <tr class="memitem:af6f11677e3b3ca42a54a71982a72f23f"><td class="memItemLeft" align="right" valign="top">struct <a class="el" href="structssm__mm.html">ssm_mm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__adt1.html#af6f11677e3b3ca42a54a71982a72f23f">mm</a></td></tr>
+<tr class="memdesc:af6f11677e3b3ca42a54a71982a72f23f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Variant-flavored memory management header.  <a href="structssm__adt1.html#af6f11677e3b3ca42a54a71982a72f23f">More...</a><br /></td></tr>
 <tr class="separator:af6f11677e3b3ca42a54a71982a72f23f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6b136674fc19df0452ff421c8884bf7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__adt1.html#ae6b136674fc19df0452ff421c8884bf7">fields</a> [1]</td></tr>
+<tr class="memdesc:ae6b136674fc19df0452ff421c8884bf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of ADT object fields.  <a href="structssm__adt1.html#ae6b136674fc19df0452ff421c8884bf7">More...</a><br /></td></tr>
 <tr class="separator:ae6b136674fc19df0452ff421c8884bf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -129,7 +131,7 @@ Data Fields</h2></td></tr>
 <div class="line">};</div>
 </div><!-- fragment --><p>Note that the memory layout of all ADTs is the same save for the length of the <em>fields</em>, so we use this struct definition as the "base case" of ADT object lengths. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00635">635</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00471">471</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -143,7 +145,9 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00636">636</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p>Variant-flavored memory management header. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00472">472</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -159,7 +163,9 @@ Data Fields</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00637">637</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p>Array of ADT object fields. </p>
+
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00473">473</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -168,10 +174,10 @@ Data Fields</h2></td></tr>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="aunionssm__value__t_html"><div class="ttname"><a href="unionssm__value__t.html">ssm_value_t</a></div><div class="ttdoc">SSM values are either &quot;packed&quot; values or heap-allocated.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00099">ssm.h:99</a></div></div>
-<div class="ttc" id="astructssm__adt1_html_af6f11677e3b3ca42a54a71982a72f23f"><div class="ttname"><a href="structssm__adt1.html#af6f11677e3b3ca42a54a71982a72f23f">ssm_adt1::mm</a></div><div class="ttdeci">struct ssm_mm mm</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00636">ssm.h:636</a></div></div>
-<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The metadata &quot;header&quot; accompanying any heap-allocated object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00117">ssm.h:117</a></div></div>
-<div class="ttc" id="astructssm__adt1_html_ae6b136674fc19df0452ff421c8884bf7"><div class="ttname"><a href="structssm__adt1.html#ae6b136674fc19df0452ff421c8884bf7">ssm_adt1::fields</a></div><div class="ttdeci">ssm_value_t fields[1]</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00637">ssm.h:637</a></div></div>
+<div class="ttc" id="aunionssm__value__t_html"><div class="ttname"><a href="unionssm__value__t.html">ssm_value_t</a></div><div class="ttdoc">SSM values are either &quot;packed&quot; values or heap-allocated.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00219">ssm.h:219</a></div></div>
+<div class="ttc" id="astructssm__adt1_html_af6f11677e3b3ca42a54a71982a72f23f"><div class="ttname"><a href="structssm__adt1.html#af6f11677e3b3ca42a54a71982a72f23f">ssm_adt1::mm</a></div><div class="ttdeci">struct ssm_mm mm</div><div class="ttdoc">Variant-flavored memory management header.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00472">ssm.h:472</a></div></div>
+<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The memory management metadata &quot;header&quot; for heap-allocated objects.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00241">ssm.h:241</a></div></div>
+<div class="ttc" id="astructssm__adt1_html_ae6b136674fc19df0452ff421c8884bf7"><div class="ttname"><a href="structssm__adt1.html#ae6b136674fc19df0452ff421c8884bf7">ssm_adt1::fields</a></div><div class="ttdeci">ssm_value_t fields[1]</div><div class="ttdoc">Array of ADT object fields.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00473">ssm.h:473</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

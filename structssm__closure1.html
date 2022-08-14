@@ -107,7 +107,7 @@ $(document).ready(function(){initNavTree('structssm__closure1.html',''); initRes
 <div class="center"><img src="structssm__closure1__coll__graph.png" border="0" usemap="#ssm__closure1_coll__map" alt="Collaboration graph"/></div>
 <map name="ssm__closure1_coll__map" id="ssm__closure1_coll__map">
 <area shape="rect" title="The struct template of a heap&#45;allocated closure object." alt="" coords="77,184,187,211"/>
-<area shape="rect" href="structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="5,5,88,32"/>
+<area shape="rect" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="5,5,88,32"/>
 <area shape="rect" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap&#45;allocated." alt="" coords="80,95,184,121"/>
 <area shape="rect" href="structssm__act.html" title="Activation record for an SSM routine." alt="" coords="209,95,285,121"/>
 </map>
@@ -131,7 +131,7 @@ Data Fields</h2></td></tr>
 <p>A closure should always be allocated with enough space in <em>argv</em> to accommodate <em>all</em> arguments expected by the enter function <em>f</em>, so faciliate efficient in-place usage.</p>
 <p>The current number of arguments owned by the closure is tracked by the memory management header's <em>val_count</em> field; the reference counts of the <em>argv</em> fields within this range need to be decremented when the enclosing closure is freed. The total number of arguments accommodated by the closure is tracked by the <em>tag</em> field; this also determines the size of the closure object. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00722">722</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00766">766</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -147,7 +147,7 @@ Data Fields</h2></td></tr>
 
 <p>Memory management header. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00723">723</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00767">767</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -165,7 +165,7 @@ Data Fields</h2></td></tr>
 
 <p>Enter function pointer. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00724">724</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00768">768</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -183,7 +183,7 @@ Data Fields</h2></td></tr>
 
 <p>An array of arguments. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00725">725</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00769">769</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

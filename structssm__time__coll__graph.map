@@ -1,4 +1,4 @@
 <map id="ssm_time" name="ssm_time">
 <area shape="rect" id="node1" title="Heap&#45;allocated time values." alt="" coords="5,95,92,121"/>
-<area shape="rect" id="node2" href="$structssm__mm.html" title="The metadata &quot;header&quot; accompanying any heap&#45;allocated object." alt="" coords="7,5,90,32"/>
+<area shape="rect" id="node2" href="$structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap&#45;allocated objects." alt="" coords="7,5,90,32"/>
 </map>

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['error_20handling_357',['Error handling',['../group__error.html',1,'']]]
+  ['closures_403',['Closures',['../group__closure.html',1,'']]]
 ];

@@ -114,12 +114,12 @@ $(document).ready(function(){initNavTree('ssm-mem_8c.html',''); initResizable();
 <div class="center"><img src="ssm-mem_8c__incl.png" border="0" usemap="#ssm-mem_8c" alt=""/></div>
 <map name="ssm-mem_8c" id="ssm-mem_8c">
 <area shape="rect" title="SSM runtime memory management and allocation." alt="" coords="241,5,340,32"/>
-<area shape="rect" title=" " alt="" coords="36,80,111,107"/>
-<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="135,80,251,107"/>
-<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="161,229,223,256"/>
+<area shape="rect" title=" " alt="" coords="37,80,112,107"/>
+<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="137,80,253,107"/>
+<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="209,229,271,256"/>
 <area shape="rect" title=" " alt="" coords="306,304,377,331"/>
 <area shape="rect" title=" " alt="" coords="379,80,445,107"/>
-<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="131,155,253,181"/>
+<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="80,155,203,181"/>
 <area shape="rect" title=" " alt="" coords="5,304,88,331"/>
 <area shape="rect" title=" " alt="" coords="112,304,187,331"/>
 <area shape="rect" title=" " alt="" coords="211,304,282,331"/>
@@ -183,12 +183,21 @@ Functions</h2></td></tr>
 <tr class="memitem:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">ssm_new_time</a> (<a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> time)</td></tr>
 <tr class="memdesc:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a> on the heap.  <a href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">More...</a><br /></td></tr>
 <tr class="separator:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga7af49e1e09fce985c20fd37388207b55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">ssm_new_adt</a> (uint8_t field_count, uint8_t tag)</td></tr>
+<tr class="memdesc:ga7af49e1e09fce985c20fd37388207b55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new ADT object on the heap.  <a href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">More...</a><br /></td></tr>
+<tr class="separator:ga7af49e1e09fce985c20fd37388207b55"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">ssm_new_sv</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> val)</td></tr>
 <tr class="memdesc:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an <a class="el" href="structssm__sv.html" title="A scheduled variable that supports scheduled updates with triggers.">ssm_sv</a> on the heap.  <a href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">More...</a><br /></td></tr>
 <tr class="separator:ga66d8e778566e92663beb3ed3d6b6a7bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga12f0353d3348de5943ea702d81659eaf"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga12f0353d3348de5943ea702d81659eaf">ssm_new_adt</a> (uint8_t val_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga12f0353d3348de5943ea702d81659eaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new ADT object on the heap.  <a href="group__adt.html#ga12f0353d3348de5943ea702d81659eaf">More...</a><br /></td></tr>
-<tr class="separator:ga12f0353d3348de5943ea702d81659eaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga2fe1eea56004a8e66c079e254cc3ea91"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__closure.html#ga2fe1eea56004a8e66c079e254cc3ea91">ssm_new_closure</a> (<a class="el" href="group__closure.html#gaa9ab36bd353c371e02a2fbd3e007e0c6">ssm_func_t</a> f, uint8_t arg_cap)</td></tr>
+<tr class="memdesc:ga2fe1eea56004a8e66c079e254cc3ea91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a closure on the heap.  <a href="group__closure.html#ga2fe1eea56004a8e66c079e254cc3ea91">More...</a><br /></td></tr>
+<tr class="separator:ga2fe1eea56004a8e66c079e254cc3ea91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga01af8f58423a1e0d5135632e18b01a0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">ssm_new_array</a> (uint16_t elems)</td></tr>
+<tr class="memdesc:ga01af8f58423a1e0d5135632e18b01a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an array on the heap.  <a href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">More...</a><br /></td></tr>
+<tr class="separator:ga01af8f58423a1e0d5135632e18b01a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga647d6eda0f83abfc1e2724d80a2887a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__blob.html#ga647d6eda0f83abfc1e2724d80a2887a0">ssm_new_blob</a> (uint16_t size)</td></tr>
+<tr class="memdesc:ga647d6eda0f83abfc1e2724d80a2887a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a blob on the heap.  <a href="group__blob.html#ga647d6eda0f83abfc1e2724d80a2887a0">More...</a><br /></td></tr>
+<tr class="separator:ga647d6eda0f83abfc1e2724d80a2887a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
 <tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
 <tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>

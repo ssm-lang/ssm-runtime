@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['ssm_5ferror_330',['ssm_error',['../group__error.html#gaca45923425917b02a000ff716a2c8ed5',1,'ssm.h']]],
-  ['ssm_5fkind_331',['ssm_kind',['../group__mem.html#ga0f26e675a76a28f76a4d31787be19250',1,'ssm-internal.h']]]
+  ['ssm_5ferror_374',['ssm_error',['../group__error.html#gaca45923425917b02a000ff716a2c8ed5',1,'ssm.h']]],
+  ['ssm_5fkind_375',['ssm_kind',['../group__mem.html#ga0f26e675a76a28f76a4d31787be19250',1,'ssm.h']]]
 ];

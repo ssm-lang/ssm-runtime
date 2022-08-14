@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['contributing_365',['Contributing',['../contributing.html',1,'']]],
-  ['closure_366',['closure',['../md_doc_closure.html',1,'']]]
+  ['blob_413',['blob',['../md_doc_blob.html',1,'']]]
 ];
