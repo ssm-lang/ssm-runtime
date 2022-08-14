@@ -267,7 +267,7 @@ enum ssm_kind {
   SSM_SV_K,       /**< Scheduled variables, #ssm_sv_t */
   SSM_CLOSURE_K,  /**< Closure object, e.g., #ssm_closure1 */
   SSM_ARRAY_K,    /**< Array of values, e.g., #ssm_array1 */
-  SSM_BLOB_K,     /**< Blob of arbitrary data, e.g., #ssm_blob4 */
+  SSM_BLOB_K,     /**< Blob of arbitrary data, e.g., #ssm_blob1 */
 };
 
 /** @brief Construct an #ssm_value_t from a 31-bit integral value.
@@ -1008,6 +1008,9 @@ ssm_value_t ssm_new_array(uint16_t count);
  * @{
  */
 
+/** @brief The @a size resolution for heap-allocated blobs. */
+#define SSM_BLOB_SIZE_SCALE 4
+
 /** @brief The struct template of a heap-allocated blob.
  *
  *  Blobs are just arbitrary chunks of memory in the heap where any kind of
@@ -1016,42 +1019,48 @@ ssm_value_t ssm_new_array(uint16_t count);
  * via other means.
  *
  *  Though this struct's @a payload is only declared with 4 bytes, actual
- *  heap-allocated blobs may have large payloads. (We construct this template
- *  with 4 bytes rather than 1 byte to avoid padding irregularities.) For
- *  instance, a 48-byte blob might look like:
+ *  heap-allocated blobs may have large payloads. For instance, a 48-byte blob
+ *  might look like:
  *
  *  ~~~{.c}
  *  struct ssm_blob48 {
  *    struct ssm_mm mm;
- *    char payload[48];
+ *    char payload[48 / SSM_BLOB_SIZE_SCALE];
  *  };
  *  ~~~
  *
  *  The memory layout of all blobs is the same save for the size of the
  *  @a payload, so we use this struct definition as the "base case" of blobs.
+ *
+ *  To allow even larger blobs, the actual size of the payload is divided by
+ *  #SSM_BLOB_SIZE_SCALE while stored in the @a size field.
  */
-struct ssm_blob4 {
+struct ssm_blob1 {
   struct ssm_mm mm; /**< Size-flavored memory management header. */
-  char payload[4];  /**< Payload of heap-allocated blob. */
+  char payload[SSM_BLOB_SIZE_SCALE]; /**< Payload of heap-allocated blob. */
 };
 
 /** @brief Compute the size of a blob with its header.
  *
- *  @param size   size of the blob's payload.
+ *  The @a size parameter should already be scaled, i.e., already multiplied by
+ *  #SSM_BLOB_SIZE_SCALE, before being passed into this macro.
+ *
+ *  @param size   scaled size of the blob's payload.
  *  @returns      size that a blob of @a size payload occupies in the heap.
  */
-#define ssm_blob_size(size) (sizeof(struct ssm_blob4) + (size)-4)
+#define ssm_blob_size(size) (sizeof(struct ssm_blob1) + (size)-SSM_BLOB_SIZE_SCALE)
 
 /** @brief Compute the size a blob in the heap.
  *
  *  @param v  #ssm_value_t pointing to some blob in the heap.
  *  @returns  size of the blob that @a v points to.
  */
-#define ssm_blob_heap_size(v) ssm_blob_size((v).heap_ptr->info.size)
+#define ssm_blob_heap_size(v)                                                  \
+  ssm_blob_size(((v).heap_ptr->info.size) * SSM_BLOB_SIZE_SCALE)
 
 /** @brief Obtain pointer to the payload of a blob from an #ssm_value_t. */
 #define ssm_blob_payload(v)                                                    \
-  (&*(container_of((v).heap_ptr, struct ssm_blob4, mm)->payload))
+  (&*(container_of((v).heap_ptr, struct ssm_blob1, mm)->payload))
 
 /** @brief Allocate a blob on the heap.
  *

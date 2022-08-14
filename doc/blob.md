@@ -9,5 +9,8 @@ that the runtime does not natively support, so long as they commit to managing
 stored resources themselves, because the garbage collector will not scan the
 payload for other managed heap pointers.
 
-Since there is no meaningful interpretation to the @a tag field of the memory
-management header, blobs use the @a size field of its #ssm_mm header.
+Blobs use size-flavored #ssm_mm headers, where the @a size field determines the
+size of blob payload. To support even larger blob sizes, the actual size is
+divided by #SSM_BLOB_SIZE_SCALE while stored in @a size.
+
+The heap memory layout for blobs are described by #ssm_blob1.

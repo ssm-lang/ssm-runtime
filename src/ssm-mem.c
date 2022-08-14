@@ -255,10 +255,14 @@ ssm_value_t ssm_new_array(uint16_t elems) {
 }
 
 ssm_value_t ssm_new_blob(uint16_t size) {
-  struct ssm_mm *mm = ssm_mem_alloc(ssm_blob_size(size));
+  uint16_t scaled_size = // ceiling(size / SSM_BLOB_SIZE_SCALE)
+      size / SSM_BLOB_SIZE_SCALE + !!(size % SSM_BLOB_SIZE_SCALE);
+
+  struct ssm_mm *mm =
+      ssm_mem_alloc(ssm_blob_size(scaled_size * SSM_BLOB_SIZE_SCALE));
   mm->ref_count = 1;
   mm->kind = SSM_BLOB_K;
-  mm->info.size = size;
+  mm->info.size = scaled_size;
   return (ssm_value_t){.heap_ptr = mm};
 }
 
