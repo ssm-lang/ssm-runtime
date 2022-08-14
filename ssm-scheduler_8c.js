@@ -30,5 +30,6 @@ var ssm_scheduler_8c =
     [ "event_queue_len", "ssm-scheduler_8c.html#a9b067486a0ad26ce2c76bd6964f858fc", null ],
     [ "act_queue", "ssm-scheduler_8c.html#a50a79f16bc1a091bc13d9597278daae7", null ],
     [ "act_queue_len", "ssm-scheduler_8c.html#a3bf5d178a07888ef6947d379cca4e8e0", null ],
-    [ "now", "ssm-scheduler_8c.html#a2b2e93b2d3f5db60cd2893861ae7e21b", null ]
+    [ "now", "ssm-scheduler_8c.html#a2b2e93b2d3f5db60cd2893861ae7e21b", null ],
+    [ "num_processes", "ssm-scheduler_8c.html#a560ba7a821352669d1e781f544cdf4d1", null ]
 ];
