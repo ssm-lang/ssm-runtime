@@ -1,6 +1,11 @@
 #include "ssm.h"
 typedef char unit;
 
+#include <kernel.h>
+static void blink(ssm_value_t i) {
+    printk("Blinking %d\n", ssm_unmarshal(i));
+}
+
 typedef struct {
             ssm_act_t act;
             ssm_value_t t;
@@ -17,6 +22,8 @@ typedef struct {
             ssm_value_t *__return_val;
             ssm_value_t __tmp_0;
             ssm_value_t __tmp_1;
+            ssm_value_t __tmp_10;
+            ssm_value_t __tmp_11;
             ssm_value_t __tmp_2;
             ssm_value_t __tmp_3;
             ssm_value_t __tmp_7;
@@ -83,8 +90,8 @@ ssm_act_t *__enter_ms(ssm_act_t *caller, ssm_priority_t priority, ssm_depth_t de
     acts->__return_val = __return_val;
     return actg;
 }
-struct ssm_closure1 __closure_ms = {.mm ={.ref_count =1, .kind =3, .val_count =0, .tag =1}, .f =__enter_ms, .argv =
-                                    {{0}}};
+struct ssm_closure1 __closure_ms = {.mm ={.ref_count =1, .kind =SSM_CLOSURE_K, .info ={.vector ={.count =0, .cap =1}}},
+                                    .f =__enter_ms, .argv ={{0}}};
 void __step_ms(ssm_act_t *actg)
 {
     act_ms_t *acts = container_of(actg, act_ms_t, act);
@@ -116,8 +123,9 @@ ssm_act_t *__enter_blink(ssm_act_t *caller, ssm_priority_t priority, ssm_depth_t
     acts->__trig_1.act = actg;
     return actg;
 }
-struct ssm_closure1 __closure_blink = {.mm ={.ref_count =1, .kind =3, .val_count =0, .tag =2}, .f =__enter_blink,
-                                       .argv ={{0}}};
+struct ssm_closure1 __closure_blink = {.mm ={.ref_count =1, .kind =SSM_CLOSURE_K, .info ={.vector ={.count =0, .cap =
+                                                                                                    2}}}, .f =
+                                       __enter_blink, .argv ={{0}}};
 void __step_blink(ssm_act_t *actg)
 {
     act_blink_t *acts = container_of(actg, act_blink_t, act);
@@ -175,8 +183,10 @@ void __step_blink(ssm_act_t *actg)
           case 2:
             ;
             ssm_desensitize(&acts->__trig_1);
+            acts->__tmp_8 = ssm_deref(acts->led);
+            blink(acts->__tmp_8);
             ssm_closure_apply((ssm_value_t) {.heap_ptr = &__closure_ms.mm}, ssm_marshal((uint32_t) 50), actg,
-                              actg->priority, actg->depth, &acts->__tmp_8);
+                              actg->priority, actg->depth, &acts->__tmp_9);
             if (ssm_has_children(actg)) {
                 actg->pc = 3;
                 return;
@@ -185,7 +195,7 @@ void __step_blink(ssm_act_t *actg)
                 ;
                 ;
             }
-            ssm_later(acts->led, ssm_now() + (uint32_t) ssm_unmarshal(acts->__tmp_8), ssm_marshal((uint32_t) 0));
+            ssm_later(acts->led, ssm_now() + (uint32_t) ssm_unmarshal(acts->__tmp_9), ssm_marshal((uint32_t) 0));
             ssm_sensitize(acts->led, &acts->__trig_1);
             actg->pc = 4;
             return;
@@ -193,8 +203,10 @@ void __step_blink(ssm_act_t *actg)
           case 4:
             ;
             ssm_desensitize(&acts->__trig_1);
-            acts->__tmp_9 = ssm_deref(acts->n_);
-            ssm_assign(acts->n_, actg->priority, ssm_marshal((uint32_t) ((uint32_t) ssm_unmarshal(acts->__tmp_9) -
+            acts->__tmp_10 = ssm_deref(acts->led);
+            blink(acts->__tmp_10);
+            acts->__tmp_11 = ssm_deref(acts->n_);
+            ssm_assign(acts->n_, actg->priority, ssm_marshal((uint32_t) ((uint32_t) ssm_unmarshal(acts->__tmp_11) -
                                                                          (uint32_t) ssm_unmarshal(ssm_marshal((uint32_t) 1)))));
         }
         
@@ -219,7 +231,9 @@ ssm_act_t *__enter_main_putc_anon0(ssm_act_t *caller, ssm_priority_t priority, s
     acts->__trig_1.act = actg;
     return actg;
 }
-struct ssm_closure1 __closure_main_putc_anon0 = {.mm ={.ref_count =1, .kind =3, .val_count =0, .tag =2}, .f =
+struct ssm_closure1 __closure_main_putc_anon0 = {.mm ={.ref_count =1, .kind =SSM_CLOSURE_K, .info ={.vector ={.count =0,
+                                                                                                              .cap =
+                                                                                                              2}}}, .f =
                                                  __enter_main_putc_anon0, .argv ={{0}}};
 void __step_main_putc_anon0(ssm_act_t *actg)
 {
@@ -259,8 +273,9 @@ ssm_act_t *__enter_main_display_anon1(ssm_act_t *caller, ssm_priority_t priority
     acts->__trig_1.act = actg;
     return actg;
 }
-struct ssm_closure1 __closure_main_display_anon1 = {.mm ={.ref_count =1, .kind =3, .val_count =0, .tag =2}, .f =
-                                                    __enter_main_display_anon1, .argv ={{0}}};
+struct ssm_closure1 __closure_main_display_anon1 = {.mm ={.ref_count =1, .kind =SSM_CLOSURE_K, .info ={.vector =
+                                                          {.count =0, .cap =2}}}, .f =__enter_main_display_anon1,
+                                                    .argv ={{0}}};
 void __step_main_display_anon1(ssm_act_t *actg)
 {
     act_main_display_anon1_t *acts = container_of(actg, act_main_display_anon1_t, act);
@@ -321,8 +336,9 @@ ssm_act_t *__enter_main(ssm_act_t *caller, ssm_priority_t priority, ssm_depth_t 
     acts->__return_val = __return_val;
     return actg;
 }
-struct ssm_closure1 __closure_main = {.mm ={.ref_count =1, .kind =3, .val_count =0, .tag =2}, .f =__enter_main, .argv =
-                                      {{0}}};
+struct ssm_closure1 __closure_main = {.mm ={.ref_count =1, .kind =SSM_CLOSURE_K, .info ={.vector ={.count =0, .cap =
+                                                                                                   2}}}, .f =
+                                      __enter_main, .argv ={{0}}};
 void __step_main(ssm_act_t *actg)
 {
     act_main_t *acts = container_of(actg, act_main_t, act);
