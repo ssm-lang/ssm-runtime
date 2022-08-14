@@ -10,6 +10,8 @@
 
 /** @brief Platform-defined entry point.
  *
+ *  Should be called by @a main function to start running SSM code.
+ *
  *  @returns    0 on success, negative errno otherwise.
  */
 int ssm_platform_entry(void);

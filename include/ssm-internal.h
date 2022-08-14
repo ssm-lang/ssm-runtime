@@ -10,8 +10,8 @@
 #ifndef _SSM_SCHED_H
 #define _SSM_SCHED_H
 
-#include <ssm.h>
 #include <ssm-platform.h>
+#include <ssm.h>
 
 /** @ingroup error
  *  @brief Throw an internal error.
@@ -127,34 +127,10 @@ void ssm_unschedule(ssm_sv_t *var);
  */
 void ssm_tick(void);
 
-/** @ingroup adt
- *  @brief Compute the size of a heap-allocated ADT.
- *  @todo document
- */
-#define ssm_adt_size(vc)                                                       \
-  (sizeof(struct ssm_adt1) + sizeof(ssm_value_t) * ((vc)-1))
-
-#define ssm_closure_size(vc)                                                   \
-  (sizeof(struct ssm_closure1) + (sizeof(ssm_value_t) * ((vc)-1)))
-
 /**
  * @addtogroup mem
  * @{
  */
-
-/** @brief The different kinds of heap objects, enumerated.
- *
- *  Types enumerated here that are not ADTs are chosen because they cannot be
- *  easily or efficiently expressed as a product of words. For instance, 64-bit
- *  timestamps cannot be directly stored in the payload of a regular heap
- *  object, where even-numbered timestamps may be misinterpreted as pointers.
- */
-enum ssm_kind {
-  SSM_ADT_K = 0, /**< ADT object, e.g., #ssm_adt1 */
-  SSM_TIME_K,    /**< 64-bit timestamps, #ssm_time_t */
-  SSM_SV_K,      /**< Scheduled variables, #ssm_sv_t */
-  SSM_CLOSURE_K, /**< Closure object, #ssm_closure1 */
-};
 
 /** @brief Initializes the underlying allocator system.
  *
