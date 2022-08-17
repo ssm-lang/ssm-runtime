@@ -163,13 +163,23 @@ static void tick_loop(void) {
       } else {
         // Need to set alarm
 
-        int err = ssm_timer_set_alarm(next_time, send_timeout_event, NULL);
-        if (err < 0) {
-          printk("Encountered error: %d!!\r\n", err);
+        for (int err;;) {
+          err = ssm_timer_set_alarm(next_time, send_timeout_event, NULL);
+
+          if (err == 0)
+            break; // Success
+
+          if (err == -ETIME) // Alarm already expired
+            break;
+
+          if (err == -EALREADY)
+            continue;
+
+          printk("Unexpected error while setting alarm: %d!!\r\n", err);
           printk("wall_time: %llx!!\r\n", wall_time);
           printk("next_time: %llx!!\r\n", next_time);
           SSM_THROW(SSM_INTERNAL_ERROR);
-          return; // unreachable
+          // unreachable
         }
 
         sem_wait();
