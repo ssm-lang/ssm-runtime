@@ -1048,7 +1048,8 @@ struct ssm_blob1 {
  *  @param size   scaled size of the blob's payload.
  *  @returns      size that a blob of @a size payload occupies in the heap.
  */
-#define ssm_blob_size(size) (sizeof(struct ssm_blob1) + (size)-SSM_BLOB_SIZE_SCALE)
+#define ssm_blob_size(size) \
+  (sizeof(struct ssm_blob1) - SSM_BLOB_SIZE_SCALE + (size))
 
 /** @brief Compute the size a blob in the heap.
  *
@@ -1105,6 +1106,45 @@ void ssm_mem_prealloc(size_t size, size_t num_pages);
  *  @param size   the size of the memory range allocated by ssm_mem_alloc().
  */
 void ssm_mem_free(void *m, size_t size);
+
+#ifdef CONFIG_MEM_STATS
+
+/** @brief  Statistics for a heap page pool; used in #ssm_mem_statistics_t
+ *
+ * @note Define CONFIG_MEM_STATS to enable this
+ */
+typedef struct ssm_mem_statistics_pool {
+  size_t block_size;       /**< Size of this pool's blocks */
+  size_t pages_allocated;  /**< Number of pages allocated to this pool */
+  size_t free_list_length; /**< Length of the free list */
+} ssm_mem_statistics_pool_t;
+
+/** @brief  Statistics for the heap; fill this in with #ssm_mem_statistics_collect()
+ *
+ * A collection of satistics collected by #ssm_mem_statistics_collect()
+ * and designed to be printed by a function you supply.
+ *
+ * @note Define CONFIG_MEM_STATS to enable this
+ */
+
+typedef struct ssm_mem_statistics {
+  size_t sizeof_ssm_mm;        /**< size of per-object memory management header */  
+  size_t page_size;            /**< Bytes in a memory page */
+  size_t pages_allocated;      /**< Number of pages that have been allocated */
+  size_t live_objects;         /**< Number of live objects **/
+  size_t pool_count;           /**< Number of memory pools */
+  ssm_mem_statistics_pool_t pool[32]; /**< Size of the blocks in each pool */
+} ssm_mem_statistics_t;
+
+/** @brief Collect and return statistics about the heap
+ *
+ * @note Define CONFIG_MEM_STATS to enable this
+ *
+ * @param stats   non-NULL pointer to a #ssm_mem_statistics_t to be filled in
+ */
+void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats);
+
+#endif /* CONFIG_MEM_STATS */
 
 /** @} */
 

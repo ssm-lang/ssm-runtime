@@ -73,7 +73,7 @@ static void (*free_mem)(void *mem, size_t size);
  */
 static inline size_t find_pool_size(size_t size) {
   for (size_t pool_idx = 0; pool_idx < SSM_MEM_POOL_COUNT; pool_idx++)
-    if (size < SSM_MEM_POOL_SIZE(pool_idx))
+    if (size <= SSM_MEM_POOL_SIZE(pool_idx))
       return pool_idx;
   return SSM_MEM_POOL_COUNT;
 }
@@ -84,6 +84,16 @@ static inline block_t *find_next_block(block_t *block, size_t pool_size) {
   else
     return block->free_list_next;
 }
+
+#ifdef CONFIG_MEM_STATS
+/** @brief Tracks how many pages have been allocated by #alloc_pool
+ *
+ * @note Define CONFIG_MEM_STATS to enable this
+ */
+static size_t num_pages_allocated = 0;
+static size_t live_objects = 0;
+static size_t pages_allocated[SSM_MEM_POOL_COUNT] = {0};
+#endif
 
 /** @brief Allocate a new block for a memory pool.
  *
@@ -98,6 +108,12 @@ static inline block_t *find_next_block(block_t *block, size_t pool_size) {
 static inline void alloc_pool(size_t p) {
   block_t *new_page = alloc_page();
   SSM_ASSERT(END_OF_FREELIST < new_page);
+
+#ifdef CONFIG_MEM_STATS
+  num_pages_allocated++;
+  pages_allocated[p]++;
+#endif
+  
   struct mem_pool *pool = &mem_pools[p];
   size_t last_block = BLOCKS_PER_PAGE - SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
   new_page[last_block].free_list_next = pool->free_list_head;
@@ -158,6 +174,9 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 }
 
 void *ssm_mem_alloc(size_t size) {
+#ifdef CONFIG_MEM_STATS
+  live_objects++;
+#endif
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
     return alloc_mem(size);
@@ -189,6 +208,9 @@ void *ssm_mem_alloc(size_t size) {
 }
 
 void ssm_mem_free(void *m, size_t size) {
+#ifdef CONFIG_MEM_STATS
+  live_objects--;
+#endif
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
@@ -317,3 +339,36 @@ void ssm_drops(size_t cnt, ssm_value_t *arr) {
   for (size_t i = 0; i < cnt; i++)
     ssm_drop(arr[i]);
 }
+
+
+#ifdef CONFIG_MEM_STATS
+
+void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats)
+{
+  SSM_ASSERT(stats != NULL);
+
+  stats->sizeof_ssm_mm = sizeof(struct ssm_mm);
+  stats->page_size = SSM_MEM_PAGE_SIZE;
+  stats->pages_allocated = num_pages_allocated;
+  stats->live_objects = live_objects;
+
+  stats->pool_count = SSM_MEM_POOL_COUNT;
+
+  for (size_t i = 0; i < SSM_MEM_POOL_COUNT; i++) {
+    size_t pool_size = SSM_MEM_POOL_SIZE(i);
+    stats->pool[i].block_size = pool_size;
+    stats->pool[i].pages_allocated = pages_allocated[i];
+    size_t n = 0;
+    block_t *block = mem_pools[i].free_list_head;
+    while (block != END_OF_FREELIST) {
+      n++;
+      block = find_next_block(block, pool_size);
+    }
+    stats->pool[i].free_list_length = n;
+  }
+}
+
+#else
+#error "NOT CONFIGURED!"
+
+#endif /* CONFIG_MEM_STATS */
