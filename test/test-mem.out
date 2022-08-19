@@ -3,6 +3,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 0
+# objects allocated 0
+# objects freed 0
 # live objects 0
 # 4 pools
 # pool   0: pages   0  block-size    16  free-blocks     0
@@ -14,6 +16,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 1
+# objects allocated 1
+# objects freed 0
 # live objects 1
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   255
@@ -25,6 +29,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 1
+# objects allocated 1
+# objects freed 1
 # live objects 0
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   256
@@ -36,6 +42,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 1
+# objects allocated 4
+# objects freed 1
 # live objects 3
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -47,6 +55,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 2
+# objects allocated 7
+# objects freed 1
 # live objects 6
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -58,6 +68,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 3
+# objects allocated 10
+# objects freed 1
 # live objects 9
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -69,6 +81,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 4
+# objects allocated 11
+# objects freed 1
 # live objects 10
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -80,6 +94,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 4
+# objects allocated 11
+# objects freed 2
 # live objects 9
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -91,6 +107,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 4
+# objects allocated 11
+# objects freed 5
 # live objects 6
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   253
@@ -102,6 +120,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 4
+# objects allocated 11
+# objects freed 8
 # live objects 3
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   256
@@ -113,6 +133,8 @@
 # sizeof(struct ssm_mm) = 4
 # page size 4096
 # pages allocated 4
+# objects allocated 11
+# objects freed 11
 # live objects 0
 # 4 pools
 # pool   0: pages   1  block-size    16  free-blocks   256

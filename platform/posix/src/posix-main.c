@@ -1,5 +1,18 @@
 #include "posix-common.h"
 
+
+extern ssm_act_t *__enter_main(ssm_act_t *caller, ssm_priority_t priority,
+                               ssm_depth_t depth, ssm_value_t *__argv,
+                               ssm_value_t *__return_val);
+extern ssm_act_t *__enter_stdout_handler(ssm_act_t *parent,
+                                         ssm_priority_t priority,
+                                         ssm_depth_t depth, ssm_value_t *argv,
+                                         ssm_value_t *ret);
+extern void __spawn_stdin_handler(ssm_sv_t *ssm_stdin);
+extern void __kill_stdin_handler(void);
+
+
+
 int ssm_sem_fd[2];
 atomic_size_t rb_r;
 atomic_size_t rb_w;
@@ -7,8 +20,6 @@ pthread_mutex_t rb_lk;
 
 struct ssm_input ssm_input_rb[SSM_INPUT_RB_SIZE];
 
-void ssm_program_init(void);
-void ssm_program_exit(void);
 char **ssm_init_args;
 
 #define MAX_PAGES 2048
@@ -27,6 +38,33 @@ static void *alloc_page(void) {
 static void *alloc_mem(size_t size) { return malloc(size); }
 
 static void free_mem(void *mem, size_t size) { free(mem); }
+
+#ifdef CONFIG_MEM_STATS
+void print_mem_stats(ssm_mem_statistics_t *stats)
+{
+  ssm_mem_statistics_collect(stats);
+
+  printf("sizeof(struct ssm_mm) = %lu\n", stats->sizeof_ssm_mm);
+  printf("page size %lu\n", stats->page_size);
+  printf("pages allocated %lu\n", stats->pages_allocated);
+  printf("objects allocated %lu\n", stats->objects_allocated);
+  printf("objects freed %lu\n", stats->objects_freed);  
+  printf("live objects %lu\n", stats->live_objects);
+
+  size_t pool_count = stats->pool_count;
+
+  printf("%lu pools\n", pool_count);
+
+  for (size_t i = 0 ; i < pool_count ; i++) {
+    printf("pool %3lu: pages %3lu  block-size %5lu  free-blocks %5lu\n", i,
+	   stats->pool[i].pages_allocated,
+	   stats->pool[i].block_size,
+	   stats->pool[i].free_list_length);
+  }
+
+  printf("\n");
+}
+#endif
 
 size_t ssm_input_consume(size_t r, size_t w) {
   if (!ssm_input_read_ready(r, w))
@@ -69,7 +107,19 @@ int main(void) {
   struct timespec init_time;
   clock_gettime(CLOCK_MONOTONIC, &init_time);
   ssm_set_now(timespec_time(init_time));
-  ssm_program_init();
+
+  ssm_value_t ssm_stdin = ssm_new_sv(ssm_marshal((uint32_t)0));
+  ssm_value_t ssm_stdout = ssm_new_sv(ssm_marshal((uint32_t)0));
+  ssm_value_t std_argv[2] = {ssm_stdin, ssm_stdout};
+
+  ssm_activate(__enter_stdout_handler(
+      &ssm_top_parent, SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
+      SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL));
+  ssm_activate(__enter_main(&ssm_top_parent,
+                            SSM_ROOT_PRIORITY + 1 * (1 << (SSM_ROOT_DEPTH - 1)),
+                            SSM_ROOT_DEPTH - 1, std_argv, NULL));
+  __spawn_stdin_handler(ssm_to_sv(ssm_stdin));
+
   ssm_tick();
   int ret = 0;
 
@@ -163,7 +213,16 @@ int main(void) {
 #endif
 
   DBG("Broke out of main loop, quitting\n");
-  ssm_program_exit();
+  
+  __kill_stdin_handler();
+
+  ssm_drop(ssm_stdout);
+  ssm_drop(ssm_stdin);
+
+#ifdef CONFIG_MEM_STATS
+  ssm_mem_statistics_t stats;
+  print_mem_stats(&stats);
+#endif
 
   for (size_t p = 0; p < allocated_pages; p++)
     free(pages[p]);
@@ -171,29 +230,3 @@ int main(void) {
   return ret;
 }
 
-/***** FIXME: hardcoded entry point for posix, ported from sslc *****/
-
-extern ssm_act_t *__enter_main(ssm_act_t *caller, ssm_priority_t priority,
-                               ssm_depth_t depth, ssm_value_t *__argv,
-                               ssm_value_t *__return_val);
-extern ssm_act_t *__enter_stdout_handler(ssm_act_t *parent,
-                                         ssm_priority_t priority,
-                                         ssm_depth_t depth, ssm_value_t *argv,
-                                         ssm_value_t *ret);
-extern void __spawn_stdin_handler(ssm_sv_t *ssm_stdin);
-extern void __kill_stdin_handler(void);
-
-void ssm_program_init(void) {
-  ssm_value_t ssm_stdin = ssm_new_sv(ssm_marshal((uint32_t)0));
-  ssm_value_t ssm_stdout = ssm_new_sv(ssm_marshal((uint32_t)0));
-  ssm_value_t std_argv[2] = {ssm_stdin, ssm_stdout};
-
-  ssm_activate(__enter_stdout_handler(
-      &ssm_top_parent, SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
-      SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL));
-  ssm_activate(__enter_main(&ssm_top_parent,
-                            SSM_ROOT_PRIORITY + 1 * (1 << (SSM_ROOT_DEPTH - 1)),
-                            SSM_ROOT_DEPTH - 1, std_argv, NULL));
-  __spawn_stdin_handler(ssm_to_sv(ssm_stdin));
-}
-void ssm_program_exit(void) { __kill_stdin_handler(); }

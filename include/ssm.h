@@ -1131,6 +1131,8 @@ typedef struct ssm_mem_statistics {
   size_t sizeof_ssm_mm;        /**< size of per-object memory management header */  
   size_t page_size;            /**< Bytes in a memory page */
   size_t pages_allocated;      /**< Number of pages that have been allocated */
+  size_t objects_allocated;    /**< Total number of allocated objects */
+  size_t objects_freed;        /**< Total number of object free events */
   size_t live_objects;         /**< Number of live objects **/
   size_t pool_count;           /**< Number of memory pools */
   ssm_mem_statistics_pool_t pool[32]; /**< Size of the blocks in each pool */

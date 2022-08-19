@@ -58,6 +58,8 @@ TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJ := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/test_%.o, $(TEST_SRC))
 TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 
+CONFIG_FLAGS := $(patsubst %, -D%, $(CONFIGS))
+
 PLATFORM_SRC := $(wildcard $(PLATFORM_DIR)/src/*.c)
 PLATFORM_OBJ := $(patsubst $(PLATFORM_DIR)/src/%.c, $(BUILD_DIR)/%.o, $(PLATFORM_SRC))
 $(info PLATFORM is $(PLATFORM))
@@ -65,7 +67,7 @@ $(info PLATFORM is $(PLATFORM))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
-CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic -DCONFIG_MEM_STATS
+CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic $(CONFIG_FLAGS)
 
 ifeq ($(PLATFORM),simulation)
 # enforce c99 for pure testing, but don't enforce it for other platforms
@@ -87,7 +89,7 @@ CFLAGS += -DUSE_VALGRIND
 endif
 endif
 
-TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage
+TEST_CFLAGS = $(CFLAGS) -g -DSSM_DEBUG --coverage -DCONFIG_MEM_STATS
 
 LD = $(MAKE_LD)
 LDFLAGS = -L$(BUILD_DIR)
@@ -164,5 +166,7 @@ help:
 	@echo
 	@echo "Available example targets:" $(EXE_TGT)
 	@echo "Available test targets:" $(TEST_TGT)
+	@echo
+	@echo "Specify, e.g., CONFIGS=\"CONFIG_MEM_STATS SSM_DEBUG\" to define additional compilation flags"
 
 .PHONY: $(PHONY)

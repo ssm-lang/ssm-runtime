@@ -37,6 +37,8 @@ void print_stats(ssm_mem_statistics_t *stats)
   printf("sizeof(struct ssm_mm) = %lu\n", stats->sizeof_ssm_mm);
   printf("page size %lu\n", stats->page_size);
   printf("pages allocated %lu\n", stats->pages_allocated);
+  printf("objects allocated %lu\n", stats->objects_allocated);
+  printf("objects freed %lu\n", stats->objects_freed);
   printf("live objects %lu\n", stats->live_objects);
 
   size_t pool_count = stats->pool_count;

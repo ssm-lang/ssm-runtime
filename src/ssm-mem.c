@@ -93,6 +93,8 @@ static inline block_t *find_next_block(block_t *block, size_t pool_size) {
 static size_t num_pages_allocated = 0;
 static size_t live_objects = 0;
 static size_t pages_allocated[SSM_MEM_POOL_COUNT] = {0};
+static size_t objects_allocated = 0;
+static size_t objects_freed = 0;
 #endif
 
 /** @brief Allocate a new block for a memory pool.
@@ -175,7 +177,8 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 
 void *ssm_mem_alloc(size_t size) {
 #ifdef CONFIG_MEM_STATS
-  live_objects++;
+  objects_allocated++;
+  live_objects++;  
 #endif
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
@@ -210,6 +213,7 @@ void *ssm_mem_alloc(size_t size) {
 void ssm_mem_free(void *m, size_t size) {
 #ifdef CONFIG_MEM_STATS
   live_objects--;
+  objects_freed++;
 #endif
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
@@ -350,6 +354,8 @@ void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats)
   stats->sizeof_ssm_mm = sizeof(struct ssm_mm);
   stats->page_size = SSM_MEM_PAGE_SIZE;
   stats->pages_allocated = num_pages_allocated;
+  stats->objects_allocated = objects_allocated;
+  stats->objects_freed = objects_freed;
   stats->live_objects = live_objects;
 
   stats->pool_count = SSM_MEM_POOL_COUNT;
@@ -367,8 +373,5 @@ void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats)
     stats->pool[i].free_list_length = n;
   }
 }
-
-#else
-#error "NOT CONFIGURED!"
 
 #endif /* CONFIG_MEM_STATS */
