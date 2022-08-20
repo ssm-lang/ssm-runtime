@@ -20,6 +20,8 @@ static void step_stdout_handler(ssm_act_t *act) {
       break;
     write(1, &c, 1);
     return;
+  case 2:;
+    break;
   }
   ssm_leave(&cont->act, sizeof(stdout_handler_act_t));
 }
@@ -77,5 +79,5 @@ void __spawn_stdin_handler(ssm_sv_t *ssm_stdin) {
 
 void __kill_stdin_handler(void) {
   pthread_cancel(ssm_stdin_tid);
-  pthread_join(ssm_stdin_tid, NULL);
+  pthread_join(ssm_stdin_tid, NULL);  
 }

@@ -44,25 +44,26 @@ void print_mem_stats(ssm_mem_statistics_t *stats)
 {
   ssm_mem_statistics_collect(stats);
 
-  printf("sizeof(struct ssm_mm) = %lu\n", stats->sizeof_ssm_mm);
-  printf("page size %lu\n", stats->page_size);
-  printf("pages allocated %lu\n", stats->pages_allocated);
-  printf("objects allocated %lu\n", stats->objects_allocated);
-  printf("objects freed %lu\n", stats->objects_freed);  
-  printf("live objects %lu\n", stats->live_objects);
+  fprintf(stderr, "sizeof(struct ssm_mm) = %lu\n", stats->sizeof_ssm_mm);
+  fprintf(stderr, "page size %lu\n", stats->page_size);
+  fprintf(stderr, "pages allocated %lu\n", stats->pages_allocated);
+  fprintf(stderr, "objects allocated %lu\n", stats->objects_allocated);
+  fprintf(stderr, "objects freed %lu\n", stats->objects_freed);  
+  fprintf(stderr, "live objects %lu\n", stats->live_objects);
 
   size_t pool_count = stats->pool_count;
 
-  printf("%lu pools\n", pool_count);
+  fprintf(stderr,"%lu pools\n", pool_count);
 
   for (size_t i = 0 ; i < pool_count ; i++) {
-    printf("pool %3lu: pages %3lu  block-size %5lu  free-blocks %5lu\n", i,
-	   stats->pool[i].pages_allocated,
-	   stats->pool[i].block_size,
-	   stats->pool[i].free_list_length);
+    fprintf(stderr,
+	    "pool %3lu: pages %3lu  block-size %5lu  free-blocks %5lu\n", i,
+	    stats->pool[i].pages_allocated,
+	    stats->pool[i].block_size,
+	    stats->pool[i].free_list_length);
   }
 
-  printf("\n");
+  fprintf(stderr, "\n");
 }
 #endif
 
@@ -112,9 +113,12 @@ int main(void) {
   ssm_value_t ssm_stdout = ssm_new_sv(ssm_marshal((uint32_t)0));
   ssm_value_t std_argv[2] = {ssm_stdin, ssm_stdout};
 
-  ssm_activate(__enter_stdout_handler(
-      &ssm_top_parent, SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
-      SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL));
+  ssm_act_t * stdout_act =
+    __enter_stdout_handler( &ssm_top_parent,
+			    SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
+			    SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL);
+  ssm_activate(stdout_act);
+  
   ssm_activate(__enter_main(&ssm_top_parent,
                             SSM_ROOT_PRIORITY + 1 * (1 << (SSM_ROOT_DEPTH - 1)),
                             SSM_ROOT_DEPTH - 1, std_argv, NULL));
@@ -213,8 +217,15 @@ int main(void) {
 #endif
 
   DBG("Broke out of main loop, quitting\n");
+
+  // FIXME: hack to force the stdout_handler function to terminate
+  // and free its activation record
+  stdout_act->pc = 2; // FIXME: must match the code in step_stdout_handler()
+  ssm_activate(stdout_act);
+  ssm_tick();
+
   
-  __kill_stdin_handler();
+  __kill_stdin_handler(); 
 
   ssm_drop(ssm_stdout);
   ssm_drop(ssm_stdin);
@@ -222,6 +233,11 @@ int main(void) {
 #ifdef CONFIG_MEM_STATS
   ssm_mem_statistics_t stats;
   print_mem_stats(&stats);
+  if ( stats.live_objects ) {
+    fprintf(stderr, "FAILED: %lu live objects leaked at the end\n",
+	    stats.live_objects);
+    exit(1);
+  }
 #endif
 
   for (size_t p = 0; p < allocated_pages; p++)
