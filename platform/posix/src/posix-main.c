@@ -110,7 +110,9 @@ int main(void) {
   ssm_set_now(timespec_time(init_time));
 
   ssm_value_t ssm_stdin = ssm_new_sv(ssm_marshal((uint32_t)0));
+  ssm_dup(ssm_stdin); // dup because this is passed to stdin_handler
   ssm_value_t ssm_stdout = ssm_new_sv(ssm_marshal((uint32_t)0));
+  ssm_dup(ssm_stdout); // dup because this is passed to stdout_handler
   ssm_value_t std_argv[2] = {ssm_stdin, ssm_stdout};
 
   ssm_act_t * stdout_act =

@@ -23,6 +23,7 @@ static void step_stdout_handler(ssm_act_t *act) {
   case 2:;
     break;
   }
+  ssm_drop(cont->ssm_stdout); // Caller drop this argument
   ssm_leave(&cont->act, sizeof(stdout_handler_act_t));
 }
 
