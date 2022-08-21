@@ -225,12 +225,9 @@ int main(void) {
   stdout_act->pc = 2; // FIXME: must match the code in step_stdout_handler()
   ssm_activate(stdout_act);
   ssm_tick();
-
   
-  __kill_stdin_handler(); 
-
-  ssm_drop(ssm_stdout);
-  ssm_drop(ssm_stdin);
+   __kill_stdin_handler();
+   ssm_drop(ssm_stdin); // FIXME: should probably be part of __kill_stdin_handler
 
 #ifdef CONFIG_MEM_STATS
   ssm_mem_statistics_t stats;
@@ -247,4 +244,3 @@ int main(void) {
 
   return ret;
 }
-
