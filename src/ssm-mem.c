@@ -176,45 +176,61 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 }
 
 void *ssm_mem_alloc(size_t size) {
+  
 #ifdef CONFIG_MEM_STATS
   objects_allocated++;
   live_objects++;  
 #endif
+
+  void *m;
+  
   size_t p = find_pool_size(size);
-  if (p >= SSM_MEM_POOL_COUNT)
-    return alloc_mem(size);
+  if (p >= SSM_MEM_POOL_COUNT) {
+    m = alloc_mem(size);
+  } else {
+    struct mem_pool *pool = &mem_pools[p];
 
-  struct mem_pool *pool = &mem_pools[p];
+    if (pool->free_list_head == END_OF_FREELIST)
+      alloc_pool(p);
 
-  if (pool->free_list_head == END_OF_FREELIST)
-    alloc_pool(p);
-
-  void *m = pool->free_list_head->block_buf;
+    m = pool->free_list_head->block_buf;
 
 #ifdef USE_VALGRIND
-  // Tell Valgrind that we have allocated m as a chunk of pool.
-  //
-  // The memory range [m..m+size] is now considered DEFINED.
-  VALGRIND_MALLOCLIKE_BLOCK(m, size, 0, 1);
+    // Tell Valgrind that we have allocated m as a chunk of pool.
+    //
+    // The memory range [m..m+size] is now considered DEFINED.
+    VALGRIND_MALLOCLIKE_BLOCK(m, size, 0, 1);
 #endif
 
-  pool->free_list_head =
+    pool->free_list_head =
       find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
 
 #ifdef USE_VALGRIND
-  // Make the memory range [m..m+size] undefined, because the caller should
-  // not rely on allocated chunks being defined.
-  VALGRIND_MAKE_MEM_UNDEFINED(m, size);
+    // Make the memory range [m..m+size] undefined, because the caller should
+    // not rely on allocated chunks being defined.
+    VALGRIND_MAKE_MEM_UNDEFINED(m, size);
+#endif
+
+  }
+
+#ifdef CONFIG_MEM_TRACE
+  fprintf(stderr, "%p = ssm_mem_alloc(%lu)\n", m, size);
 #endif
 
   return m;
 }
 
 void ssm_mem_free(void *m, size_t size) {
+
+#ifdef CONFIG_MEM_TRACE
+  fprintf(stderr, "%p ssm_mem_free(%lu)\n", m, size);
+#endif
+    
 #ifdef CONFIG_MEM_STATS
   live_objects--;
   objects_freed++;
 #endif
+  
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
@@ -233,7 +249,7 @@ void ssm_mem_free(void *m, size_t size) {
 #endif
 }
 
-ssm_value_t ssm_new_time(ssm_time_t time) {
+ssm_value_t ssm_new_time_int(ssm_time_t time) {
   struct ssm_time *t = ssm_mem_alloc(sizeof(struct ssm_sv));
   t->mm.ref_count = 1;
   t->mm.kind = SSM_TIME_K;
@@ -241,7 +257,7 @@ ssm_value_t ssm_new_time(ssm_time_t time) {
   return (ssm_value_t){.heap_ptr = &t->mm};
 }
 
-ssm_value_t ssm_new_adt(uint8_t field_count, uint8_t tag) {
+ssm_value_t ssm_new_adt_int(uint8_t field_count, uint8_t tag) {
   struct ssm_mm *mm = ssm_mem_alloc(ssm_adt_size(field_count));
   mm->ref_count = 1;
   mm->kind = SSM_ADT_K;
@@ -250,7 +266,7 @@ ssm_value_t ssm_new_adt(uint8_t field_count, uint8_t tag) {
   return (ssm_value_t){.heap_ptr = mm};
 }
 
-ssm_value_t ssm_new_sv(ssm_value_t val) {
+ssm_value_t ssm_new_sv_int(ssm_value_t val) {
   struct ssm_sv *sv = ssm_mem_alloc(sizeof(struct ssm_sv));
   sv->mm.ref_count = 1;
   sv->mm.kind = SSM_SV_K;
@@ -261,7 +277,7 @@ ssm_value_t ssm_new_sv(ssm_value_t val) {
   return (ssm_value_t){.heap_ptr = &sv->mm};
 }
 
-ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap) {
+ssm_value_t ssm_new_closure_int(ssm_func_t f, uint8_t arg_cap) {
   struct ssm_closure1 *closure = container_of(
       ssm_mem_alloc(ssm_closure_size(arg_cap)), struct ssm_closure1, mm);
   closure->mm.ref_count = 1;
@@ -272,7 +288,7 @@ ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap) {
   return (ssm_value_t){.heap_ptr = &closure->mm};
 }
 
-ssm_value_t ssm_new_array(uint16_t elems) {
+ssm_value_t ssm_new_array_int(uint16_t elems) {
   struct ssm_mm *mm = ssm_mem_alloc(ssm_array_size(elems));
   mm->ref_count = 1;
   mm->kind = SSM_ARRAY_K;
@@ -280,7 +296,7 @@ ssm_value_t ssm_new_array(uint16_t elems) {
   return (ssm_value_t){.heap_ptr = mm};
 }
 
-ssm_value_t ssm_new_blob(uint16_t size) {
+ssm_value_t ssm_new_blob_int(uint16_t size) {
   uint16_t scaled_size = // ceiling(size / SSM_BLOB_SIZE_SCALE)
       (size + SSM_BLOB_SIZE_SCALE - 1) / SSM_BLOB_SIZE_SCALE;
 

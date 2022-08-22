@@ -14,6 +14,10 @@
 #include <stdint.h>  /* For uint16_t, UINT64_MAX etc. */
 #include <stdlib.h>  /* For size_t */
 
+#ifdef CONFIG_MEM_TRACE
+#  include <stdio.h>
+#endif
+
 /**
  * @addtogroup error
  * @{
@@ -426,8 +430,18 @@ ssm_time_t ssm_now(void);
  *
  *  @param time what the heap-allocated @a time field is initialized to.
  *  @returns    #ssm_value_t pointing to the heap-allocated #ssm_time.
+ *
+ * ssm_value_t ssm_new_time(ssm_time_t time)
  */
-ssm_value_t ssm_new_time(ssm_time_t time);
+extern ssm_value_t ssm_new_time_int(ssm_time_t time);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_time(t) \
+     (fprintf(stderr,"%s:%d:ssm_new_time()\n", __FILE__, __LINE__), \
+      ssm_new_time_int(t))
+#else
+#  define ssm_new_time(t) ssm_new_time_int(t)
+#endif
+
 
 /** @brief Read the heap-allocated time pointed to by an #ssm_value_t.
  *
@@ -483,7 +497,16 @@ struct ssm_adt1 {
  *  @param tag          the tag of the ADT object, stored in the #ssm_mm header.
  *  @returns            #ssm_value_t poining to the ADT object on the heap.
  */
-ssm_value_t ssm_new_adt(uint8_t field_count, uint8_t tag);
+extern ssm_value_t ssm_new_adt_int(uint8_t field_count, uint8_t tag);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_adt(fc, tag)					  \
+  (fprintf(stderr,"%s:%d:ssm_new_adt(%d, %d)\n", \
+       __FILE__, __LINE__, (fc), (tag)),			\
+   ssm_new_adt_int((fc), (tag)))
+#else
+#  define ssm_new_adt(fc, tag) ssm_new_adt_int((fc), (tag))
+#endif
+
 
 /** @brief Access the field of an ADT object.
  *
@@ -572,7 +595,16 @@ typedef struct ssm_sv {
  *  @param val  the initial value of the scheduled variable.
  *  @returns    #ssm_value_t pointing to the #ssm_sv on the heap.
  */
-ssm_value_t ssm_new_sv(ssm_value_t val);
+extern ssm_value_t ssm_new_sv_int(ssm_value_t val);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_sv(v)					  \
+  (fprintf(stderr,"%s:%d:ssm_new_sv()\n", \
+       __FILE__, __LINE__),			\
+   ssm_new_sv_int(v))
+#else
+#  define ssm_new_sv(v) ssm_new_sv_int(v)
+#endif
+
 
 /** @brief Retrieve #ssm_sv pointer pointed to by an #ssm_value_t.
  *
@@ -837,7 +869,16 @@ struct ssm_closure1 {
  *  @param arg_cap  the number of arguments the closure should accommodate.
  *  @returns        a value pointing to the heap-allocated closure.
  */
-ssm_value_t ssm_new_closure(ssm_func_t f, uint8_t arg_cap);
+extern ssm_value_t ssm_new_closure_int(ssm_func_t f, uint8_t arg_cap);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_closure(f, args)					  \
+  (fprintf(stderr,"%s:%d:ssm_new_closure(_, %d)\n", \
+	   __FILE__, __LINE__, (args)),		     \
+   ssm_new_closure_int((f), (args)))
+#else
+#  define ssm_new_closure(f, args) ssm_new_closure_int((f), (args))
+#endif
+
 
 /** @brief Create a copy of a closure.
  *
@@ -999,7 +1040,17 @@ struct ssm_array1 {
  *  @param count  number of #ssm_value_t elements to be stored in the array.
  *  @returns      #ssm_value_t pointing to heap-allocated array.
  */
-ssm_value_t ssm_new_array(uint16_t count);
+
+extern ssm_value_t ssm_new_array_int(uint16_t count);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_array(c)					  \
+  (fprintf(stderr,"%s:%d:ssm_new_array(%d)\n", \
+	   __FILE__, __LINE__, (c)),		     \
+   ssm_new_array_int(c)
+#else
+#  define ssm_new_array(c) ssm_new_array_int(c)
+#endif
+
 
 /** @} */
 
@@ -1068,7 +1119,16 @@ struct ssm_blob1 {
  *  @param size   size of the payload to the allocated.
  *  @returns      #ssm_value_t pointing to heap-allocated blob.
  */
-ssm_value_t ssm_new_blob(uint16_t size);
+extern ssm_value_t ssm_new_blob_int(uint16_t size);
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_new_blob(s)					  \
+  (fprintf(stderr,"%s:%d:ssm_new_blob(%lu)\n", \
+	   __FILE__, __LINE__, (size)),		     \
+   ssm_new_blob_int(size))
+#else
+#  define ssm_new_blob(s) ssm_new_blob_int(s)
+#endif
+
 
 /** @} */
 
