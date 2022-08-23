@@ -58,8 +58,6 @@ TEST_SRC := $(wildcard $(TEST_DIR)/*.c)
 TEST_OBJ := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/test_%.o, $(TEST_SRC))
 TEST_TGT := $(patsubst %.o, %, $(TEST_OBJ))
 
-CONFIG_FLAGS := $(patsubst %, -D%, $(CONFIGS))
-
 PLATFORM_SRC := $(wildcard $(PLATFORM_DIR)/src/*.c)
 PLATFORM_OBJ := $(patsubst $(PLATFORM_DIR)/src/%.c, $(BUILD_DIR)/%.o, $(PLATFORM_SRC))
 $(info PLATFORM is $(PLATFORM))
@@ -67,7 +65,7 @@ $(info PLATFORM is $(PLATFORM))
 COV_TGT := $(BUILD_DIR)/coverage.xml
 
 CC = $(MAKE_CC)
-CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic $(CONFIG_FLAGS)
+CFLAGS += -g -I$(INC_DIR) -O -Wall -pedantic $(EXTRA_CFLAGS)
 
 ifeq ($(PLATFORM),simulation)
 # enforce c99 for pure testing, but don't enforce it for other platforms
@@ -76,7 +74,7 @@ endif
 
 ifeq ($(PLATFORM),simulation)
 # Check whether valgrind is available.
-ifeq ($(shell which valgrind),)
+ifeq (0,0) # ($(shell which valgrind),)
 $(info # Valgrind is not available; compiling without it.)
 else
 # If available, we try to #include <valgrind/valgrind.h>, which we use to

@@ -97,6 +97,7 @@ static size_t objects_allocated = 0;
 static size_t objects_freed = 0;
 #endif
 
+#ifndef CONFIG_MALLOC_HEAP
 /** @brief Allocate a new block for a memory pool.
  *
  *  Calls alloc_page() to allocate a new zero-initialized page for the memory
@@ -129,6 +130,7 @@ static inline void alloc_pool(size_t p) {
   VALGRIND_CREATE_BLOCK(new_page, SSM_MEM_PAGE_SIZE, "SSM memory pool page");
 #endif
 }
+#endif /* ifndef CONFIG_MALLOC_HEAP */
 
 void ssm_mem_init(void *(*alloc_page_handler)(void),
                   void *(*alloc_mem_handler)(size_t),
@@ -167,6 +169,7 @@ void ssm_mem_destroy(void (*free_page_handler)(void *)) {
 #endif
 }
 
+#ifndef CONFIG_MALLOC_HEAP
 void ssm_mem_prealloc(size_t size, size_t num_pages) {
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT)
@@ -174,6 +177,7 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
   for (size_t i = 0; i < num_pages; i++)
     alloc_pool(p);
 }
+#endif
 
 void *ssm_mem_alloc(size_t size) {
   
@@ -183,7 +187,11 @@ void *ssm_mem_alloc(size_t size) {
 #endif
 
   void *m;
-  
+
+#ifdef CONFIG_MALLOC_HEAP
+  m = malloc(size);
+#else
+    
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     m = alloc_mem(size);
@@ -209,9 +217,10 @@ void *ssm_mem_alloc(size_t size) {
     // Make the memory range [m..m+size] undefined, because the caller should
     // not rely on allocated chunks being defined.
     VALGRIND_MAKE_MEM_UNDEFINED(m, size);
-#endif
-
+#endif    
   }
+
+#endif /* CONFIG_MALLOC_HEAP */
 
 #ifdef CONFIG_MEM_TRACE
   fprintf(stderr, "%p = ssm_mem_alloc(%lu)\n", m, size);
@@ -230,6 +239,10 @@ void ssm_mem_free(void *m, size_t size) {
   live_objects--;
   objects_freed++;
 #endif
+
+#ifdef CONFIG_MALLOC_HEAP
+  free(m);
+#else
   
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
@@ -247,6 +260,8 @@ void ssm_mem_free(void *m, size_t size) {
   // Tell Valgrind that we have freed m.
   VALGRIND_FREELIKE_BLOCK(m, 0);
 #endif
+
+#endif /* CONFIG_MALLOC_HEAP */  
 }
 
 ssm_value_t ssm_new_time_int(ssm_time_t time) {
