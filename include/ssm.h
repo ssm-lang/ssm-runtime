@@ -173,8 +173,17 @@ typedef struct ssm_trigger {
  *
  *  @throws SSM_EXHAUSTED_MEMORY out of memory.
  */
-ssm_act_t *ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent,
-                     ssm_priority_t priority, ssm_depth_t depth);
+ssm_act_t *ssm_enter_int(size_t size, ssm_stepf_t step, ssm_act_t *parent,
+                         ssm_priority_t priority, ssm_depth_t depth);
+
+#ifdef CONFIG_MEM_TRACE
+#  define ssm_enter(si, st, pa, pr, de) \
+  (fprintf(stderr,"%s:%d:ssm_enter(%lu,_,_,_,_,_)\n", __FILE__, __LINE__, (si)), \
+   ssm_enter_int((si), (st), (pa), (pr), (de)))
+#else
+#  define ssm_enter(si, st, pa, pr, de) \
+  ssm_enter_int((si), (st), (pa), (pr), (de))
+#endif
 
 /** @brief Destroy the activation record of a routine before leaving.
  *
