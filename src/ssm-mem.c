@@ -87,7 +87,7 @@ static inline block_t *find_next_block(block_t *block, size_t pool_size) {
 }
 
 #ifdef CONFIG_MEM_STATS
-/** @brief Tracks how many pages have been allocated by #alloc_pool.
+/** @brief Tracks how many pages have been allocated by alloc_pool().
  *
  *  @note Define CONFIG_MEM_STATS to enable this.
  */
