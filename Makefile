@@ -74,7 +74,8 @@ endif
 
 ifeq ($(PLATFORM),simulation)
 # Check whether valgrind is available.
-ifeq (0,0) # ($(shell which valgrind),)
+# ifeq (0,0)
+ifeq ($(shell which valgrind),)
 $(info # Valgrind is not available; compiling without it.)
 else
 # If available, we try to #include <valgrind/valgrind.h>, which we use to
