@@ -15,7 +15,7 @@
 #include <stdlib.h>  /* For size_t */
 
 #ifdef CONFIG_MEM_TRACE
-#  include <stdio.h>
+#include <stdio.h>
 #endif
 
 /**
@@ -177,11 +177,12 @@ ssm_act_t *ssm_enter_int(size_t size, ssm_stepf_t step, ssm_act_t *parent,
                          ssm_priority_t priority, ssm_depth_t depth);
 
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_enter(si, st, pa, pr, de) \
-  (fprintf(stderr,"%s:%d:ssm_enter(%lu,_,_,_,_,_)\n", __FILE__, __LINE__, (si)), \
+#define ssm_enter(si, st, pa, pr, de)                                          \
+  (fprintf(stderr, "%s:%d:ssm_enter(%lu,_,_,_,_,_)\n", __FILE__, __LINE__,     \
+           (si)),                                                              \
    ssm_enter_int((si), (st), (pa), (pr), (de)))
 #else
-#  define ssm_enter(si, st, pa, pr, de) \
+#define ssm_enter(si, st, pa, pr, de)                                          \
   ssm_enter_int((si), (st), (pa), (pr), (de))
 #endif
 
@@ -440,17 +441,16 @@ ssm_time_t ssm_now(void);
  *  @param time what the heap-allocated @a time field is initialized to.
  *  @returns    #ssm_value_t pointing to the heap-allocated #ssm_time.
  *
- * ssm_value_t ssm_new_time(ssm_time_t time)
+ *  ssm_value_t ssm_new_time(ssm_time_t time)
  */
 extern ssm_value_t ssm_new_time_int(ssm_time_t time);
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_time(t) \
-     (fprintf(stderr,"%s:%d:ssm_new_time()\n", __FILE__, __LINE__), \
-      ssm_new_time_int(t))
+#define ssm_new_time(t)                                                        \
+  (fprintf(stderr, "%s:%d:ssm_new_time()\n", __FILE__, __LINE__),              \
+   ssm_new_time_int(t))
 #else
-#  define ssm_new_time(t) ssm_new_time_int(t)
+#define ssm_new_time(t) ssm_new_time_int(t)
 #endif
-
 
 /** @brief Read the heap-allocated time pointed to by an #ssm_value_t.
  *
@@ -507,15 +507,15 @@ struct ssm_adt1 {
  *  @returns            #ssm_value_t poining to the ADT object on the heap.
  */
 extern ssm_value_t ssm_new_adt_int(uint8_t field_count, uint8_t tag);
+
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_adt(fc, tag)					  \
-  (fprintf(stderr,"%s:%d:ssm_new_adt(%d, %d)\n", \
-       __FILE__, __LINE__, (fc), (tag)),			\
+#define ssm_new_adt(fc, tag)                                                   \
+  (fprintf(stderr, "%s:%d:ssm_new_adt(%d, %d)\n", __FILE__, __LINE__, (fc),    \
+           (tag)),                                                             \
    ssm_new_adt_int((fc), (tag)))
 #else
-#  define ssm_new_adt(fc, tag) ssm_new_adt_int((fc), (tag))
+#define ssm_new_adt(fc, tag) ssm_new_adt_int((fc), (tag))
 #endif
-
 
 /** @brief Access the field of an ADT object.
  *
@@ -606,14 +606,12 @@ typedef struct ssm_sv {
  */
 extern ssm_value_t ssm_new_sv_int(ssm_value_t val);
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_sv(v)					  \
-  (fprintf(stderr,"%s:%d:ssm_new_sv()\n", \
-       __FILE__, __LINE__),			\
+#define ssm_new_sv(v)                                                          \
+  (fprintf(stderr, "%s:%d:ssm_new_sv()\n", __FILE__, __LINE__),                \
    ssm_new_sv_int(v))
 #else
-#  define ssm_new_sv(v) ssm_new_sv_int(v)
+#define ssm_new_sv(v) ssm_new_sv_int(v)
 #endif
-
 
 /** @brief Retrieve #ssm_sv pointer pointed to by an #ssm_value_t.
  *
@@ -880,14 +878,13 @@ struct ssm_closure1 {
  */
 extern ssm_value_t ssm_new_closure_int(ssm_func_t f, uint8_t arg_cap);
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_closure(f, args)					  \
-  (fprintf(stderr,"%s:%d:ssm_new_closure(_, %d)\n", \
-	   __FILE__, __LINE__, (args)),		     \
+#define ssm_new_closure(f, args)                                               \
+  (fprintf(stderr, "%s:%d:ssm_new_closure(_, %d)\n", __FILE__, __LINE__,       \
+           (args)),                                                            \
    ssm_new_closure_int((f), (args)))
 #else
-#  define ssm_new_closure(f, args) ssm_new_closure_int((f), (args))
+#define ssm_new_closure(f, args) ssm_new_closure_int((f), (args))
 #endif
-
 
 /** @brief Create a copy of a closure.
  *
@@ -1052,14 +1049,13 @@ struct ssm_array1 {
 
 extern ssm_value_t ssm_new_array_int(uint16_t count);
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_array(c)					  \
+#define ssm_new_array(c)                                                       \
   (fprintf(stderr,"%s:%d:ssm_new_array(%d)\n", \
 	   __FILE__, __LINE__, (c)),		     \
    ssm_new_array_int(c)
 #else
-#  define ssm_new_array(c) ssm_new_array_int(c)
+#define ssm_new_array(c) ssm_new_array_int(c)
 #endif
-
 
 /** @} */
 
@@ -1108,7 +1104,7 @@ struct ssm_blob1 {
  *  @param size   scaled size of the blob's payload.
  *  @returns      size that a blob of @a size payload occupies in the heap.
  */
-#define ssm_blob_size(size) \
+#define ssm_blob_size(size)                                                    \
   (sizeof(struct ssm_blob1) - SSM_BLOB_SIZE_SCALE + (size))
 
 /** @brief Compute the size a blob in the heap.
@@ -1130,14 +1126,12 @@ struct ssm_blob1 {
  */
 extern ssm_value_t ssm_new_blob_int(uint16_t size);
 #ifdef CONFIG_MEM_TRACE
-#  define ssm_new_blob(s)					  \
-  (fprintf(stderr,"%s:%d:ssm_new_blob(%lu)\n", \
-	   __FILE__, __LINE__, (size)),		     \
+#define ssm_new_blob(s)                                                        \
+  (fprintf(stderr, "%s:%d:ssm_new_blob(%lu)\n", __FILE__, __LINE__, (size)),   \
    ssm_new_blob_int(size))
 #else
-#  define ssm_new_blob(s) ssm_new_blob_int(s)
+#define ssm_new_blob(s) ssm_new_blob_int(s)
 #endif
-
 
 /** @} */
 
@@ -1175,47 +1169,6 @@ void ssm_mem_prealloc(size_t size, size_t num_pages);
  *  @param size   the size of the memory range allocated by ssm_mem_alloc().
  */
 void ssm_mem_free(void *m, size_t size);
-
-#ifdef CONFIG_MEM_STATS
-
-/** @brief  Statistics for a heap page pool; used in #ssm_mem_statistics_t
- *
- * @note Define CONFIG_MEM_STATS to enable this
- */
-typedef struct ssm_mem_statistics_pool {
-  size_t block_size;       /**< Size of this pool's blocks */
-  size_t pages_allocated;  /**< Number of pages allocated to this pool */
-  size_t free_list_length; /**< Length of the free list */
-} ssm_mem_statistics_pool_t;
-
-/** @brief  Statistics for the heap; fill this in with #ssm_mem_statistics_collect()
- *
- * A collection of satistics collected by #ssm_mem_statistics_collect()
- * and designed to be printed by a function you supply.
- *
- * @note Define CONFIG_MEM_STATS to enable this
- */
-
-typedef struct ssm_mem_statistics {
-  size_t sizeof_ssm_mm;        /**< size of per-object memory management header */  
-  size_t page_size;            /**< Bytes in a memory page */
-  size_t pages_allocated;      /**< Number of pages that have been allocated */
-  size_t objects_allocated;    /**< Total number of allocated objects */
-  size_t objects_freed;        /**< Total number of object free events */
-  size_t live_objects;         /**< Number of live objects **/
-  size_t pool_count;           /**< Number of memory pools */
-  ssm_mem_statistics_pool_t pool[32]; /**< Size of the blocks in each pool */
-} ssm_mem_statistics_t;
-
-/** @brief Collect and return statistics about the heap
- *
- * @note Define CONFIG_MEM_STATS to enable this
- *
- * @param stats   non-NULL pointer to a #ssm_mem_statistics_t to be filled in
- */
-void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats);
-
-#endif /* CONFIG_MEM_STATS */
 
 /** @} */
 

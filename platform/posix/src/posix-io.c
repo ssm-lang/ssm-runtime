@@ -20,11 +20,12 @@ static void step_stdout_handler(ssm_act_t *act) {
       return;
     write(1, &c, 1);
     return;
-  case 2:;  // Magical "terminate self" code
+  case 2:; // Magical "terminate self" code
     break;
   }
 
-  ssm_desensitize(&cont->trigger); // sensitize added a pointer to the activation record
+  ssm_desensitize(
+      &cont->trigger); // sensitize added a pointer to the activation record
   ssm_drop(cont->ssm_stdout); // Caller drop this argument
   ssm_leave(&cont->act, sizeof(stdout_handler_act_t));
 }
@@ -82,5 +83,5 @@ void __spawn_stdin_handler(ssm_sv_t *ssm_stdin) {
 
 void __kill_stdin_handler(void) {
   pthread_cancel(ssm_stdin_tid);
-  pthread_join(ssm_stdin_tid, NULL);  
+  pthread_join(ssm_stdin_tid, NULL);
 }

@@ -2,6 +2,7 @@
  *  @brief SSM runtime memory management and allocation.
  *
  *  @author John Hui (j-hui)
+ *  @author Stephen Edwards (sedwards-lab)
  *  @author Daniel Scanteianu (Scanteianu)
  */
 #include <assert.h>
@@ -86,9 +87,9 @@ static inline block_t *find_next_block(block_t *block, size_t pool_size) {
 }
 
 #ifdef CONFIG_MEM_STATS
-/** @brief Tracks how many pages have been allocated by #alloc_pool
+/** @brief Tracks how many pages have been allocated by #alloc_pool.
  *
- * @note Define CONFIG_MEM_STATS to enable this
+ *  @note Define CONFIG_MEM_STATS to enable this.
  */
 static size_t num_pages_allocated = 0;
 static size_t live_objects = 0;
@@ -116,7 +117,7 @@ static inline void alloc_pool(size_t p) {
   num_pages_allocated++;
   pages_allocated[p]++;
 #endif
-  
+
   struct mem_pool *pool = &mem_pools[p];
   size_t last_block = BLOCKS_PER_PAGE - SSM_MEM_POOL_SIZE(p) / sizeof(block_t);
   new_page[last_block].free_list_next = pool->free_list_head;
@@ -180,10 +181,10 @@ void ssm_mem_prealloc(size_t size, size_t num_pages) {
 #endif
 
 void *ssm_mem_alloc(size_t size) {
-  
+
 #ifdef CONFIG_MEM_STATS
   objects_allocated++;
-  live_objects++;  
+  live_objects++;
 #endif
 
   void *m;
@@ -191,7 +192,7 @@ void *ssm_mem_alloc(size_t size) {
 #ifdef CONFIG_MALLOC_HEAP
   m = malloc(size);
 #else
-    
+
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     m = alloc_mem(size);
@@ -211,13 +212,13 @@ void *ssm_mem_alloc(size_t size) {
 #endif
 
     pool->free_list_head =
-      find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
+        find_next_block(pool->free_list_head, SSM_MEM_POOL_SIZE(p));
 
 #ifdef USE_VALGRIND
     // Make the memory range [m..m+size] undefined, because the caller should
     // not rely on allocated chunks being defined.
     VALGRIND_MAKE_MEM_UNDEFINED(m, size);
-#endif    
+#endif
   }
 
 #endif /* CONFIG_MALLOC_HEAP */
@@ -234,7 +235,7 @@ void ssm_mem_free(void *m, size_t size) {
 #ifdef CONFIG_MEM_TRACE
   fprintf(stderr, "%p ssm_mem_free(%lu)\n", m, size);
 #endif
-    
+
 #ifdef CONFIG_MEM_STATS
   live_objects--;
   objects_freed++;
@@ -243,7 +244,6 @@ void ssm_mem_free(void *m, size_t size) {
 #ifdef CONFIG_MALLOC_HEAP
   free(m);
 #else
-  
   size_t p = find_pool_size(size);
   if (p >= SSM_MEM_POOL_COUNT) {
     free_mem(m, size);
@@ -260,8 +260,7 @@ void ssm_mem_free(void *m, size_t size) {
   // Tell Valgrind that we have freed m.
   VALGRIND_FREELIKE_BLOCK(m, 0);
 #endif
-
-#endif /* CONFIG_MALLOC_HEAP */  
+#endif /* CONFIG_MALLOC_HEAP */
 }
 
 ssm_value_t ssm_new_time_int(ssm_time_t time) {
@@ -375,11 +374,8 @@ void ssm_drops(size_t cnt, ssm_value_t *arr) {
     ssm_drop(arr[i]);
 }
 
-
 #ifdef CONFIG_MEM_STATS
-
-void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats)
-{
+void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats) {
   SSM_ASSERT(stats != NULL);
 
   stats->sizeof_ssm_mm = sizeof(struct ssm_mm);
@@ -404,5 +400,4 @@ void ssm_mem_statistics_collect(ssm_mem_statistics_t *stats)
     stats->pool[i].free_list_length = n;
   }
 }
-
 #endif /* CONFIG_MEM_STATS */

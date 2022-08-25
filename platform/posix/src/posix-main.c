@@ -1,6 +1,5 @@
 #include "posix-common.h"
 
-
 extern ssm_act_t *__enter_main(ssm_act_t *caller, ssm_priority_t priority,
                                ssm_depth_t depth, ssm_value_t *__argv,
                                ssm_value_t *__return_val);
@@ -10,8 +9,6 @@ extern ssm_act_t *__enter_stdout_handler(ssm_act_t *parent,
                                          ssm_value_t *ret);
 extern void __spawn_stdin_handler(ssm_sv_t *ssm_stdin);
 extern void __kill_stdin_handler(void);
-
-
 
 int ssm_sem_fd[2];
 atomic_size_t rb_r;
@@ -40,27 +37,25 @@ static void *alloc_mem(size_t size) { return malloc(size); }
 static void free_mem(void *mem, size_t size) { free(mem); }
 
 #ifdef CONFIG_MEM_STATS
-void print_mem_stats(ssm_mem_statistics_t *stats)
-{
+void print_mem_stats(ssm_mem_statistics_t *stats) {
   ssm_mem_statistics_collect(stats);
 
   fprintf(stderr, "sizeof(struct ssm_mm) = %lu\n", stats->sizeof_ssm_mm);
   fprintf(stderr, "page size %lu\n", stats->page_size);
   fprintf(stderr, "pages allocated %lu\n", stats->pages_allocated);
   fprintf(stderr, "objects allocated %lu\n", stats->objects_allocated);
-  fprintf(stderr, "objects freed %lu\n", stats->objects_freed);  
+  fprintf(stderr, "objects freed %lu\n", stats->objects_freed);
   fprintf(stderr, "live objects %lu\n", stats->live_objects);
 
   size_t pool_count = stats->pool_count;
 
-  fprintf(stderr,"%lu pools\n", pool_count);
+  fprintf(stderr, "%lu pools\n", pool_count);
 
-  for (size_t i = 0 ; i < pool_count ; i++) {
+  for (size_t i = 0; i < pool_count; i++) {
     fprintf(stderr,
-	    "pool %3lu: pages %3lu  block-size %5lu  free-blocks %5lu\n", i,
-	    stats->pool[i].pages_allocated,
-	    stats->pool[i].block_size,
-	    stats->pool[i].free_list_length);
+            "pool %3lu: pages %3lu  block-size %5lu  free-blocks %5lu\n", i,
+            stats->pool[i].pages_allocated, stats->pool[i].block_size,
+            stats->pool[i].free_list_length);
   }
 
   fprintf(stderr, "\n");
@@ -95,7 +90,6 @@ static inline void poll_input_queue(size_t *r, size_t *w) {
         ssm_raw_time64_scale(ssm_input_get(scaled)->time, 1);
 }
 
-// int ret = 0;
 ssm_time_t next_time, wall_time;
 size_t r, w;
 
@@ -115,12 +109,11 @@ int main(void) {
   ssm_dup(ssm_stdout); // dup because this is passed to stdout_handler
   ssm_value_t std_argv[2] = {ssm_stdin, ssm_stdout};
 
-  ssm_act_t * stdout_act =
-    __enter_stdout_handler( &ssm_top_parent,
-			    SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
-			    SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL);
+  ssm_act_t *stdout_act = __enter_stdout_handler(
+      &ssm_top_parent, SSM_ROOT_PRIORITY + 0 * (1 << (SSM_ROOT_DEPTH - 1)),
+      SSM_ROOT_DEPTH - 1, &ssm_stdout, NULL);
   ssm_activate(stdout_act);
-  
+
   ssm_activate(__enter_main(&ssm_top_parent,
                             SSM_ROOT_PRIORITY + 1 * (1 << (SSM_ROOT_DEPTH - 1)),
                             SSM_ROOT_DEPTH - 1, std_argv, NULL));
@@ -225,16 +218,16 @@ int main(void) {
   stdout_act->pc = 2; // FIXME: must match the code in step_stdout_handler()
   ssm_activate(stdout_act);
   ssm_tick();
-  
-   __kill_stdin_handler();
-   ssm_drop(ssm_stdin); // FIXME: should probably be part of __kill_stdin_handler
+
+  __kill_stdin_handler();
+  ssm_drop(ssm_stdin); // FIXME: should probably be part of __kill_stdin_handler
 
 #ifdef CONFIG_MEM_STATS
   ssm_mem_statistics_t stats;
   print_mem_stats(&stats);
-  if ( stats.live_objects ) {
+  if (stats.live_objects) {
     fprintf(stderr, "FAILED: %lu live objects leaked at the end\n",
-	    stats.live_objects);
+            stats.live_objects);
     exit(1);
   }
 #endif
