@@ -1,5 +1,20 @@
 var group__mem =
 [
+    [ "ssm_mem_statistics_pool", "structssm__mem__statistics__pool.html", [
+      [ "block_size", "structssm__mem__statistics__pool.html#ad7524613c3881d09bda0d270ede83779", null ],
+      [ "pages_allocated", "structssm__mem__statistics__pool.html#a20f6097fe6844b1bdfc7a4487a784e65", null ],
+      [ "free_list_length", "structssm__mem__statistics__pool.html#a3415d47782a00603b18298b66609cfae", null ]
+    ] ],
+    [ "ssm_mem_statistics", "structssm__mem__statistics.html", [
+      [ "sizeof_ssm_mm", "structssm__mem__statistics.html#a42d23f9117431fb3b7592d3b93301943", null ],
+      [ "page_size", "structssm__mem__statistics.html#af91f634fbc8d26e705035b0613f7d077", null ],
+      [ "pages_allocated", "structssm__mem__statistics.html#a20f6097fe6844b1bdfc7a4487a784e65", null ],
+      [ "objects_allocated", "structssm__mem__statistics.html#a5b4c75ea2fb97eec6f166c9ce9866f5b", null ],
+      [ "objects_freed", "structssm__mem__statistics.html#af3bb3701310045e116fd66944fbeb7ad", null ],
+      [ "live_objects", "structssm__mem__statistics.html#a4f3bc95f94f71754ba6994d7b5c6eeb1", null ],
+      [ "pool_count", "structssm__mem__statistics.html#ae1f0c3456aa5b3f54c671a5fdef0282e", null ],
+      [ "pool", "structssm__mem__statistics.html#a4612342c1643b415be9f7fcdd2c4a11c", null ]
+    ] ],
     [ "ssm_value_t", "unionssm__value__t.html", [
       [ "heap_ptr", "unionssm__value__t.html#a4793df5c970482e74f1fcdbe517dfd8b", null ],
       [ "packed_val", "unionssm__value__t.html#acba11ac1890e4bcc14b76e90a7badf18", null ]
@@ -29,6 +44,8 @@ var group__mem =
     [ "ssm_drop", "group__mem.html#gabaf350ad4a1577dee5e31e6efd851054", null ],
     [ "ssm_dup_unsafe", "group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f", null ],
     [ "ssm_drop_unsafe", "group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e", null ],
+    [ "ssm_mem_statistics_pool_t", "group__mem.html#gac7ae9a342c295d6d62852b3924b768b1", null ],
+    [ "ssm_mem_statistics_t", "group__mem.html#ga11df8a853242068faf5de7c8258c96d5", null ],
     [ "ssm_word_t", "group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24", null ],
     [ "ssm_kind", "group__mem.html#ga0f26e675a76a28f76a4d31787be19250", [
       [ "SSM_TIME_K", "group__mem.html#gga0f26e675a76a28f76a4d31787be19250a384acc0f162ac52d0dfa65dd02f20edc", null ],
@@ -40,6 +57,7 @@ var group__mem =
     ] ],
     [ "ssm_mem_init", "group__mem.html#gafe56b79f41cfe1522669c35cbc423231", null ],
     [ "ssm_mem_destroy", "group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb", null ],
+    [ "ssm_mem_statistics_collect", "group__mem.html#gae2ba32721536023e424c4b2679b65390", null ],
     [ "ssm_drop_final", "group__mem.html#gac773e49a0378b73d49552e242a1a7971", null ],
     [ "ssm_dups", "group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66", null ],
     [ "ssm_drops", "group__mem.html#ga8b1681c79051b78cd5f54cb80a0c81f4", null ],

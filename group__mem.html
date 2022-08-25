@@ -106,12 +106,24 @@ $(document).ready(function(){initNavTree('group__mem.html',''); initResizable();
 <p>For simplicity and flexibility, all values in SSM runtime are word-sized, represented using <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. When the size of a value exceeds what can be represented by a word, the value is a pointer to a heap-allocated <em>object</em>. In particular, they point to a memory management metadata header, <a class="el" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap-allocated objects.">ssm_mm</a>.</p>
 <p>The SSM runtime uses reference counting to manage the lifetime of heap objects. The reference count is also maintained in the <a class="el" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap-allocated objects.">ssm_mm</a> header. When a reference is duplicated, use <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> to increment its reference count. When a reference is dropped, use <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> decrement its reference and free if necessary. These macros first check whether the given <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> is heap-allocated before attempting to dereference the heap pointer; to skip this check (for example, if a value is known to be a heap object at compile time), use <a class="el" href="group__mem.html#gab5dad0cd40fb4260de450e2226d26a8f" title="Duplicate a heap reference, incrementing its ref count.">ssm_dup_unsafe()</a> and <a class="el" href="group__mem.html#ga51acf919e4a7bd5b795aa8f302d8605e" title="Drop a reference to a heap item, and free it if necessary.">ssm_drop_unsafe()</a>. When the reference count of an object reaches zero, it is cleaned up and freed using <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a>, which drop any references held by the soon-to-be-freed object.</p>
 <p>The <a class="el" href="structssm__mm.html" title="The memory management metadata &quot;header&quot; for heap-allocated objects.">ssm_mm</a> header's <em>kind</em> field indicates what <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> the object is. This determines its memory layout in the heap, in particular where the object might hold references (pointers) to other heap objects. The interpretation and layout of the 16-bit <em>info</em> field depends on the <em>kind</em>, coming in three different "flavors": <em>vector</em>, <em>variant</em>, and <em>size</em>. All this information is used by <a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971" title="Finalize and free a heap object.">ssm_drop_final()</a> to figure out the number and location of values to <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a>, as well as the size of the object to deallocate.</p>
-<p>Heap objects are allocated for each <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> using functions with prefix <em>ssm_new_</em>, such as <a class="el" href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55" title="Allocate a new ADT object on the heap.">ssm_new_adt()</a> or <a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13" title="Allocate a ssm_time on the heap.">ssm_new_time()</a>.</p>
+<p>Heap objects are allocated for each <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> using functions with prefix <em>ssm_new_</em>, such as <a class="el" href="group__adt.html#ga5126bbb129deaf5b0fac198760fc38be">ssm_new_adt()</a> or <a class="el" href="group__time.html#gad3a108e2859a0959fcf5dffcc8f86671">ssm_new_time()</a>.</p>
 <p>The SSM runtime comes with its own platform-agnostic allocator, parameterized by handlers set using <a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231" title="Initializes the underlying allocator system.">ssm_mem_init()</a>. It allocates small pieces of memory in <em>blocks</em>, within designated <em>memory pools</em>. Each memory pool consists of zero or more fixed-size <em>memory pages</em>, and are requested from the platform/OS on-demand via the <a class="el" href="ssm-mem_8c.html#a40385bc630b530cbe8cadeff2008421a" title="Page allocation handler, set by ssm_mem_init().">alloc_page()</a> handler. Meanwhile, allocations for larger ranges of memory are deferred to the <a class="el" href="ssm-mem_8c.html#afe84928b968b035c36a85decd645d13f" title="Large memory allocation handler, set by ssm_mem_init().">alloc_mem()</a> and <a class="el" href="ssm-mem_8c.html#ac9e094b32b7178847b7c17a01070f5ea" title="Large memory release handler, set by ssm_mem_init().">free_mem()</a> handlers.</p>
-<p>The allocator's memory pools may be configured using the <a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef" title="Block size of the smallest memory pool.">SSM_MEM_POOL_MIN</a>, <a class="el" href="group__mem.html#ga1ef7f3f854e79719bd5bb8e8f3694a23" title="Factor between each successive memory pool size, in base 2.">SSM_MEM_POOL_FACTOR_BASE2</a>, <a class="el" href="group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790" title="Number of memory pools.">SSM_MEM_POOL_COUNT</a>, and <a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388" title="The size of a memory page; must be greater than SSM_MEM_POOL_MAX.">SSM_MEM_PAGE_SIZE</a> preprocessor constants. The default values produce 4 memory pools, of sizes 16B, 64B, 256B, and 1024B, and a memory page size of 4096B. </p>
+<p>The allocator's memory pools may be configured using the <a class="el" href="group__mem.html#ga5514bce5af584559d51b5f75344205ef" title="Block size of the smallest memory pool.">SSM_MEM_POOL_MIN</a>, <a class="el" href="group__mem.html#ga1ef7f3f854e79719bd5bb8e8f3694a23" title="Factor between each successive memory pool size, in base 2.">SSM_MEM_POOL_FACTOR_BASE2</a>, <a class="el" href="group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790" title="Number of memory pools.">SSM_MEM_POOL_COUNT</a>, and <a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388" title="The size of a memory page; must be greater than SSM_MEM_POOL_MAX.">SSM_MEM_PAGE_SIZE</a> preprocessor constants. The default values produce 4 memory pools, of sizes 16B, 64B, 256B, and 1024B, and a memory page size of 4096B.</p>
+<p>The runtime recognizes several compile time configuration macros that help with profiling and debugging. They are:</p>
+<ul>
+<li>CONFIG_MEM_TRACE: log information any time something is allocated or freed.</li>
+<li>CONFIG_MEM_STATS: collect statistics and report about memory pool usage.</li>
+<li>CONFIG_MALLOC_HEAP: bypass the allocator entirely and allocate everything using malloc(), so that memory accesses can be tracked with Valgrind. </li>
+</ul>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mem__statistics__pool.html">ssm_mem_statistics_pool</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for a heap page pool; used in <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a>.  <a href="structssm__mem__statistics__pool.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mem__statistics.html">ssm_mem_statistics</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for the heap; filled with <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a>.  <a href="structssm__mem__statistics.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="unionssm__value__t.html">ssm_value_t</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">SSM values are either "packed" values or heap-allocated.  <a href="unionssm__value__t.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -166,6 +178,12 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:gac7ae9a342c295d6d62852b3924b768b1"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structssm__mem__statistics__pool.html">ssm_mem_statistics_pool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac7ae9a342c295d6d62852b3924b768b1">ssm_mem_statistics_pool_t</a></td></tr>
+<tr class="memdesc:gac7ae9a342c295d6d62852b3924b768b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for a heap page pool; used in <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a>.  <a href="group__mem.html#gac7ae9a342c295d6d62852b3924b768b1">More...</a><br /></td></tr>
+<tr class="separator:gac7ae9a342c295d6d62852b3924b768b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga11df8a853242068faf5de7c8258c96d5"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structssm__mem__statistics.html">ssm_mem_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a></td></tr>
+<tr class="memdesc:ga11df8a853242068faf5de7c8258c96d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for the heap; filled with <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a>.  <a href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">More...</a><br /></td></tr>
+<tr class="separator:ga11df8a853242068faf5de7c8258c96d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1e1f76a5ae1699bf2358c3e2e2224c24"><td class="memItemLeft" align="right" valign="top">typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24">ssm_word_t</a></td></tr>
 <tr class="memdesc:ga1e1f76a5ae1699bf2358c3e2e2224c24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Values are 32-bits, the largest supported machine word size.  <a href="group__mem.html#ga1e1f76a5ae1699bf2358c3e2e2224c24">More...</a><br /></td></tr>
 <tr class="separator:ga1e1f76a5ae1699bf2358c3e2e2224c24"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -193,6 +211,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a> (void(*free_page_handler)(void *))</td></tr>
 <tr class="memdesc:ga478b2d53579f050c74c7374e75dd8bcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tears down the underlying allocator system.  <a href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">More...</a><br /></td></tr>
 <tr class="separator:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae2ba32721536023e424c4b2679b65390"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390">ssm_mem_statistics_collect</a> (<a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a> *stats)</td></tr>
+<tr class="memdesc:gae2ba32721536023e424c4b2679b65390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect and return statistics about the heap.  <a href="group__mem.html#gae2ba32721536023e424c4b2679b65390">More...</a><br /></td></tr>
+<tr class="separator:gae2ba32721536023e424c4b2679b65390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:gac773e49a0378b73d49552e242a1a7971"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">ssm_drop_final</a> (<a class="el" href="unionssm__value__t.html">ssm_value_t</a> v)</td></tr>
 <tr class="memdesc:gac773e49a0378b73d49552e242a1a7971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Finalize and free a heap object.  <a href="group__mem.html#gac773e49a0378b73d49552e242a1a7971">More...</a><br /></td></tr>
 <tr class="separator:gac773e49a0378b73d49552e242a1a7971"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -366,7 +387,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a packed <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00278">278</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00292">292</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -395,7 +416,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the raw 31-bit integral value. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00286">286</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00300">300</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -424,7 +445,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>non-zero if on heap, zero otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00293">293</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00307">307</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -454,7 +475,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>non-zero if shared, zero otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00302">302</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00316">316</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -483,7 +504,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00312">312</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00326">326</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -517,7 +538,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00325">325</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00339">339</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -547,7 +568,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00339">339</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00353">353</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -583,11 +604,46 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00353">353</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00367">367</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Typedef Documentation</h2>
+<a id="gac7ae9a342c295d6d62852b3924b768b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac7ae9a342c295d6d62852b3924b768b1">&#9670;&nbsp;</a></span>ssm_mem_statistics_pool_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structssm__mem__statistics__pool.html">ssm_mem_statistics_pool</a> <a class="el" href="group__mem.html#gac7ae9a342c295d6d62852b3924b768b1">ssm_mem_statistics_pool_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Statistics for a heap page pool; used in <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a>. </p>
+<dl class="section note"><dt>Note</dt><dd>Define CONFIG_MEM_STATS to enable this. </dd></dl>
+
+</div>
+</div>
+<a id="ga11df8a853242068faf5de7c8258c96d5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga11df8a853242068faf5de7c8258c96d5">&#9670;&nbsp;</a></span>ssm_mem_statistics_t</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef struct <a class="el" href="structssm__mem__statistics.html">ssm_mem_statistics</a> <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Statistics for the heap; filled with <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a>. </p>
+<p>A collection of satistics collected by <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a> and designed to be printed by a function you supply.</p>
+<dl class="section note"><dt>Note</dt><dd>Define CONFIG_MEM_STATS to enable this. </dd></dl>
+
+</div>
+</div>
 <a id="ga1e1f76a5ae1699bf2358c3e2e2224c24"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga1e1f76a5ae1699bf2358c3e2e2224c24">&#9670;&nbsp;</a></span>ssm_word_t</h2>
 
@@ -602,7 +658,7 @@ Functions</h2></td></tr>
 
 <p>Values are 32-bits, the largest supported machine word size. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00216">216</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00230">230</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -636,7 +692,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00264">264</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00278">278</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -687,7 +743,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00115">115</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00136">136</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -718,7 +774,36 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00135">135</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00156">156</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+
+</div>
+</div>
+<a id="gae2ba32721536023e424c4b2679b65390"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae2ba32721536023e424c4b2679b65390">&#9670;&nbsp;</a></span>ssm_mem_statistics_collect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ssm_mem_statistics_collect </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a> *&#160;</td>
+          <td class="paramname"><em>stats</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Collect and return statistics about the heap. </p>
+<dl class="section note"><dt>Note</dt><dd>Define CONFIG_MEM_STATS to enable this.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">stats</td><td>non-NULL pointer to a <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a> to be filled in </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00378">378</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -749,7 +834,7 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00269">269</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00325">325</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -781,7 +866,7 @@ Functions</h2></td></tr>
 
 <p>Call <a class="el" href="group__mem.html#ga9f7765026c74350e37df334c9e59bb12" title="Duplicate a possible heap reference, incrementing its ref count.">ssm_dup()</a> on an array of values. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00311">311</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00367">367</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -813,7 +898,7 @@ Functions</h2></td></tr>
 
 <p>Call <a class="el" href="group__mem.html#gabaf350ad4a1577dee5e31e6efd851054" title="Drop a reference to a possible heap item, and free it if necessary.">ssm_drop()</a> on an array of values. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00316">316</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00372">372</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -843,7 +928,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>pointer to the first byte of the allocate memory block. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00160">160</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00183">183</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -883,8 +968,6 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00152">152</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
-
 </div>
 </div>
 <a id="ga3087c5edfa451e28309ea0cb234ad02e"></a>
@@ -923,13 +1006,13 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00191">191</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00233">233</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__mem_html_gab4385ed8c6c55bb272f6048a721d533e"><div class="ttname"><a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a></div><div class="ttdeci">#define ssm_on_heap(v)</div><div class="ttdoc">Whether a value is on the heap (i.e., is an object).</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00293">ssm.h:293</a></div></div>
+<div class="ttc" id="agroup__mem_html_gab4385ed8c6c55bb272f6048a721d533e"><div class="ttname"><a href="group__mem.html#gab4385ed8c6c55bb272f6048a721d533e">ssm_on_heap</a></div><div class="ttdeci">#define ssm_on_heap(v)</div><div class="ttdoc">Whether a value is on the heap (i.e., is an object).</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00307">ssm.h:307</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

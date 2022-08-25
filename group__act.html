@@ -127,6 +127,8 @@ Macros</h2></td></tr>
 <tr class="memitem:ga22f3a7b6991a73f7c173f5a488de5f1e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e">ssm_has_children</a>(act)&#160;&#160;&#160;((act)-&gt;children != 0)</td></tr>
 <tr class="memdesc:ga22f3a7b6991a73f7c173f5a488de5f1e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether an activation record has any children.  <a href="group__act.html#ga22f3a7b6991a73f7c173f5a488de5f1e">More...</a><br /></td></tr>
 <tr class="separator:ga22f3a7b6991a73f7c173f5a488de5f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadf6b78cff81f05acd9e8718763085c52"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gadf6b78cff81f05acd9e8718763085c52">ssm_enter</a>(si,  st,  pa,  pr,  de)</td></tr>
+<tr class="separator:gadf6b78cff81f05acd9e8718763085c52"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
@@ -154,9 +156,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gaba874593a4027732c9a8c84a25a8bb8d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">ssm_tick</a> (void)</td></tr>
 <tr class="memdesc:gaba874593a4027732c9a8c84a25a8bb8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run the system for the next scheduled instant.  <a href="group__act.html#gaba874593a4027732c9a8c84a25a8bb8d">More...</a><br /></td></tr>
 <tr class="separator:gaba874593a4027732c9a8c84a25a8bb8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm_enter</a> (size_t size, <a class="el" href="group__act.html#gadb557bb02081e7d883bcc7d133eb96f6">ssm_stepf_t</a> step, <a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *parent, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> priority, <a class="el" href="group__act.html#ga22bed0d9ef54aa307caef28a6b3fe010">ssm_depth_t</a> depth)</td></tr>
-<tr class="memdesc:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and initialize a routine activation record.  <a href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">More...</a><br /></td></tr>
-<tr class="separator:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b722dfdff8da54693ad9714d9c6f808"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">ssm_enter_int</a> (size_t size, <a class="el" href="group__act.html#gadb557bb02081e7d883bcc7d133eb96f6">ssm_stepf_t</a> step, <a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *parent, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> priority, <a class="el" href="group__act.html#ga22bed0d9ef54aa307caef28a6b3fe010">ssm_depth_t</a> depth)</td></tr>
+<tr class="memdesc:ga9b722dfdff8da54693ad9714d9c6f808"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and initialize a routine activation record.  <a href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">More...</a><br /></td></tr>
+<tr class="separator:ga9b722dfdff8da54693ad9714d9c6f808"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5">ssm_leave</a> (<a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *act, size_t size)</td></tr>
 <tr class="memdesc:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the activation record of a routine before leaving.  <a href="group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5">More...</a><br /></td></tr>
 <tr class="separator:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -185,7 +187,7 @@ Variables</h2></td></tr>
 
 <p>The priority for the entry point of an SSM program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00102">102</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00106">106</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -203,7 +205,7 @@ Variables</h2></td></tr>
 
 <p>The depth at the entry point of an SSM program. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00111">111</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00115">115</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -225,7 +227,58 @@ Variables</h2></td></tr>
 
 <p>Whether an activation record has any children. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00145">145</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00149">149</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="gadf6b78cff81f05acd9e8718763085c52"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadf6b78cff81f05acd9e8718763085c52">&#9670;&nbsp;</a></span>ssm_enter</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_enter</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">si, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">st, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">pa, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">pr, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">de&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  (fprintf(stderr, <span class="stringliteral">&quot;%s:%d:ssm_enter(%lu,_,_,_,_,_)\n&quot;</span>, __FILE__, __LINE__,     \</div>
+<div class="line">           (si)),                                                              \</div>
+<div class="line">   ssm_enter_int((si), (st), (pa), (pr), (de)))</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00180">180</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -245,7 +298,7 @@ Variables</h2></td></tr>
 <p>Thread priority. </p>
 <p>Lower numbers execute first in an instant. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00099">99</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00103">103</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -264,7 +317,7 @@ Variables</h2></td></tr>
 <p>Index of least significant bit in a group of priorities. </p>
 <p>This only needs to represent the number of bits in the <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82" title="Thread priority.">ssm_priority_t</a> type. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00108">108</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00112">112</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -282,7 +335,7 @@ Variables</h2></td></tr>
 
 <p>The function that does an instant's work for a routine. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00114">114</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00118">118</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -377,14 +430,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="gae5a581a8b2ef63d0403c80d2fdfc25e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#gae5a581a8b2ef63d0403c80d2fdfc25e0">&#9670;&nbsp;</a></span>ssm_enter()</h2>
+<a id="ga9b722dfdff8da54693ad9714d9c6f808"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga9b722dfdff8da54693ad9714d9c6f808">&#9670;&nbsp;</a></span>ssm_enter_int()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a>* ssm_enter </td>
+          <td class="memname"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a>* ssm_enter_int </td>
           <td>(</td>
           <td class="paramtype">size_t&#160;</td>
           <td class="paramname"><em>size</em>, </td>
@@ -540,7 +593,7 @@ Variables</h2></td></tr>
 
 <p>An activation record for the parent of the top-most routine. </p>
 <p>This activation record should be used as the parent of the entry point. For example, if the entry point is named <code>main</code>, with activation record type <code>main_act_t</code> and step function <code>step_main</code>:</p>
-<div class="fragment"><div class="line"><a class="code" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm_enter</a>(<span class="keyword">sizeof</span>(main_act_t), step_main, &amp;<a class="code" href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a>,</div>
+<div class="fragment"><div class="line"><a class="code" href="group__act.html#gadf6b78cff81f05acd9e8718763085c52">ssm_enter</a>(<span class="keyword">sizeof</span>(main_act_t), step_main, &amp;<a class="code" href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a>,</div>
 <div class="line">          <a class="code" href="group__act.html#gabea6090ce063ae674b31fc2ded743d4b">SSM_ROOT_PRIORITY</a>, <a class="code" href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">SSM_ROOT_DEPTH</a>)</div>
 </div><!-- fragment --> 
 <p class="definition">Definition at line <a class="el" href="ssm-top-act_8c_source.html#l00009">9</a> of file <a class="el" href="ssm-top-act_8c_source.html">ssm-top-act.c</a>.</p>
@@ -549,11 +602,11 @@ Variables</h2></td></tr>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__act_html_gae5a581a8b2ef63d0403c80d2fdfc25e0"><div class="ttname"><a href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm_enter</a></div><div class="ttdeci">ssm_act_t * ssm_enter(size_t size, ssm_stepf_t step, ssm_act_t *parent, ssm_priority_t priority, ssm_depth_t depth)</div><div class="ttdoc">Allocate and initialize a routine activation record.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-scheduler_8c_source.html#l00273">ssm-scheduler.c:273</a></div></div>
 <div class="ttc" id="agroup__act_html_gaec0cb9b65b0fae98389b310a6d34e5f5"><div class="ttname"><a href="group__act.html#gaec0cb9b65b0fae98389b310a6d34e5f5">ssm_top_parent</a></div><div class="ttdeci">ssm_act_t ssm_top_parent</div><div class="ttdoc">An activation record for the parent of the top-most routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm-top-act_8c_source.html#l00009">ssm-top-act.c:9</a></div></div>
-<div class="ttc" id="astructssm__act_html"><div class="ttname"><a href="structssm__act.html">ssm_act</a></div><div class="ttdoc">Activation record for an SSM routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00122">ssm.h:122</a></div></div>
-<div class="ttc" id="agroup__act_html_gabea6090ce063ae674b31fc2ded743d4b"><div class="ttname"><a href="group__act.html#gabea6090ce063ae674b31fc2ded743d4b">SSM_ROOT_PRIORITY</a></div><div class="ttdeci">#define SSM_ROOT_PRIORITY</div><div class="ttdoc">The priority for the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00102">ssm.h:102</a></div></div>
-<div class="ttc" id="agroup__act_html_ga50b5df0fe51a91d9667ec34eecc9210a"><div class="ttname"><a href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">SSM_ROOT_DEPTH</a></div><div class="ttdeci">#define SSM_ROOT_DEPTH</div><div class="ttdoc">The depth at the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00111">ssm.h:111</a></div></div>
+<div class="ttc" id="astructssm__act_html"><div class="ttname"><a href="structssm__act.html">ssm_act</a></div><div class="ttdoc">Activation record for an SSM routine.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00126">ssm.h:126</a></div></div>
+<div class="ttc" id="agroup__act_html_gadf6b78cff81f05acd9e8718763085c52"><div class="ttname"><a href="group__act.html#gadf6b78cff81f05acd9e8718763085c52">ssm_enter</a></div><div class="ttdeci">#define ssm_enter(si, st, pa, pr, de)</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00180">ssm.h:180</a></div></div>
+<div class="ttc" id="agroup__act_html_gabea6090ce063ae674b31fc2ded743d4b"><div class="ttname"><a href="group__act.html#gabea6090ce063ae674b31fc2ded743d4b">SSM_ROOT_PRIORITY</a></div><div class="ttdeci">#define SSM_ROOT_PRIORITY</div><div class="ttdoc">The priority for the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00106">ssm.h:106</a></div></div>
+<div class="ttc" id="agroup__act_html_ga50b5df0fe51a91d9667ec34eecc9210a"><div class="ttname"><a href="group__act.html#ga50b5df0fe51a91d9667ec34eecc9210a">SSM_ROOT_DEPTH</a></div><div class="ttdeci">#define SSM_ROOT_DEPTH</div><div class="ttdoc">The depth at the entry point of an SSM program.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00115">ssm.h:115</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

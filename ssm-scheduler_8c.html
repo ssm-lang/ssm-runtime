@@ -108,14 +108,15 @@ $(document).ready(function(){initNavTree('ssm-scheduler_8c.html',''); initResiza
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="ssm-scheduler_8c__incl.png" border="0" usemap="#ssm-scheduler_8c" alt=""/></div>
 <map name="ssm-scheduler_8c" id="ssm-scheduler_8c">
-<area shape="rect" title="Implementation of the SSM runtime scheduler." alt="" coords="134,5,261,32"/>
-<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="139,80,255,107"/>
-<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="87,155,209,181"/>
-<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,229,228,256"/>
+<area shape="rect" title="Implementation of the SSM runtime scheduler." alt="" coords="183,5,310,32"/>
+<area shape="rect" href="ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="189,80,305,107"/>
+<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="136,155,259,181"/>
+<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="216,229,277,256"/>
 <area shape="rect" title=" " alt="" coords="5,304,88,331"/>
 <area shape="rect" title=" " alt="" coords="112,304,187,331"/>
 <area shape="rect" title=" " alt="" coords="211,304,282,331"/>
 <area shape="rect" title=" " alt="" coords="306,304,377,331"/>
+<area shape="rect" title=" " alt="" coords="401,304,468,331"/>
 </map>
 </div>
 </div>
@@ -168,9 +169,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6">ssm_active</a> (void)</td></tr>
 <tr class="memdesc:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether there are still active processes in the activation queue.  <a href="group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6">More...</a><br /></td></tr>
 <tr class="separator:gac821ad7e0264f12d22a91ee9ac9e86e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm_enter</a> (size_t size, <a class="el" href="group__act.html#gadb557bb02081e7d883bcc7d133eb96f6">ssm_stepf_t</a> step, <a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *parent, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> priority, <a class="el" href="group__act.html#ga22bed0d9ef54aa307caef28a6b3fe010">ssm_depth_t</a> depth)</td></tr>
-<tr class="memdesc:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and initialize a routine activation record.  <a href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">More...</a><br /></td></tr>
-<tr class="separator:gae5a581a8b2ef63d0403c80d2fdfc25e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga9b722dfdff8da54693ad9714d9c6f808"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">ssm_enter_int</a> (size_t size, <a class="el" href="group__act.html#gadb557bb02081e7d883bcc7d133eb96f6">ssm_stepf_t</a> step, <a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *parent, <a class="el" href="group__act.html#gaf0599e969847088348147d8fb9a7bd82">ssm_priority_t</a> priority, <a class="el" href="group__act.html#ga22bed0d9ef54aa307caef28a6b3fe010">ssm_depth_t</a> depth)</td></tr>
+<tr class="memdesc:ga9b722dfdff8da54693ad9714d9c6f808"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate and initialize a routine activation record.  <a href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">More...</a><br /></td></tr>
+<tr class="separator:ga9b722dfdff8da54693ad9714d9c6f808"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5">ssm_leave</a> (<a class="el" href="group__act.html#gab35cf37819a1a1538704654128b1db4f">ssm_act_t</a> *act, size_t size)</td></tr>
 <tr class="memdesc:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Destroy the activation record of a routine before leaving.  <a href="group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5">More...</a><br /></td></tr>
 <tr class="separator:ga70103fe73a28cb722f8e3caf1629f5b5"><td class="memSeparator" colspan="2">&#160;</td></tr>

@@ -1,0 +1,4 @@
+<map id="ssm_mem_statistics" name="ssm_mem_statistics">
+<area shape="rect" id="node1" title="Statistics for the heap; filled with ssm_mem_statistics_collect()." alt="" coords="23,95,179,121"/>
+<area shape="rect" id="node2" href="$structssm__mem__statistics__pool.html" title="Statistics for a heap page pool; used in ssm_mem_statistics_t." alt="" coords="5,5,196,32"/>
+</map>

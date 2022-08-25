@@ -134,6 +134,8 @@ Macros</h2></td></tr>
 <tr class="memitem:gaa197d42e5baeef09b2106f2b07fe6878"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gaa197d42e5baeef09b2106f2b07fe6878">SSM_HOUR</a>&#160;&#160;&#160;(<a class="el" href="group__time.html#gaac175bedf4cfeb48775f5eeeb90b9d62">SSM_MINUTE</a> * 60L)</td></tr>
 <tr class="memdesc:gaa197d42e5baeef09b2106f2b07fe6878"><td class="mdescLeft">&#160;</td><td class="mdescRight">Ticks per hour.  <a href="group__time.html#gaa197d42e5baeef09b2106f2b07fe6878">More...</a><br /></td></tr>
 <tr class="separator:gaa197d42e5baeef09b2106f2b07fe6878"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gad3a108e2859a0959fcf5dffcc8f86671"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gad3a108e2859a0959fcf5dffcc8f86671">ssm_new_time</a>(t)</td></tr>
+<tr class="separator:gad3a108e2859a0959fcf5dffcc8f86671"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">ssm_time_read</a>(v)&#160;&#160;&#160;(<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__time.html">ssm_time</a>, mm)-&gt;time)</td></tr>
 <tr class="memdesc:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the heap-allocated time pointed to by an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__time.html#ga67ff4ccc2a6a56830b680982b63f3bb6">More...</a><br /></td></tr>
 <tr class="separator:ga67ff4ccc2a6a56830b680982b63f3bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -158,9 +160,9 @@ Functions</h2></td></tr>
 <tr class="memitem:gad74c026bbc98ac6d6404adf6e3a625ff"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff">ssm_now</a> (void)</td></tr>
 <tr class="memdesc:gad74c026bbc98ac6d6404adf6e3a625ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current model time.  <a href="group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff">More...</a><br /></td></tr>
 <tr class="separator:gad74c026bbc98ac6d6404adf6e3a625ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">ssm_new_time</a> (<a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> time)</td></tr>
-<tr class="memdesc:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a> on the heap.  <a href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">More...</a><br /></td></tr>
-<tr class="separator:ga162f07ad05fc2b8d5fb1bca225172d13"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae5ab6fe4e402d274842aec8e06670ff9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__time.html#gae5ab6fe4e402d274842aec8e06670ff9">ssm_new_time_int</a> (<a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a> time)</td></tr>
+<tr class="memdesc:gae5ab6fe4e402d274842aec8e06670ff9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a> on the heap.  <a href="group__time.html#gae5ab6fe4e402d274842aec8e06670ff9">More...</a><br /></td></tr>
+<tr class="separator:gae5ab6fe4e402d274842aec8e06670ff9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga21ad50b0c4e1feeaeb9c78af1a9d2d9f"></a>
@@ -178,7 +180,7 @@ Functions</h2></td></tr>
 <p>Time indicating something will never happen. </p>
 <p>The value of this must be derived from the underlying type of <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00404">404</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00418">418</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -196,7 +198,7 @@ Functions</h2></td></tr>
 
 <p>Ticks per nanosecond. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00407">407</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00421">421</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -214,7 +216,7 @@ Functions</h2></td></tr>
 
 <p>Ticks per microsecond. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00409">409</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00423">423</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -232,7 +234,7 @@ Functions</h2></td></tr>
 
 <p>Ticks per millisecond. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00411">411</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00425">425</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -250,7 +252,7 @@ Functions</h2></td></tr>
 
 <p>Ticks per second. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00413">413</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00427">427</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -268,7 +270,7 @@ Functions</h2></td></tr>
 
 <p>Ticks per minute. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00415">415</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00429">429</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +288,29 @@ Functions</h2></td></tr>
 
 <p>Ticks per hour. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00417">417</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00431">431</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<a id="gad3a108e2859a0959fcf5dffcc8f86671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gad3a108e2859a0959fcf5dffcc8f86671">&#9670;&nbsp;</a></span>ssm_new_time</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_new_time</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">t</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  (fprintf(stderr, <span class="stringliteral">&quot;%s:%d:ssm_new_time()\n&quot;</span>, __FILE__, __LINE__),              \</div>
+<div class="line">   ssm_new_time_int(t))</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00448">448</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -318,7 +342,7 @@ The behavior of using the result of this macro as an l-value is undefined.</dd><
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca" title="Absolute time; never to overflow.">ssm_time_t</a> in the heap. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00442">442</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00465">465</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -337,7 +361,7 @@ The behavior of using the result of this macro as an l-value is undefined.</dd><
 
 <p>Absolute time; never to overflow. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00386">386</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00400">400</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -453,14 +477,14 @@ The behavior of using the result of this macro as an l-value is undefined.</dd><
 
 </div>
 </div>
-<a id="ga162f07ad05fc2b8d5fb1bca225172d13"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga162f07ad05fc2b8d5fb1bca225172d13">&#9670;&nbsp;</a></span>ssm_new_time()</h2>
+<a id="gae5ab6fe4e402d274842aec8e06670ff9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gae5ab6fe4e402d274842aec8e06670ff9">&#9670;&nbsp;</a></span>ssm_new_time_int()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_time </td>
+          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_time_int </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="group__time.html#gae963c119a7847a3327202eacb31f66ca">ssm_time_t</a>&#160;</td>
           <td class="paramname"><em>time</em></td><td>)</td>
@@ -476,9 +500,10 @@ The behavior of using the result of this macro as an l-value is undefined.</dd><
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> pointing to the heap-allocated <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a>. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> pointing to the heap-allocated <a class="el" href="structssm__time.html" title="Heap-allocated time values.">ssm_time</a>.</dd></dl>
+<p><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> <a class="el" href="group__time.html#gad3a108e2859a0959fcf5dffcc8f86671">ssm_new_time(ssm_time_t time)</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00210">210</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00266">266</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

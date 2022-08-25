@@ -8,5 +8,6 @@ var group__blob =
     [ "ssm_blob_size", "group__blob.html#ga1c9c1ed79de3a572277f4c3c2d0b30c9", null ],
     [ "ssm_blob_heap_size", "group__blob.html#ga56fe22cc0fb8d17f66550d4cb974c407", null ],
     [ "ssm_blob_payload", "group__blob.html#ga8da5b4ec57c2a80db1be1606497bbbc9", null ],
-    [ "ssm_new_blob", "group__blob.html#ga647d6eda0f83abfc1e2724d80a2887a0", null ]
+    [ "ssm_new_blob", "group__blob.html#gabcb4958e51bd3f6088ea4b98fa6317dc", null ],
+    [ "ssm_new_blob_int", "group__blob.html#ga0d90c8b3b513110551b6646e25313d84", null ]
 ];

@@ -125,12 +125,14 @@ Macros</h2></td></tr>
 <tr class="memitem:ga75e9255fd3b9d39ebb1d1ec0bba8d36e"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__array.html#ga75e9255fd3b9d39ebb1d1ec0bba8d36e">ssm_array_heap_size</a>(v)&#160;&#160;&#160;<a class="el" href="group__array.html#gac4580396c154c34d2267376302f4b8d4">ssm_array_size</a>(<a class="el" href="group__array.html#ga22654f0ed0544862f21dd48d29fb26a1">ssm_array_len</a>(v))</td></tr>
 <tr class="memdesc:ga75e9255fd3b9d39ebb1d1ec0bba8d36e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the size an array in the heap from an <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a>.  <a href="group__array.html#ga75e9255fd3b9d39ebb1d1ec0bba8d36e">More...</a><br /></td></tr>
 <tr class="separator:ga75e9255fd3b9d39ebb1d1ec0bba8d36e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga04bd6c0605275d031a8887e5293a94ea"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__array.html#ga04bd6c0605275d031a8887e5293a94ea">ssm_new_array</a>(c)</td></tr>
+<tr class="separator:ga04bd6c0605275d031a8887e5293a94ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga01af8f58423a1e0d5135632e18b01a0b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">ssm_new_array</a> (uint16_t count)</td></tr>
-<tr class="memdesc:ga01af8f58423a1e0d5135632e18b01a0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an array on the heap.  <a href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">More...</a><br /></td></tr>
-<tr class="separator:ga01af8f58423a1e0d5135632e18b01a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gac546d9382bb31ae28a4f55570b1e6b08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__array.html#gac546d9382bb31ae28a4f55570b1e6b08">ssm_new_array_int</a> (uint16_t count)</td></tr>
+<tr class="memdesc:gac546d9382bb31ae28a4f55570b1e6b08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate an array on the heap.  <a href="group__array.html#gac546d9382bb31ae28a4f55570b1e6b08">More...</a><br /></td></tr>
+<tr class="separator:gac546d9382bb31ae28a4f55570b1e6b08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="ga22654f0ed0544862f21dd48d29fb26a1"></a>
@@ -151,7 +153,7 @@ Functions</h2></td></tr>
 
 <p>The length of an array pointed by <em>v</em>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00970">970</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01017">1017</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -173,7 +175,7 @@ Functions</h2></td></tr>
 
 <p>Obtain pointer to the array elements payload pointed to by @ a v. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00973">973</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01020">1020</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -205,7 +207,7 @@ Functions</h2></td></tr>
 
 <p>Obtain pointer to the ith element of the array pointed by <em>v</em>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00977">977</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01024">1024</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -234,7 +236,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>size that a array of <em>count</em> elemtns occupies in the heap. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00984">984</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01031">1031</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -263,19 +265,42 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>size of the array that <em>v</em> points to. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00992">992</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01039">1039</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
-<h2 class="groupheader">Function Documentation</h2>
-<a id="ga01af8f58423a1e0d5135632e18b01a0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga01af8f58423a1e0d5135632e18b01a0b">&#9670;&nbsp;</a></span>ssm_new_array()</h2>
+<a id="ga04bd6c0605275d031a8887e5293a94ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga04bd6c0605275d031a8887e5293a94ea">&#9670;&nbsp;</a></span>ssm_new_array</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_array </td>
+          <td class="memname">#define ssm_new_array</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">c</td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  (fprintf(stderr,<span class="stringliteral">&quot;%s:%d:ssm_new_array(%d)\n&quot;</span>, \</div>
+<div class="line">       __FILE__, __LINE__, (c)),             \</div>
+<div class="line">   ssm_new_array_int(c)</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01052">1052</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="gac546d9382bb31ae28a4f55570b1e6b08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gac546d9382bb31ae28a4f55570b1e6b08">&#9670;&nbsp;</a></span>ssm_new_array_int()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_array_int </td>
           <td>(</td>
           <td class="paramtype">uint16_t&#160;</td>
           <td class="paramname"><em>count</em></td><td>)</td>
@@ -294,7 +319,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> pointing to heap-allocated array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00249">249</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00305">305</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

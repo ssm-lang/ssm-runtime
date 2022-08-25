@@ -97,9 +97,6 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 <li>act_queue_percolate_up()
 : <a class="el" href="ssm-scheduler_8c.html#a1dbcfdc79ff6f03a8f44b2c12f6f7a84">ssm-scheduler.c</a>
 </li>
-<li>alloc_pool()
-: <a class="el" href="ssm-mem_8c.html#a9df693157bde17eda351ca1a94eae032">ssm-mem.c</a>
-</li>
 </ul>
 
 
@@ -159,9 +156,9 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 : <a class="el" href="group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66">ssm-mem.c</a>
 , <a class="el" href="group__mem.html#gafd1921cbc85e9e0e6e3d0ea931e89f66">ssm.h</a>
 </li>
-<li>ssm_enter()
-: <a class="el" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm-scheduler.c</a>
-, <a class="el" href="group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0">ssm.h</a>
+<li>ssm_enter_int()
+: <a class="el" href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">ssm-scheduler.c</a>
+, <a class="el" href="group__act.html#ga9b722dfdff8da54693ad9714d9c6f808">ssm.h</a>
 </li>
 <li>ssm_insert_input()
 : <a class="el" href="group__platform.html#ga7fcb4e84f98eba73fb6ab6c63233b543">ssm-platform.h</a>
@@ -187,32 +184,35 @@ $(document).ready(function(){initNavTree('globals_func.html',''); initResizable(
 , <a class="el" href="group__mem.html#gafe56b79f41cfe1522669c35cbc423231">ssm-internal.h</a>
 </li>
 <li>ssm_mem_prealloc()
-: <a class="el" href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">ssm-mem.c</a>
-, <a class="el" href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">ssm.h</a>
+: <a class="el" href="group__mem.html#ga1accac4139fc44c56acab9ece5db7f73">ssm.h</a>
 </li>
-<li>ssm_new_adt()
-: <a class="el" href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">ssm-mem.c</a>
-, <a class="el" href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">ssm.h</a>
+<li>ssm_mem_statistics_collect()
+: <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390">ssm-mem.c</a>
+, <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390">ssm-internal.h</a>
 </li>
-<li>ssm_new_array()
-: <a class="el" href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">ssm-mem.c</a>
-, <a class="el" href="group__array.html#ga01af8f58423a1e0d5135632e18b01a0b">ssm.h</a>
+<li>ssm_new_adt_int()
+: <a class="el" href="group__adt.html#gadc6dedffb396dfb7f18ead38f9f2e0d3">ssm-mem.c</a>
+, <a class="el" href="group__adt.html#gadc6dedffb396dfb7f18ead38f9f2e0d3">ssm.h</a>
 </li>
-<li>ssm_new_blob()
-: <a class="el" href="group__blob.html#ga647d6eda0f83abfc1e2724d80a2887a0">ssm-mem.c</a>
-, <a class="el" href="group__blob.html#ga647d6eda0f83abfc1e2724d80a2887a0">ssm.h</a>
+<li>ssm_new_array_int()
+: <a class="el" href="group__array.html#gac546d9382bb31ae28a4f55570b1e6b08">ssm-mem.c</a>
+, <a class="el" href="group__array.html#gac546d9382bb31ae28a4f55570b1e6b08">ssm.h</a>
 </li>
-<li>ssm_new_closure()
-: <a class="el" href="group__closure.html#ga2fe1eea56004a8e66c079e254cc3ea91">ssm-mem.c</a>
-, <a class="el" href="group__closure.html#ga2fe1eea56004a8e66c079e254cc3ea91">ssm.h</a>
+<li>ssm_new_blob_int()
+: <a class="el" href="group__blob.html#ga0d90c8b3b513110551b6646e25313d84">ssm-mem.c</a>
+, <a class="el" href="group__blob.html#ga0d90c8b3b513110551b6646e25313d84">ssm.h</a>
 </li>
-<li>ssm_new_sv()
-: <a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">ssm-mem.c</a>
-, <a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc">ssm.h</a>
+<li>ssm_new_closure_int()
+: <a class="el" href="group__closure.html#ga3a4934f1e4b97097eb42a900be593adc">ssm-mem.c</a>
+, <a class="el" href="group__closure.html#ga3a4934f1e4b97097eb42a900be593adc">ssm.h</a>
 </li>
-<li>ssm_new_time()
-: <a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">ssm-mem.c</a>
-, <a class="el" href="group__time.html#ga162f07ad05fc2b8d5fb1bca225172d13">ssm.h</a>
+<li>ssm_new_sv_int()
+: <a class="el" href="group__sv.html#ga782d29a6377e9b87dc5173b2023320e0">ssm-mem.c</a>
+, <a class="el" href="group__sv.html#ga782d29a6377e9b87dc5173b2023320e0">ssm.h</a>
+</li>
+<li>ssm_new_time_int()
+: <a class="el" href="group__time.html#gae5ab6fe4e402d274842aec8e06670ff9">ssm-mem.c</a>
+, <a class="el" href="group__time.html#gae5ab6fe4e402d274842aec8e06670ff9">ssm.h</a>
 </li>
 <li>ssm_next_event_time()
 : <a class="el" href="group__time.html#gae3e5f51dac6ee65b5be5034045b01a79">ssm-scheduler.c</a>

@@ -13,7 +13,7 @@ var ssm_scheduler_8c =
     [ "find_queued_event", "ssm-scheduler_8c.html#a360e351475aba3ecf51930c9adc6a36f", null ],
     [ "ssm_now", "group__time.html#gad74c026bbc98ac6d6404adf6e3a625ff", null ],
     [ "ssm_active", "group__act.html#gac821ad7e0264f12d22a91ee9ac9e86e6", null ],
-    [ "ssm_enter", "group__act.html#gae5a581a8b2ef63d0403c80d2fdfc25e0", null ],
+    [ "ssm_enter_int", "group__act.html#ga9b722dfdff8da54693ad9714d9c6f808", null ],
     [ "ssm_leave", "group__act.html#ga70103fe73a28cb722f8e3caf1629f5b5", null ],
     [ "ssm_activate", "group__act.html#gaf9d88d2b23295c4d405e9479c421efca", null ],
     [ "ssm_sv_assign_unsafe", "group__sv.html#gae375396db801571915176a1619bba97b", null ],

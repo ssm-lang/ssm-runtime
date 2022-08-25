@@ -139,7 +139,7 @@ Data Fields</h2></td></tr>
 <p>This header should always be embedded in heap-allocated objects as the first field (at memory offset 0); values of type <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> will point to this header and use its <em>kind</em> and other fields to figure out the size and memory layout of the rest of the object.</p>
 <p>The interpretation and usage of the latter 16 bits of this header, i.e., the <em>info</em> field, depends on the value of <em>kind</em>. For objects encoding variants (e.g., <a class="el" href="structssm__adt1.html" title="The struct template of a heap-allocated ADT object.">ssm_adt1</a>), the <em>count</em> field counts the number of fields in the object payload, while the <em>tag</em> records which variant is inhabited by the object. Meanwhile, vector-style objects (e.g., <a class="el" href="structssm__closure1.html" title="The struct template of a heap-allocated closure object.">ssm_closure1</a>) also use the <em>count</em> field to record the number of values present, but use the <em>cap</em> field to determine the full capacity of the payload. Finally, objects like arrays and blobs do not need to record more than their size, and benefit from making use of all 16 bits to support up to 65536 sizes. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00241">241</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00255">255</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="a8d212098cbfe18fbd9bec648cc0eebb7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8d212098cbfe18fbd9bec648cc0eebb7">&#9670;&nbsp;</a></span>ref_count</h2>
@@ -155,7 +155,7 @@ Data Fields</h2></td></tr>
 
 <p>The number of references to this object. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00242">242</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00256">256</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -173,7 +173,7 @@ Data Fields</h2></td></tr>
 
 <p>The <a class="el" href="group__mem.html#ga0f26e675a76a28f76a4d31787be19250" title="The different kinds of heap objects, enumerated.">ssm_kind</a> of object this is. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00243">243</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00257">257</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -191,7 +191,7 @@ Data Fields</h2></td></tr>
 
 <p>Number of <a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> values in payload. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00246">246</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00260">260</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -209,7 +209,7 @@ Data Fields</h2></td></tr>
 
 <p>Which variant is inhabited by this object. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00247">247</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00261">261</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -241,7 +241,7 @@ Data Fields</h2></td></tr>
 
 <p>Which variant is inhabited by this object. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00251">251</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00265">265</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -273,7 +273,7 @@ Data Fields</h2></td></tr>
 
 <p>16-bit size </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00253">253</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00267">267</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

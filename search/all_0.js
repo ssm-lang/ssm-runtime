@@ -10,11 +10,10 @@ var searchData=
   ['adt_2emd_7',['adt.md',['../adt_8md.html',1,'']]],
   ['alloc_5fmem_8',['alloc_mem',['../ssm-mem_8c.html#afe84928b968b035c36a85decd645d13f',1,'ssm-mem.c']]],
   ['alloc_5fpage_9',['alloc_page',['../ssm-mem_8c.html#a40385bc630b530cbe8cadeff2008421a',1,'ssm-mem.c']]],
-  ['alloc_5fpool_10',['alloc_pool',['../ssm-mem_8c.html#a9df693157bde17eda351ca1a94eae032',1,'ssm-mem.c']]],
-  ['argv_11',['argv',['../structssm__closure1.html#aceb5fb6a3d1c58721131e4b0b3fe8245',1,'ssm_closure1']]],
-  ['arrays_12',['Arrays',['../group__array.html',1,'']]],
-  ['array_2emd_13',['array.md',['../array_8md.html',1,'']]],
-  ['act_14',['act',['../md_doc_act.html',1,'']]],
-  ['adt_15',['adt',['../md_doc_adt.html',1,'']]],
-  ['array_16',['array',['../md_doc_array.html',1,'']]]
+  ['argv_10',['argv',['../structssm__closure1.html#aceb5fb6a3d1c58721131e4b0b3fe8245',1,'ssm_closure1']]],
+  ['arrays_11',['Arrays',['../group__array.html',1,'']]],
+  ['array_2emd_12',['array.md',['../array_8md.html',1,'']]],
+  ['act_13',['act',['../md_doc_act.html',1,'']]],
+  ['adt_14',['adt',['../md_doc_adt.html',1,'']]],
+  ['array_15',['array',['../md_doc_array.html',1,'']]]
 ];

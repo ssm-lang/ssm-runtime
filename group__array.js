@@ -9,5 +9,6 @@ var group__array =
     [ "ssm_array_element", "group__array.html#ga1d8fa4c3b06bea1884611744e261a97c", null ],
     [ "ssm_array_size", "group__array.html#gac4580396c154c34d2267376302f4b8d4", null ],
     [ "ssm_array_heap_size", "group__array.html#ga75e9255fd3b9d39ebb1d1ec0bba8d36e", null ],
-    [ "ssm_new_array", "group__array.html#ga01af8f58423a1e0d5135632e18b01a0b", null ]
+    [ "ssm_new_array", "group__array.html#ga04bd6c0605275d031a8887e5293a94ea", null ],
+    [ "ssm_new_array_int", "group__array.html#gac546d9382bb31ae28a4f55570b1e6b08", null ]
 ];

@@ -15,11 +15,12 @@ var group__closure =
     [ "ssm_closure_push", "group__closure.html#ga3a8b76546d87060af917b4e6d1b2d272", null ],
     [ "ssm_closure_pop", "group__closure.html#ga2c557ccba40dc1ee7124ab385484ee1d", null ],
     [ "ssm_closure_activate", "group__closure.html#ga0bddd427ac9052a9ba74e2bccc46bae4", null ],
+    [ "ssm_new_closure", "group__closure.html#gaac4dc7cfc89aa6b972109aae42aa5938", null ],
     [ "ssm_closure_apply_auto", "group__closure.html#ga070172394583c84f7ff1a93472c6e445", null ],
     [ "ssm_closure_apply_final_auto", "group__closure.html#gaf62e6248814cf417c3ccd5c9b3053da6", null ],
     [ "ssm_closure_free", "group__closure.html#gaba4b57a3eb4997a63db2d978a07deb1f", null ],
     [ "ssm_func_t", "group__closure.html#gaa9ab36bd353c371e02a2fbd3e007e0c6", null ],
-    [ "ssm_new_closure", "group__closure.html#ga2fe1eea56004a8e66c079e254cc3ea91", null ],
+    [ "ssm_new_closure_int", "group__closure.html#ga3a4934f1e4b97097eb42a900be593adc", null ],
     [ "ssm_closure_clone", "group__closure.html#ga67e6195803299954772a7f437d637e53", null ],
     [ "ssm_closure_apply", "group__closure.html#ga2cecadddeda0060a2eecd394b41c0588", null ],
     [ "ssm_closure_apply_final", "group__closure.html#ga8187d02ef5541bc83fe16528b3114c29", null ]

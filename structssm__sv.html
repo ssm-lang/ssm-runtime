@@ -136,14 +136,14 @@ Data Fields</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A scheduled variable that supports scheduled updates with triggers. </p>
-<p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. These should be always allocated on the heap using <a class="el" href="group__sv.html#ga66d8e778566e92663beb3ed3d6b6a7bc" title="Allocate an ssm_sv on the heap.">ssm_new_sv()</a>.</p>
+<p>Scheduled variables are heap-allocated built-in types that represent variables with reference-like semantics in SSM. These should be always allocated on the heap using <a class="el" href="group__sv.html#ga5556c504e76a849304210dcef038b6ed">ssm_new_sv()</a>.</p>
 <p>Routines may directly assign to them in the current instant (<a class="el" href="group__sv.html#gad2813acae8332a57decdbd7bf8d37ec9" title="Instantaneous assignment to a scheduled variable.">ssm_assign()</a>), or schedule a delayed assignment to them (<a class="el" href="group__sv.html#ga46f3f3ac1efff267c6d7441faa81fb54" title="Delayed assignment to a scheduled variable.">ssm_later()</a>). The <em>last_updated</em> time is recorded in each case, sensitive routines, i.e., <em>triggers</em>, are woken up.</p>
 <p>At most one delayed assignment may be scheduled at a time, but a single update may wake any number of sensitive routines.</p>
 <dl class="section invariant"><dt>Invariant</dt><dd><em>later_time</em> != <a class="el" href="group__time.html#ga21ad50b0c4e1feeaeb9c78af1a9d2d9f" title="Time indicating something will never happen.">SSM_NEVER</a> iff this variable in the event queue. </dd>
 <dd>
 for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00557">557</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00589">589</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -157,7 +157,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00558">558</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00590">590</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -175,7 +175,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
 <p>When the variable should be next updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00559">559</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00591">591</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -193,7 +193,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
 <p>When the variable was last updated. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00560">560</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00592">592</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -211,7 +211,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
 <p>List of sensitive continuations. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00561">561</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00593">593</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -229,7 +229,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
 <p>Current value. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00562">562</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00594">594</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -247,7 +247,7 @@ for all <code>ssm_sv_t v</code>, <code>v.mm.kind == SSM_SV_K</code>. </dd></dl>
 
 <p>Buffered value for delayed assignment. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00563">563</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00595">595</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>

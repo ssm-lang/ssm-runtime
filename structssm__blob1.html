@@ -131,7 +131,7 @@ Data Fields</h2></td></tr>
 </div><!-- fragment --><p>The memory layout of all blobs is the same save for the size of the <em>payload</em>, so we use this struct definition as the "base case" of blobs.</p>
 <p>To allow even larger blobs, the actual size of the payload is divided by <a class="el" href="group__blob.html#ga7845e221ce58af6590807c86c911d03d" title="The size resolution for heap-allocated blobs.">SSM_BLOB_SIZE_SCALE</a> while stored in the <em>size</em> field. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01038">1038</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01094">1094</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="af6f11677e3b3ca42a54a71982a72f23f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af6f11677e3b3ca42a54a71982a72f23f">&#9670;&nbsp;</a></span>mm</h2>
@@ -147,7 +147,7 @@ Data Fields</h2></td></tr>
 
 <p>Size-flavored memory management header. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01039">1039</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01095">1095</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -165,7 +165,7 @@ Data Fields</h2></td></tr>
 
 <p>Payload of heap-allocated blob. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01040">1040</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l01096">1096</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -174,10 +174,10 @@ Data Fields</h2></td></tr>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="astructssm__blob1_html_af6f11677e3b3ca42a54a71982a72f23f"><div class="ttname"><a href="structssm__blob1.html#af6f11677e3b3ca42a54a71982a72f23f">ssm_blob1::mm</a></div><div class="ttdeci">struct ssm_mm mm</div><div class="ttdoc">Size-flavored memory management header.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01039">ssm.h:1039</a></div></div>
-<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The memory management metadata &quot;header&quot; for heap-allocated objects.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00241">ssm.h:241</a></div></div>
-<div class="ttc" id="astructssm__blob1_html_ab41cb26c09989a6b93599f80ecbcdb48"><div class="ttname"><a href="structssm__blob1.html#ab41cb26c09989a6b93599f80ecbcdb48">ssm_blob1::payload</a></div><div class="ttdeci">char payload[SSM_BLOB_SIZE_SCALE]</div><div class="ttdoc">Payload of heap-allocated blob.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01040">ssm.h:1040</a></div></div>
-<div class="ttc" id="agroup__blob_html_ga7845e221ce58af6590807c86c911d03d"><div class="ttname"><a href="group__blob.html#ga7845e221ce58af6590807c86c911d03d">SSM_BLOB_SIZE_SCALE</a></div><div class="ttdeci">#define SSM_BLOB_SIZE_SCALE</div><div class="ttdoc">The size resolution for heap-allocated blobs.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01012">ssm.h:1012</a></div></div>
+<div class="ttc" id="astructssm__blob1_html_af6f11677e3b3ca42a54a71982a72f23f"><div class="ttname"><a href="structssm__blob1.html#af6f11677e3b3ca42a54a71982a72f23f">ssm_blob1::mm</a></div><div class="ttdeci">struct ssm_mm mm</div><div class="ttdoc">Size-flavored memory management header.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01095">ssm.h:1095</a></div></div>
+<div class="ttc" id="astructssm__mm_html"><div class="ttname"><a href="structssm__mm.html">ssm_mm</a></div><div class="ttdoc">The memory management metadata &quot;header&quot; for heap-allocated objects.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00255">ssm.h:255</a></div></div>
+<div class="ttc" id="astructssm__blob1_html_ab41cb26c09989a6b93599f80ecbcdb48"><div class="ttname"><a href="structssm__blob1.html#ab41cb26c09989a6b93599f80ecbcdb48">ssm_blob1::payload</a></div><div class="ttdeci">char payload[SSM_BLOB_SIZE_SCALE]</div><div class="ttdoc">Payload of heap-allocated blob.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01096">ssm.h:1096</a></div></div>
+<div class="ttc" id="agroup__blob_html_ga7845e221ce58af6590807c86c911d03d"><div class="ttname"><a href="group__blob.html#ga7845e221ce58af6590807c86c911d03d">SSM_BLOB_SIZE_SCALE</a></div><div class="ttdeci">#define SSM_BLOB_SIZE_SCALE</div><div class="ttdoc">The size resolution for heap-allocated blobs.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l01068">ssm.h:1068</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->

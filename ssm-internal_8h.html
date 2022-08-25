@@ -89,7 +89,9 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 
 <div class="header">
   <div class="summary">
+<a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
+<a href="#typedef-members">Typedefs</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">ssm-internal.h File Reference</div>  </div>
@@ -107,13 +109,14 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="ssm-internal_8h__incl.png" border="0" usemap="#ssm-internal_8h" alt=""/></div>
 <map name="ssm-internal_8h" id="ssm-internal_8h">
-<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="139,5,255,32"/>
-<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="87,80,209,107"/>
-<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="167,155,228,181"/>
+<area shape="rect" title="The internal interface of the SSM runtime." alt="" coords="189,5,305,32"/>
+<area shape="rect" href="ssm-platform_8h.html" title=" " alt="" coords="136,80,259,107"/>
+<area shape="rect" href="ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="216,155,277,181"/>
 <area shape="rect" title=" " alt="" coords="5,229,88,256"/>
 <area shape="rect" title=" " alt="" coords="112,229,187,256"/>
 <area shape="rect" title=" " alt="" coords="211,229,282,256"/>
 <area shape="rect" title=" " alt="" coords="306,229,377,256"/>
+<area shape="rect" title=" " alt="" coords="401,229,468,256"/>
 </map>
 </div>
 </div><div class="textblock"><div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -132,6 +135,15 @@ $(document).ready(function(){initNavTree('ssm-internal_8h.html',''); initResizab
 </div>
 <p><a href="ssm-internal_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Data Structures</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mem__statistics__pool.html">ssm_mem_statistics_pool</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for a heap page pool; used in <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a>.  <a href="structssm__mem__statistics__pool.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structssm__mem__statistics.html">ssm_mem_statistics</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for the heap; filled with <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a>.  <a href="structssm__mem__statistics.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ga3d0f3851fe9b66a8c421974262799fd4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__error.html#ga3d0f3851fe9b66a8c421974262799fd4">SSM_ASSERT</a>(cond)</td></tr>
@@ -155,6 +167,15 @@ Macros</h2></td></tr>
 <tr class="memitem:gab5a6226f024f81622a5ce90dcd9b7388"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388">SSM_MEM_PAGE_SIZE</a>&#160;&#160;&#160;<a class="el" href="group__mem.html#ga9fe24b7e82f37df88331c2acef65ed2c">SSM_MEM_POOL_SIZE</a>(<a class="el" href="group__mem.html#ga8404b692c7f1ab6beaf2ebb5614e4790">SSM_MEM_POOL_COUNT</a>)</td></tr>
 <tr class="memdesc:gab5a6226f024f81622a5ce90dcd9b7388"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of a memory page; must be greater than <a class="el" href="group__mem.html#gafd44b83b7d4fb58e0fccd2380a540a52" title="The size of the largest memory pool.">SSM_MEM_POOL_MAX</a>.  <a href="group__mem.html#gab5a6226f024f81622a5ce90dcd9b7388">More...</a><br /></td></tr>
 <tr class="separator:gab5a6226f024f81622a5ce90dcd9b7388"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
+Typedefs</h2></td></tr>
+<tr class="memitem:gac7ae9a342c295d6d62852b3924b768b1"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structssm__mem__statistics__pool.html">ssm_mem_statistics_pool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gac7ae9a342c295d6d62852b3924b768b1">ssm_mem_statistics_pool_t</a></td></tr>
+<tr class="memdesc:gac7ae9a342c295d6d62852b3924b768b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for a heap page pool; used in <a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5" title="Statistics for the heap; filled with ssm_mem_statistics_collect().">ssm_mem_statistics_t</a>.  <a href="group__mem.html#gac7ae9a342c295d6d62852b3924b768b1">More...</a><br /></td></tr>
+<tr class="separator:gac7ae9a342c295d6d62852b3924b768b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ga11df8a853242068faf5de7c8258c96d5"><td class="memItemLeft" align="right" valign="top">typedef struct <a class="el" href="structssm__mem__statistics.html">ssm_mem_statistics</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a></td></tr>
+<tr class="memdesc:ga11df8a853242068faf5de7c8258c96d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics for the heap; filled with <a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390" title="Collect and return statistics about the heap.">ssm_mem_statistics_collect()</a>.  <a href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">More...</a><br /></td></tr>
+<tr class="separator:ga11df8a853242068faf5de7c8258c96d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -185,6 +206,9 @@ Functions</h2></td></tr>
 <tr class="memitem:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">ssm_mem_destroy</a> (void(*free_page_handler)(void *))</td></tr>
 <tr class="memdesc:ga478b2d53579f050c74c7374e75dd8bcb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tears down the underlying allocator system.  <a href="group__mem.html#ga478b2d53579f050c74c7374e75dd8bcb">More...</a><br /></td></tr>
 <tr class="separator:ga478b2d53579f050c74c7374e75dd8bcb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gae2ba32721536023e424c4b2679b65390"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__mem.html#gae2ba32721536023e424c4b2679b65390">ssm_mem_statistics_collect</a> (<a class="el" href="group__mem.html#ga11df8a853242068faf5de7c8258c96d5">ssm_mem_statistics_t</a> *stats)</td></tr>
+<tr class="memdesc:gae2ba32721536023e424c4b2679b65390"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collect and return statistics about the heap.  <a href="group__mem.html#gae2ba32721536023e424c4b2679b65390">More...</a><br /></td></tr>
+<tr class="separator:gae2ba32721536023e424c4b2679b65390"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The internal interface of the SSM runtime. </p>

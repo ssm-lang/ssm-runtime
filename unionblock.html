@@ -122,7 +122,7 @@ Data Fields</h2></td></tr>
 <p>The size of each block varies depending on which memory pool it resides in. When a block is being used (allocated), <em>block_buf</em> effectively gives a pointer to the beginning that block that can be indexed into.</p>
 <p>When a block is not being used, it is maintained in a <em>free list</em>. If it is not at the head of the free list, then it is pointed to by the <em>free_list_next</em> field of some other block_t, while its own <em>free_list_next</em> points to the next block in the free list. To avoid initializing the <em>free_list_next</em> fields of "fresh" blocks, when <em>free_list_next</em> is <a class="el" href="ssm-mem_8c.html#a6f798b3dcc78cc8ef1fe40aff68ccfd8" title="A &quot;pointer&quot; that points to the next contiguous block in memory.">UNINITIALIZED_FREE_BLOCK</a>, the next free block contiguously follows the current block in memory. The last free block points to <a class="el" href="ssm-mem_8c.html#ad8d38e174ca767601ec126ef90cf89ab" title="Sentinel value indicating the end of the free list.">END_OF_FREELIST</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00027">27</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00028">28</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 </div><h2 class="groupheader">Field Documentation</h2>
 <a id="ab75a6cd071ce51962a966b713463dd34"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab75a6cd071ce51962a966b713463dd34">&#9670;&nbsp;</a></span>free_list_next</h2>
@@ -138,7 +138,7 @@ Data Fields</h2></td></tr>
 
 <p>Pointer to the next block. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00028">28</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00029">29</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
@@ -156,7 +156,7 @@ Data Fields</h2></td></tr>
 
 <p>Variable-size buffer of the block. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00029">29</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00030">30</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>

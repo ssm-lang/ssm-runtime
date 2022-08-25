@@ -112,6 +112,8 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
+<tr class="memitem:ga5126bbb129deaf5b0fac198760fc38be"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga5126bbb129deaf5b0fac198760fc38be">ssm_new_adt</a>(fc,  tag)</td></tr>
+<tr class="separator:ga5126bbb129deaf5b0fac198760fc38be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ga1db3e00247a1f1a15dd1aff6dbcb5be6"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga1db3e00247a1f1a15dd1aff6dbcb5be6">ssm_adt_field</a>(v,  i)&#160;&#160;&#160;(&amp;*<a class="el" href="group__util.html#gaf8c317a42292b61c93aae91e59118a46">container_of</a>((v).heap_ptr, struct <a class="el" href="structssm__adt1.html">ssm_adt1</a>, mm)-&gt;fields)[i]</td></tr>
 <tr class="memdesc:ga1db3e00247a1f1a15dd1aff6dbcb5be6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Access the field of an ADT object.  <a href="group__adt.html#ga1db3e00247a1f1a15dd1aff6dbcb5be6">More...</a><br /></td></tr>
 <tr class="separator:ga1db3e00247a1f1a15dd1aff6dbcb5be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,11 +132,44 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ga7af49e1e09fce985c20fd37388207b55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">ssm_new_adt</a> (uint8_t field_count, uint8_t tag)</td></tr>
-<tr class="memdesc:ga7af49e1e09fce985c20fd37388207b55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new ADT object on the heap.  <a href="group__adt.html#ga7af49e1e09fce985c20fd37388207b55">More...</a><br /></td></tr>
-<tr class="separator:ga7af49e1e09fce985c20fd37388207b55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:gadc6dedffb396dfb7f18ead38f9f2e0d3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="unionssm__value__t.html">ssm_value_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__adt.html#gadc6dedffb396dfb7f18ead38f9f2e0d3">ssm_new_adt_int</a> (uint8_t field_count, uint8_t tag)</td></tr>
+<tr class="memdesc:gadc6dedffb396dfb7f18ead38f9f2e0d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a new ADT object on the heap.  <a href="group__adt.html#gadc6dedffb396dfb7f18ead38f9f2e0d3">More...</a><br /></td></tr>
+<tr class="separator:gadc6dedffb396dfb7f18ead38f9f2e0d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
+<a id="ga5126bbb129deaf5b0fac198760fc38be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ga5126bbb129deaf5b0fac198760fc38be">&#9670;&nbsp;</a></span>ssm_new_adt</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define ssm_new_adt</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">fc, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">tag&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  (fprintf(stderr, <span class="stringliteral">&quot;%s:%d:ssm_new_adt(%d, %d)\n&quot;</span>, __FILE__, __LINE__, (fc),    \</div>
+<div class="line">           (tag)),                                                             \</div>
+<div class="line">   ssm_new_adt_int((fc), (tag)))</div>
+</div><!-- fragment -->
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00512">512</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+
+</div>
+</div>
 <a id="ga1db3e00247a1f1a15dd1aff6dbcb5be6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ga1db3e00247a1f1a15dd1aff6dbcb5be6">&#9670;&nbsp;</a></span>ssm_adt_field</h2>
 
@@ -174,7 +209,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the <em>i'th</em> field of <em>v</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00505">505</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00537">537</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -204,7 +239,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the tag of <em>v</em>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00516">516</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00548">548</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -226,7 +261,7 @@ Functions</h2></td></tr>
 
 <p>Obtain number of fields in the ADT pointed by <em>v</em>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00520">520</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00552">552</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -255,7 +290,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>the size of the ADT object in the heap. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00527">527</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00559">559</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
@@ -277,19 +312,19 @@ Functions</h2></td></tr>
 
 <p>Compute the size of an ADT already allocated on the heap. </p>
 
-<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00531">531</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm_8h_source.html#l00563">563</a> of file <a class="el" href="ssm_8h_source.html">ssm.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ga7af49e1e09fce985c20fd37388207b55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ga7af49e1e09fce985c20fd37388207b55">&#9670;&nbsp;</a></span>ssm_new_adt()</h2>
+<a id="gadc6dedffb396dfb7f18ead38f9f2e0d3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#gadc6dedffb396dfb7f18ead38f9f2e0d3">&#9670;&nbsp;</a></span>ssm_new_adt_int()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_adt </td>
+          <td class="memname"><a class="el" href="unionssm__value__t.html">ssm_value_t</a> ssm_new_adt_int </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>field_count</em>, </td>
@@ -319,14 +354,14 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="unionssm__value__t.html" title="SSM values are either &quot;packed&quot; values or heap-allocated.">ssm_value_t</a> poining to the ADT object on the heap. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00218">218</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ssm-mem_8c_source.html#l00274">274</a> of file <a class="el" href="ssm-mem_8c_source.html">ssm-mem.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 </div><!-- doc-content -->
-<div class="ttc" id="agroup__adt_html_ga1db3e00247a1f1a15dd1aff6dbcb5be6"><div class="ttname"><a href="group__adt.html#ga1db3e00247a1f1a15dd1aff6dbcb5be6">ssm_adt_field</a></div><div class="ttdeci">#define ssm_adt_field(v, i)</div><div class="ttdoc">Access the field of an ADT object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00505">ssm.h:505</a></div></div>
-<div class="ttc" id="agroup__mem_html_ga8036e301aaee6fbac00bd2cdaa0dea8c"><div class="ttname"><a href="group__mem.html#ga8036e301aaee6fbac00bd2cdaa0dea8c">ssm_marshal</a></div><div class="ttdeci">#define ssm_marshal(v)</div><div class="ttdoc">Construct an ssm_value_t from a 31-bit integral value.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00278">ssm.h:278</a></div></div>
+<div class="ttc" id="agroup__adt_html_ga1db3e00247a1f1a15dd1aff6dbcb5be6"><div class="ttname"><a href="group__adt.html#ga1db3e00247a1f1a15dd1aff6dbcb5be6">ssm_adt_field</a></div><div class="ttdeci">#define ssm_adt_field(v, i)</div><div class="ttdoc">Access the field of an ADT object.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00537">ssm.h:537</a></div></div>
+<div class="ttc" id="agroup__mem_html_ga8036e301aaee6fbac00bd2cdaa0dea8c"><div class="ttname"><a href="group__mem.html#ga8036e301aaee6fbac00bd2cdaa0dea8c">ssm_marshal</a></div><div class="ttdeci">#define ssm_marshal(v)</div><div class="ttdoc">Construct an ssm_value_t from a 31-bit integral value.</div><div class="ttdef"><b>Definition:</b> <a href="ssm_8h_source.html#l00292">ssm.h:292</a></div></div>
 <!-- HTML footer for doxygen 1.8.20-->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
