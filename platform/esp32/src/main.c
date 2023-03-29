@@ -5,7 +5,11 @@
 #include "driver/gpio.h"
 #include "freertos/semphr.h"
 
+#include <ssm-platform.h>
+#include <ssm-internal.h>
+
 #define BLINK_GPIO GPIO_NUM_2
+
 
 SemaphoreHandle_t xSemaphore;
 int max_takes;
@@ -19,6 +23,7 @@ static bool timer_on_alarm_cb(gptimer_handle_t timer, const gptimer_alarm_event_
 
 void app_main(void)
 {
+	int test_macro = SSM_MEM_POOL_MIN;
 	printf("running\r\n");
 	max_takes = 10;
 	xSemaphore = xSemaphoreCreateBinary();
