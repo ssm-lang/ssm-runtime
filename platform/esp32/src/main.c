@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include "driver/gptimer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -8,92 +9,81 @@
 #include <ssm-platform.h>
 #include <ssm-internal.h>
 
+
+typedef uint64_t ssm_time_t;
+
 #define BLINK_GPIO GPIO_NUM_2
 
+gptimer_handle_t timer;
+SemaphoreHandle_t tick_sem;
 
-SemaphoreHandle_t xSemaphore;
-int max_takes;
 
 static bool timer_on_alarm_cb(gptimer_handle_t timer, const gptimer_alarm_event_data_t *edata, void *user_ctx)
 {
 	BaseType_t xHighPriTaskWoken = pdFALSE;
-	xSemaphoreGiveFromISR( xSemaphore, &xHighPriTaskWoken);
+	xSemaphoreGiveFromISR( tick_sem, &xHighPriTaskWoken);
 	return false;
 }
 
-void app_main(void)
+void ssm_platform_timer_start()
 {
-	int test_macro = SSM_MEM_POOL_MIN;
-	printf("running\r\n");
-	max_takes = 10;
-	xSemaphore = xSemaphoreCreateBinary();
-	if (xSemaphore == NULL){
-		printf("error creating semaphore, restarting\r\n");
-		fflush(stdout);
-    		esp_restart();
-	}
-	// Must give sem once before taking
-	printf("sem created \r\n");
-	gptimer_handle_t gptimer = NULL;
+	timer = NULL;
 	gptimer_config_t timer_config = {
     		.clk_src = GPTIMER_CLK_SRC_DEFAULT,
     		.direction = GPTIMER_COUNT_UP,
     		.resolution_hz = 1 * 1000 * 1000, // 1MHz, 1 tick = 1us
 	};
-	
-	gpio_reset_pin(BLINK_GPIO);
-    	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);	
-	gpio_set_level(BLINK_GPIO, 0);	
-	ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &gptimer));
-	printf("timer config set \r\n");	
+	ESP_ERROR_CHECK(gptimer_new_timer(&timer_config, &timer));
 	gptimer_alarm_config_t alarm_config = {
     		.alarm_count = 1000000, // initial alarm target = 1s @resolution 1MHz
 	};
-	ESP_ERROR_CHECK(gptimer_set_alarm_action(gptimer, &alarm_config));
-	printf("alarm set\r\n");
-	gptimer_event_callbacks_t cbs = {
+	ESP_ERROR_CHECK(gptimer_set_alarm_action(timer, &alarm_config));
+	gptimer_event_callbacks_t cb = {
 		.on_alarm = timer_on_alarm_cb,
 	};
-	ESP_ERROR_CHECK(gptimer_register_event_callbacks(gptimer, &cbs, NULL));
-	printf("callback registered \r\n");
-	ESP_ERROR_CHECK(gptimer_enable(gptimer));
-	printf("timer enabled\r\n");
-	ESP_ERROR_CHECK(gptimer_start(gptimer));
-	printf("timer started \r\n");
-	fflush(stdout);
-	int curr_level = 0;
-	int num_ticks_to_wait = 10;
-	int original = max_takes;
-	while(true){
-		if(max_takes <= 0){
+	ESP_ERROR_CHECK(gptimer_register_event_callbacks(timer, &cb, NULL));
+	ESP_ERROR_CHECK(gptimer_enable(timer));
+	ESP_ERROR_CHECK(gptimer_start(timer));
+}
+
+void tick_loop(void)
+{
+	ssm_platform_timer_start();
+	ssm_tick();// TODO
+	for (;;) {
+		ssm_time_t platform_time;
+		esp_err_t err = gptimer_get_raw_count(gptimer, &platform_time);
+		if (err != ESP_OK){
+			printf("err during timer raw count read \n");
+			fflush(stdout);
 			break;
 		}
-		// No need to give sem back since isr gives
-		if(xSemaphoreTake( xSemaphore, (TickType_t) num_ticks_to_wait) == pdTRUE){
-			printf("Took sem \r\n");
-			if (curr_level == 0){
-				gpio_set_level(BLINK_GPIO, 1);
-			}else {
-				gpio_set_level(BLINK_GPIO, 0);
-			}
-			curr_level = (curr_level == 0) ? 1 : 0;	
-			max_takes--;
-			uint64_t raw_count;
-			esp_err_t err = gptimer_get_raw_count(gptimer, &raw_count);
-			if (err != ESP_OK){
-				printf("err during timer raw count read \r\n");
-				break;
-			}
-			gptimer_alarm_config_t alarm_config = {
-        			.alarm_count = raw_count + 1000000, // alarm in next 1s
-    			};
-			gptimer_set_alarm_action(gptimer, &alarm_config);
-		} else{
-			printf("Unable to take sem within %d ticks, looping again \r\n", num_ticks_to_wait);
+		ssm_time_t next_event_time = ssm_next_event_time();// TODO
+		// Check if there is an input somehow? For now assume none now but one exists in the future
+		int has_input = 0;
+		int has_future_input = 1;
+		if (has_input) {
+			// Schedule event
+		} else if (platform_time <= next_event_time) {
+			ssm_tick();
+		} else if (has_future_input){
+			//TODO: Move to the top of the loop
+			int num_ticks_to_wait = 10; // TODO: Remove and set INCLUDE_vTaskSuspend in config fail to wait indef
+			xSemaphoreTake( xSemaphore, (TickType_t) num_ticks_to_wait);
 		}
+	}	
+}
+
+void app_main(void)
+{
+	tick_sem = xSemaphoreCreateBinary();
+	if (tick_sem == NULL){
+		printf("error creating semaphore, restarting\n");
 		fflush(stdout);
+    		esp_restart();
 	}
-	printf("Took sem %d times, restarting \r\n", original - max_takes);
-    	fflush(stdout);
-    	esp_restart();
+	gpio_reset_pin(BLINK_GPIO);
+    	gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);	
+	gpio_set_level(BLINK_GPIO, 0);
+	tick_loop();
 }
