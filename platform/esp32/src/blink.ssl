@@ -1,0 +1,19 @@
+$$$
+#include <stdio.h>
+int blink_count = 0;
+void is_blinking(){
+	printf("I am blinking %d \n", blink_count++); 
+}
+$$$
+
+ms t = 1000000 * t
+
+main cin cout =
+	let led = new 0
+	loop
+		after ms 50, led <- 0
+		wait led
+		$is_blinking()
+
+
+
