@@ -1,5 +1,6 @@
 #include <ssm-internal.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 void ssm_throw(enum ssm_error reason, const char *file, int line,
                const char *func) {

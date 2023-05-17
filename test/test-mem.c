@@ -2,6 +2,7 @@
 #include <ssm.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifndef CONFIG_MEM_STATS
 #error "CONFIG_MEM_STATS must be defined to run these tests"
@@ -53,7 +54,7 @@ void print_stats(ssm_mem_statistics_t *stats) {
   printf("\n");
 }
 
-int main() {
+int main(void) {
   int num_errors = 0;
   ssm_mem_statistics_t stats;
 

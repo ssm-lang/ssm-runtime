@@ -15,6 +15,7 @@
 #include <ssm.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef ssm_value_t i8;

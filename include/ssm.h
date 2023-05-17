@@ -10,9 +10,8 @@
 #define _SSM_H
 
 #include <stdbool.h> /* For bool, true, false */
-#include <stddef.h>  /* For offsetof */
+#include <stddef.h>  /* For offsetof and size_t */
 #include <stdint.h>  /* For uint16_t, UINT64_MAX etc. */
-#include <stdlib.h>  /* For size_t */
 
 #ifdef CONFIG_MEM_TRACE
 #include <stdio.h>

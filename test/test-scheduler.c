@@ -1,6 +1,7 @@
 #include <ssm-internal.h>
 #include <ssm.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #ifndef SSM_DEBUG
@@ -29,13 +30,13 @@ ssm_act_t acts[NUM_ACTS];
 #define NUM_TRIGGERS 1024
 ssm_trigger_t triggers[NUM_TRIGGERS];
 
-void check_starts_initialized() {
+void check_starts_initialized(void) {
   SSM_ASSERT(ssm_now() == 0L);
   SSM_ASSERT(event_queue_len == 0);
   SSM_ASSERT(act_queue_len == 0);
 }
 
-void reset_all() {
+void reset_all(void) {
   for (int i = 0; i < NUM_VARIABLES; i++)
     ssm_drop(variables[i]);
   ssm_reset();
@@ -45,7 +46,7 @@ void reset_all() {
   check_starts_initialized();
 }
 
-void event_queue_basic() {
+void event_queue_basic(void) {
   reset_all();
   SSM_ASSERT(ssm_next_event_time() == SSM_NEVER);
   SSM_ASSERT(ssm_to_sv(variables[0])->last_updated != ssm_now());
@@ -60,7 +61,7 @@ void event_queue_basic() {
   SSM_ASSERT(event_queue_len == 0);
 }
 
-void print_event_queue() {
+void print_event_queue(void) {
   printf("Event queue: ");
   for (int i = 1; i <= event_queue_len; i++)
     if (event_queue[i])
@@ -181,7 +182,7 @@ void event_queue_unschedule_string(const char *input, int n,
   printf("\n");
 }
 
-void act_queue_basic() {
+void act_queue_basic(void) {
   reset_all();
   SSM_ASSERT(act_queue_len == 0);
   SSM_ASSERT(!acts[0].scheduled);
@@ -271,7 +272,7 @@ void step1(ssm_act_t *act) {
   printf("step1 ");
 }
 
-void trigger_basic() {
+void trigger_basic(void) {
   reset_all();
 
   acts[0].step = step0;
