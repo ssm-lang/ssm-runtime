@@ -33,7 +33,6 @@ TEST_DIR := test
 EXE_DIR := examples/$(PLATFORM)
 DOC_DIR := doc
 PLATFORM_DIR := platform/$(PLATFORM)
-GCOVR_CFG := test/gcovr.cfg
 
 LIB_SRC := $(wildcard $(SRC_DIR)/*.c)
 LIB_INC := $(wildcard include/*.h)
@@ -134,7 +133,7 @@ $(TLIB_OBJ) $(TEST_OBJ): $(BUILD_DIR)/test_%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 $(PLATFORM_OBJ): $(BUILD_DIR)/%.o: %.c $(LIB_INC) | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(COV_TGT): $(GCOVR_CFG) $(TEST_TGT)
+$(COV_TGT): $(TEST_TGT)
 	@for i in $(TEST_TGT) ; do \
 		echo ./$$i ;\
 		./$$i >/dev/null || exit $$? ;\
