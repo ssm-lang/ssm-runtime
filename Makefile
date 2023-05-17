@@ -139,6 +139,7 @@ $(COV_TGT): $(GCOVR_CFG) $(TEST_TGT)
 		echo ./$$i ;\
 		./$$i >/dev/null || exit $$? ;\
 	done
+	gcovr --version
 	gcovr --config $(GCOVR_CFG)
 
 $(DOC_TGT): $(DOC_CFG) $(DOC_SRC) | $(BUILD_DIR)
