@@ -1,11 +1,11 @@
 <map id="ssm&#45;mem.c" name="ssm&#45;mem.c">
-<area shape="rect" id="node1" title="SSM runtime memory management and allocation." alt="" coords="248,5,347,32"/>
-<area shape="rect" id="node2" title=" " alt="" coords="44,80,119,107"/>
-<area shape="rect" id="node3" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="143,80,259,107"/>
-<area shape="rect" id="node5" href="$ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="216,229,277,256"/>
-<area shape="rect" id="node9" title=" " alt="" coords="306,304,377,331"/>
-<area shape="rect" id="node10" title=" " alt="" coords="401,304,468,331"/>
-<area shape="rect" id="node4" href="$ssm-platform_8h.html" title=" " alt="" coords="87,155,209,181"/>
+<area shape="rect" id="node1" title="SSM runtime memory management and allocation." alt="" coords="240,5,339,32"/>
+<area shape="rect" id="node2" title=" " alt="" coords="36,80,111,107"/>
+<area shape="rect" id="node3" href="$ssm-internal_8h.html" title="The internal interface of the SSM runtime." alt="" coords="135,80,251,107"/>
+<area shape="rect" id="node5" href="$ssm_8h.html" title="Interface to the SSM runtime." alt="" coords="208,229,269,256"/>
+<area shape="rect" id="node9" title=" " alt="" coords="307,304,373,331"/>
+<area shape="rect" id="node10" title=" " alt="" coords="378,80,449,107"/>
+<area shape="rect" id="node4" href="$ssm-platform_8h.html" title=" " alt="" coords="79,155,201,181"/>
 <area shape="rect" id="node6" title=" " alt="" coords="5,304,88,331"/>
 <area shape="rect" id="node7" title=" " alt="" coords="112,304,187,331"/>
 <area shape="rect" id="node8" title=" " alt="" coords="211,304,282,331"/>
